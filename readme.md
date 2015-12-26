@@ -2,7 +2,7 @@ Application template
 ====================
 
 [![Dependencies Status](https://img.shields.io/david/stbsdk/boilerplate.svg?style=flat-square)](https://david-dm.org/stbsdk/boilerplate)
-[![Gitter](https://img.shields.io/badge/gitter-join%20chat-blue.svg?style=flat-square)](https://gitter.im/DarkPark/stb)
+[![Gitter](https://img.shields.io/badge/gitter-join%20chat-blue.svg?style=flat-square)](https://gitter.im/DarkPark/stbsdk)
 
 
 ## Usage ##
