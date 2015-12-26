@@ -1,0 +1,27 @@
+{
+    "name": "stb-boilerplate",
+    "version": "1.0.0",
+    "description": "Application template.",
+    "author": {
+        "name": "Stanislav Kalashnik",
+        "email": "darkpark.main@gmail.com"
+    },
+    "repository": "stbsdk/boilerplate",
+    "scripts": {
+        "lint": "eslint *.js",
+        "jsdoc": "jsdoc --destination doc *.js readme.md"
+    },
+    "dependencies": {
+
+    },
+    "devDependencies": {},
+    "keywords": [
+        "stb",
+        "stbsdk",
+        "framework",
+        "app",
+        "boilerplate",
+        "template"
+    ],
+    "license": "GPL-3.0"
+}
