@@ -8,4 +8,4 @@
 'use strict';
 
 // use all default STB tasks
-require('stb-gulp');
+var gulp = require('stb-gulp');
