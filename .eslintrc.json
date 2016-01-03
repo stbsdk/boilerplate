@@ -6,7 +6,8 @@
     },
 
     "globals": {
-        "DEBUG": false
+        "DEBUG": false,
+        "debug": false
     },
 
     "rules": {
