@@ -1,8 +1,5 @@
 /**
- * Gettext localization configuration.
- *
- * @author Stanislav Kalashnik <darkpark.main@gmail.com>
- * @license GNU GENERAL PUBLIC LICENSE Version 3
+ * Gettext localization configuration for lang gulp task.
  */
 
 'use strict';

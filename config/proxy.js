@@ -1,8 +1,5 @@
 /**
- * Code-proxy server configuration.
- *
- * @author Stanislav Kalashnik <darkpark.main@gmail.com>
- * @license GNU GENERAL PUBLIC LICENSE Version 3
+ * Code-proxy server configuration for proxy gulp task.
  */
 
 'use strict';

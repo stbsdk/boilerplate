@@ -1,12 +1,9 @@
 /**
- * Remote STB device connection configuration.
+ * Remote STB device connection configuration for ssh gulp task.
  *
  * Available template variables:
  *     {host} - client ip where this gulp task is running
  *     {port} - client port where this gulp task is running
- *
- * @author Stanislav Kalashnik <darkpark.main@gmail.com>
- * @license GNU GENERAL PUBLIC LICENSE Version 3
  */
 
 'use strict';

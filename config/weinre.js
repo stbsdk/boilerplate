@@ -1,8 +1,5 @@
 /**
- * WEb INspector REmote debugger server configuration.
- *
- * @author Stanislav Kalashnik <darkpark.main@gmail.com>
- * @license GNU GENERAL PUBLIC LICENSE Version 3
+ * WEb INspector REmote debugger server configuration for weinre gulp task.
  */
 
 'use strict';
