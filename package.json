@@ -11,10 +11,10 @@
         "lint": "eslint *.js"
     },
     "dependencies": {
-        "stb-app": "stbsdk/app",
-        "stb-develop": "stbsdk/develop",
-        "stb-gulp": "stbsdk/gulp",
-        "stb-keys": "stbsdk/keys"
+        "stb-app": "1.*.*",
+        "stb-develop": "1.*.*",
+        "stb-gulp": "1.*.*",
+        "stb-keys": "1.*.*"
     },
     "keywords": [
         "stb",
