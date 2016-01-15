@@ -1,6 +1,6 @@
 /**
  * Global application configuration.
- * Can store run-time options, paths, flags and so on.
+ * Can store run-time options, API urls, paths, execution flags and so on.
  */
 
 'use strict';
