@@ -1,8 +1,12 @@
 /**
- * Gulp main entry point.
+ * Gulp main entry point and tasks configurations.
  */
 
 'use strict';
 
-// use all default STB tasks
-var gulp = require('stb-gulp');
+// load STB gulp modules
+require('stb-gulp');
+
+// tasks configurations
+// to overwrite defaults
+module.exports = {};
