@@ -12,17 +12,11 @@
     },
     "dependencies": {
         "stb-app": "1.*.*",
-        "stb-develop": "1.*.*",
         "stb-gulp": "1.*.*",
         "stb-keys": "1.*.*"
     },
-    "keywords": [
-        "stb",
-        "stbsdk",
-        "framework",
-        "app",
-        "boilerplate",
-        "template"
-    ],
+    "devDependencies": {
+        "stb-develop": "1.*.*"
+    },
     "license": "GPL-3.0"
 }
