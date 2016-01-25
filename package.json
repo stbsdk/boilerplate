@@ -11,11 +11,21 @@
         "lint": "eslint *.js"
     },
     "dependencies": {
+        "spa-gulp-gettext": "1.*.*",
+        "spa-gulp-jade": "1.*.*",
+        "spa-gulp-zip": "1.*.*",
         "stb-app": "1.*.*",
+        "stb-component-page": "1.*.*",
         "stb-gulp": "1.*.*",
+        "stb-gulp-sass": "1.*.*",
+        "stb-gulp-webpack": "1.*.*",
         "stb-keys": "1.*.*"
     },
     "devDependencies": {
+        "spa-gulp-eslint": "1.*.*",
+        "spa-gulp-livereload": "1.*.*",
+        "spa-gulp-repl": "1.*.*",
+        "spa-gulp-static": "1.*.*",
         "stb-develop": "1.*.*"
     },
     "license": "GPL-3.0"
