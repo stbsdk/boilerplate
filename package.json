@@ -25,8 +25,7 @@
         "spa-gulp-eslint": "1.*.*",
         "spa-gulp-livereload": "1.*.*",
         "spa-gulp-repl": "1.*.*",
-        "spa-gulp-static": "1.*.*",
-        "stb-develop": "1.*.*"
+        "spa-gulp-static": "1.*.*"
     },
     "license": "GPL-3.0"
 }
