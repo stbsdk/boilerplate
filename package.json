@@ -13,12 +13,12 @@
     "dependencies": {
         "spa-gulp-gettext": "1.*.*",
         "spa-gulp-jade": "1.*.*",
+        "spa-gulp-webpack": "1.*.*",
         "spa-gulp-zip": "1.*.*",
         "stb-app": "1.*.*",
         "stb-component-page": "1.*.*",
         "stb-gulp": "1.*.*",
         "stb-gulp-sass": "1.*.*",
-        "stb-gulp-webpack": "1.*.*",
         "stb-keys": "1.*.*"
     },
     "devDependencies": {
