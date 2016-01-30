@@ -11,25 +11,25 @@
         "lint": "eslint *.js"
     },
     "dependencies": {
-        "stb-app": "1.*.*",
-        "stb-keys": "1.*.*",
+        "stb-app": "stbsdk/app",
+        "stb-keys": "stbsdk/keys",
 
-        "stb-component-page": "1.*.*",
+        "stb-component-page": "stbsdk/component-page",
 
-        "spa-gulp": "1.*.*",
-        "spa-gulp-gettext": "1.*.*",
-        "spa-gulp-jade": "1.*.*",
-        "spa-gulp-webpack": "1.*.*",
-        "spa-gulp-zip": "1.*.*",
+        "spa-gulp": "spasdk/gulp",
+        "spa-gulp-gettext": "spasdk/gulp-gettext",
+        "spa-gulp-jade": "spasdk/gulp-jade",
+        "spa-gulp-webpack": "spasdk/gulp-webpack",
+        "spa-gulp-zip": "spasdk/gulp-zip",
 
-        "stb-gulp": "1.*.*",
-        "stb-gulp-sass": "1.*.*"
+        "stb-gulp": "stbsdk/gulp",
+        "stb-gulp-sass": "stbsdk/gulp-sass"
     },
     "devDependencies": {
-        "spa-gulp-eslint": "1.*.*",
-        "spa-gulp-livereload": "1.*.*",
-        "spa-gulp-repl": "1.*.*",
-        "spa-gulp-static": "1.*.*"
+        "spa-gulp-eslint": "spasdk/gulp-eslint",
+        "spa-gulp-livereload": "spasdk/gulp-livereload",
+        "spa-gulp-repl": "spasdk/gulp-repl",
+        "spa-gulp-static": "spasdk/gulp-static"
     },
     "license": "GPL-3.0"
 }
