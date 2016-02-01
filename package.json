@@ -8,6 +8,7 @@
     },
     "repository": "stbsdk/boilerplate",
     "scripts": {
+        "start": "stbsdk",
         "lint": "eslint *.js"
     },
     "dependencies": {
