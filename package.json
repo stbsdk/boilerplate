@@ -16,20 +16,7 @@
 
         "stb-component-page": "stbsdk/component-page",
 
-        "spa-gulp": "spasdk/gulp",
-        "spa-gulp-gettext": "spasdk/gulp-gettext",
-        "spa-gulp-jade": "spasdk/gulp-jade",
-        "spa-gulp-webpack": "spasdk/gulp-webpack",
-        "spa-gulp-zip": "spasdk/gulp-zip",
-
-        "stb-gulp": "stbsdk/gulp",
-        "stb-gulp-sass": "stbsdk/gulp-sass"
-    },
-    "devDependencies": {
-        "spa-gulp-eslint": "spasdk/gulp-eslint",
-        "spa-gulp-livereload": "spasdk/gulp-livereload",
-        "spa-gulp-repl": "spasdk/gulp-repl",
-        "spa-gulp-static": "spasdk/gulp-static"
+        "stbsdk": "spasdk/stbsdk"
     },
     "license": "GPL-3.0"
 }
