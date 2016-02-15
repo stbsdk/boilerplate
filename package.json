@@ -8,16 +8,14 @@
     },
     "repository": "stbsdk/boilerplate",
     "scripts": {
-        "start": "stbsdk",
+        "start": "stbsdk default",
+        "build": "stbsdk jade:build webpack:build sass:cache sass:build",
         "lint": "eslint *.js"
     },
     "dependencies": {
         "stb-app": "stbsdk/app",
         "stb-rc": "stbsdk/rc",
-
-        "stb-component-page": "stbsdk/component-page",
-
-        "stbsdk": "spasdk/stbsdk"
+        "stb-component-page": "stbsdk/component-page"
     },
     "license": "GPL-3.0"
 }
