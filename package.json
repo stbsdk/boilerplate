@@ -13,7 +13,7 @@
     },
     "dependencies": {
         "stb-app": "stbsdk/app",
-        "stb-keys": "stbsdk/keys",
+        "stb-rc": "stbsdk/rc",
 
         "stb-component-page": "stbsdk/component-page",
 
