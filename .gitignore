@@ -1,5 +1,7 @@
 .idea
+.sdk
 node_modules
 app/js/*.map
 app/css/*.map
+src/js/.cache
 src/sass/.cache
