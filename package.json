@@ -8,9 +8,10 @@
     },
     "repository": "stbsdk/boilerplate",
     "scripts": {
-        "start": "stbsdk default",
-        "build": "stbsdk jade:build webpack:build sass:cache sass:build",
-        "lint": "eslint *.js"
+        "start": "stbsdk",
+        "build": "stbsdk build",
+        "watch": "stbsdk watch",
+        "serve": "stbsdk serve"
     },
     "dependencies": {
         "stb-app": "stbsdk/app",
