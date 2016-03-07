@@ -1,5 +1,6 @@
 /**
- * Application geometry options for js/sass.
+ * Application geometry options.
+ * Automatically loaded on application initialization and available as app.metrics.
  */
 
 'use strict';
