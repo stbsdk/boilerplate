@@ -16,7 +16,8 @@
     "dependencies": {
         "stb-app": "stbsdk/app",
         "stb-rc": "stbsdk/rc",
-        "stb-component-page": "stbsdk/component-page"
+        "stb-component-page": "stbsdk/component-page",
+        "stb-eslint-config": "stbsdk/eslint-config"
     },
     "license": "GPL-3.0"
 }
