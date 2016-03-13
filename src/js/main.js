@@ -4,22 +4,20 @@
 
 'use strict';
 
-var app    = require('stb-app'),
-    router = require('spa-router');
-
-
-// all resources are loaded
-app.once('load', function () {
-    // set pages
-    router.init([
-        require('./pages/init'),
-        require('./pages/main')
-    ]);
-});
+var app = require('stb-app');
 
 
 // everything is ready
-app.once('done', function () {
-    // go to the main page when necessary
-    router.navigate('pageMain');
+app.once('load', function () {
+    // load pages
+    app.pages = {
+        init: require('./pages/init'),
+        main: require('./pages/main')
+    };
+
+    // show splash screen
+    //app.route(app.pages.init);
+
+    // show main page
+    app.route(app.pages.main);
 });
