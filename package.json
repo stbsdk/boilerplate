@@ -19,5 +19,5 @@
         "stb-component-page": "stbsdk/component-page",
         "stb-eslint-config": "stbsdk/eslint-config"
     },
-    "license": "GPL-3.0"
+    "license": "MIT"
 }
