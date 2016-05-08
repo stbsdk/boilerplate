@@ -6,7 +6,10 @@
         "name": "Stanislav Kalashnik",
         "email": "darkpark.main@gmail.com"
     },
-    "repository": "stbsdk/boilerplate",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/stbsdk/boilerplate.git"
+    },
     "scripts": {
         "start": "stbsdk",
         "build": "stbsdk build",
