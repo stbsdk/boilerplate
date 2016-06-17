@@ -60,8 +60,8 @@
 	app.once('load', function () {
 	    // load pages
 	    app.pages = {
-	        init: __webpack_require__(/*! ./pages/init */ 35),
-	        main: __webpack_require__(/*! ./pages/main */ 39)
+	        init: __webpack_require__(/*! ./pages/init */ 31),
+	        main: __webpack_require__(/*! ./pages/main */ 35)
 	    };
 	
 	    // show splash screen
@@ -1879,9 +1879,6 @@
 	// public app instance
 	window.app = app;
 	
-	// universal storage
-	window.localStorage = window.localStorage || window.stbStorage;
-	
 	// all development tools placeholder
 	app.develop = {};
 	
@@ -1894,6 +1891,9 @@
 	// STB logging
 	//window.debug = app.host ? require('./debug') : require('spa-develop/debug');
 	
+	// universal storage
+	window.localStorage = window.localStorage || window.stbStorage;
+	
 	// apply screen size, position, margins and styles
 	// app.setScreen(
 	//     app.metrics[localStorage.getItem('screen.height')] ||
@@ -1902,19 +1902,19 @@
 	// );
 	
 	// inherit SPA tools
-	// require('spa-app/lib/develop/wamp');
-	// require('spa-app/lib/develop/events');
-	// require('spa-app/lib/develop/hooks');
-	// require('spa-app/lib/develop/static');
+	__webpack_require__(/*! spa-app/lib/develop/wamp */ 15);
+	__webpack_require__(/*! spa-app/lib/develop/events */ 18);
+	__webpack_require__(/*! spa-app/lib/develop/hooks */ 20);
+	__webpack_require__(/*! spa-app/lib/develop/static */ 21);
 	
 	// STB tools
 	if ( app.host ) {
 	    // web inspector
-	    __webpack_require__(/*! ./weinre */ 15);
+	    __webpack_require__(/*! ./weinre */ 23);
 	}
 	
 	//require('./proxy');
-	__webpack_require__(/*! ./events */ 21);
+	__webpack_require__(/*! ./events */ 29);
 	
 	// the application itself
 	// "js" directory is resolved by webpack to
@@ -2384,1729 +2384,6 @@
 
 /***/ },
 /* 15 */
-/*!************************************!*\
-  !*** ../app/lib/develop/weinre.js ***!
-  \************************************/
-/***/ function(module, exports, __webpack_require__) {
-
-	/**
-	 * Web Inspector Remote.
-	 *
-	 * @module stb/develop/weinre
-	 * @author Stanislav Kalashnik <darkpark.main@gmail.com>
-	 * @license GNU GENERAL PUBLIC LICENSE Version 3
-	 */
-	
-	'use strict';
-	
-	var tag    = __webpack_require__(/*! spa-dom */ 16).tag,
-	    util   = __webpack_require__(/*! util */ 17),
-	    config = {} /*require('../../config/weinre')*/;
-	
-	
-	// web inspector is allowed only without SpyJS
-	if ( config.active && !localStorage.getItem('spyjs.active') ) {
-	    // load external script
-	    document.head.appendChild(tag('script', {
-	        type: 'text/javascript',
-	        src: util.format('//%s:%s/target/target-script-min.js#%s', location.hostname, config.port, config.name)
-	    }));
-	}
-
-
-/***/ },
-/* 16 */
-/*!*************************************************!*\
-  !*** /home/dp/Projects/sdk/spasdk/dom/index.js ***!
-  \*************************************************/
-/***/ function(module, exports) {
-
-	/**
-	 * HTML elements low-level handling.
-	 *
-	 * @license The MIT License (MIT)
-	 * @copyright Stanislav Kalashnik <darkpark.main@gmail.com>
-	 */
-	
-	'use strict';
-	
-	/* eslint no-unused-vars: 0 */
-	
-	/**
-	 * DOM manipulation module
-	 */
-	var dom = {};
-	
-	
-	/**
-	 * Create a new HTML element.
-	 *
-	 * @param {string} tagName mandatory tag name
-	 * @param {Object|null} [attrList] element attributes
-	 * @param {...*} [content] element content (primitive value/values or other nodes)
-	 * @return {Node|null} HTML element or null on failure
-	 *
-	 * @example
-	 * dom.tag('table');
-	 * dom.tag('div', {}, 'some text');
-	 * dom.tag('div', {className:'top'}, dom.tag('span'), dom.tag('br'));
-	 * dom.tag('link', {rel:'stylesheet', type:'text/css', href:'http://some.url/'});
-	 */
-	dom.tag = function ( tagName, attrList, content ) {
-	    var node = null,
-	        index, name;
-	
-	    // minimal param is given
-	    if ( tagName ) {
-	        // empty element
-	        node = document.createElement(tagName);
-	
-	        // optional attribute list is given
-	        if ( attrList && typeof attrList === 'object' ) {
-	            for ( name in attrList ) {
-	                // extend a new node with the given attributes
-	                node[name] = attrList[name];
-	            }
-	        }
-	
-	        // content (arguments except the first two)
-	        for ( index = 2; index < arguments.length; index++ ) {
-	            // some data is given
-	            if ( arguments[index] ) {
-	                // regular HTML tag or plain data
-	                node.appendChild(
-	                    typeof arguments[index] === 'object' ?
-	                    arguments[index] :
-	                    document.createTextNode(arguments[index])
-	                );
-	            }
-	        }
-	
-	    }
-	
-	    return node;
-	};
-	
-	
-	/**
-	 * Create a new DocumentFragment filled with the given non-empty elements if any.
-	 *
-	 * @param {...*} [node] fragment content (primitive value/values or other nodes)
-	 * @return {DocumentFragment} new placeholder
-	 *
-	 * @example
-	 * // gives an empty fragment element
-	 * dom.fragment();
-	 * // gives a fragment element with 3 div element inside
-	 * dom.fragment(dom.tag('div'), div2, div3);
-	 * // mixed case
-	 * dom.fragment('some text', 123, div3);
-	 */
-	dom.fragment = function ( node ) {
-	    // prepare placeholder
-	    var fragment = document.createDocumentFragment(),
-	        index;
-	
-	    // walk through all the given elements
-	    for ( index = 0; index < arguments.length; index++ ) {
-	        node = arguments[index];
-	        // some data is given
-	        if ( node ) {
-	            // regular HTML tag or plain data
-	            fragment.appendChild(typeof node === 'object' ? node : document.createTextNode(node));
-	        }
-	    }
-	
-	    return fragment;
-	};
-	
-	
-	/**
-	 * Add the given non-empty data (HTML element/text or list) to the destination element.
-	 *
-	 * @param {Node} tagDst element to receive children
-	 * @param {...*} [content] element content (primitive value/values or other nodes)
-	 * @return {Node|null} the destination element - owner of all added data
-	 *
-	 * @example
-	 * // simple text value
-	 * add(some_div, 'Hello world');
-	 * // single DOM Element
-	 * add(some_div, some_other_div);
-	 * // DOM Element list
-	 * add(some_div, div1, div2, div3);
-	 * // mixed case
-	 * add(some_div, div1, 'hello', 'world');
-	 */
-	dom.add = function ( tagDst, content ) {
-	    var index;
-	
-	    // valid HTML tag as the destination
-	    if ( tagDst instanceof Node ) {
-	        // append all except the first one
-	        for ( index = 1; index < arguments.length; index++ ) {
-	            // some data is given
-	            if ( arguments[index] ) {
-	                // regular HTML tag or plain data
-	                tagDst.appendChild(
-	                    typeof arguments[index] === 'object' ?
-	                    arguments[index] :
-	                    document.createTextNode(arguments[index])
-	                );
-	            }
-	        }
-	        return tagDst;
-	    }
-	
-	    return null;
-	};
-	
-	
-	/**
-	 * Remove the given elements from the DOM.
-	 *
-	 * @param {...Node} [nodes] element to be removed
-	 * @return {boolean} operation status (true - all given elements removed)
-	 *
-	 * @example
-	 * dom.remove(document.querySelector('div.test'));
-	 * dom.remove(div1, div2, div3);
-	 */
-	dom.remove = function ( nodes ) {
-	    var count = 0,  // amount of successfully removed nodes
-	        index;
-	
-	    // walk through all the given elements
-	    for ( index = 0; index < arguments.length; index++ ) {
-	        // valid non-empty tag
-	        if ( arguments[index] && arguments[index].parentNode ) {
-	            if ( arguments[index].parentNode.removeChild(arguments[index]) === arguments[index] ) {
-	                count++;
-	            }
-	        }
-	    }
-	
-	    return arguments.length > 0 && count === arguments.length;
-	};
-	
-	
-	dom.clear = function ( node ) {
-	    while ( node.lastChild ) {
-	        node.removeChild(node.lastChild);
-	    }
-	};
-	
-	
-	// public
-	module.exports = dom;
-
-
-/***/ },
-/* 17 */
-/*!********************************************!*\
-  !*** /home/dp/Projects/sdk/~/util/util.js ***!
-  \********************************************/
-/***/ function(module, exports, __webpack_require__) {
-
-	/* WEBPACK VAR INJECTION */(function(global, process) {// Copyright Joyent, Inc. and other Node contributors.
-	//
-	// Permission is hereby granted, free of charge, to any person obtaining a
-	// copy of this software and associated documentation files (the
-	// "Software"), to deal in the Software without restriction, including
-	// without limitation the rights to use, copy, modify, merge, publish,
-	// distribute, sublicense, and/or sell copies of the Software, and to permit
-	// persons to whom the Software is furnished to do so, subject to the
-	// following conditions:
-	//
-	// The above copyright notice and this permission notice shall be included
-	// in all copies or substantial portions of the Software.
-	//
-	// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
-	// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-	// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
-	// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
-	// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
-	// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
-	// USE OR OTHER DEALINGS IN THE SOFTWARE.
-	
-	var formatRegExp = /%[sdj%]/g;
-	exports.format = function(f) {
-	  if (!isString(f)) {
-	    var objects = [];
-	    for (var i = 0; i < arguments.length; i++) {
-	      objects.push(inspect(arguments[i]));
-	    }
-	    return objects.join(' ');
-	  }
-	
-	  var i = 1;
-	  var args = arguments;
-	  var len = args.length;
-	  var str = String(f).replace(formatRegExp, function(x) {
-	    if (x === '%%') return '%';
-	    if (i >= len) return x;
-	    switch (x) {
-	      case '%s': return String(args[i++]);
-	      case '%d': return Number(args[i++]);
-	      case '%j':
-	        try {
-	          return JSON.stringify(args[i++]);
-	        } catch (_) {
-	          return '[Circular]';
-	        }
-	      default:
-	        return x;
-	    }
-	  });
-	  for (var x = args[i]; i < len; x = args[++i]) {
-	    if (isNull(x) || !isObject(x)) {
-	      str += ' ' + x;
-	    } else {
-	      str += ' ' + inspect(x);
-	    }
-	  }
-	  return str;
-	};
-	
-	
-	// Mark that a method should not be used.
-	// Returns a modified function which warns once by default.
-	// If --no-deprecation is set, then it is a no-op.
-	exports.deprecate = function(fn, msg) {
-	  // Allow for deprecating things in the process of starting up.
-	  if (isUndefined(global.process)) {
-	    return function() {
-	      return exports.deprecate(fn, msg).apply(this, arguments);
-	    };
-	  }
-	
-	  if (process.noDeprecation === true) {
-	    return fn;
-	  }
-	
-	  var warned = false;
-	  function deprecated() {
-	    if (!warned) {
-	      if (process.throwDeprecation) {
-	        throw new Error(msg);
-	      } else if (process.traceDeprecation) {
-	        console.trace(msg);
-	      } else {
-	        console.error(msg);
-	      }
-	      warned = true;
-	    }
-	    return fn.apply(this, arguments);
-	  }
-	
-	  return deprecated;
-	};
-	
-	
-	var debugs = {};
-	var debugEnviron;
-	exports.debuglog = function(set) {
-	  if (isUndefined(debugEnviron))
-	    debugEnviron = process.env.NODE_DEBUG || '';
-	  set = set.toUpperCase();
-	  if (!debugs[set]) {
-	    if (new RegExp('\\b' + set + '\\b', 'i').test(debugEnviron)) {
-	      var pid = process.pid;
-	      debugs[set] = function() {
-	        var msg = exports.format.apply(exports, arguments);
-	        console.error('%s %d: %s', set, pid, msg);
-	      };
-	    } else {
-	      debugs[set] = function() {};
-	    }
-	  }
-	  return debugs[set];
-	};
-	
-	
-	/**
-	 * Echos the value of a value. Trys to print the value out
-	 * in the best way possible given the different types.
-	 *
-	 * @param {Object} obj The object to print out.
-	 * @param {Object} opts Optional options object that alters the output.
-	 */
-	/* legacy: obj, showHidden, depth, colors*/
-	function inspect(obj, opts) {
-	  // default options
-	  var ctx = {
-	    seen: [],
-	    stylize: stylizeNoColor
-	  };
-	  // legacy...
-	  if (arguments.length >= 3) ctx.depth = arguments[2];
-	  if (arguments.length >= 4) ctx.colors = arguments[3];
-	  if (isBoolean(opts)) {
-	    // legacy...
-	    ctx.showHidden = opts;
-	  } else if (opts) {
-	    // got an "options" object
-	    exports._extend(ctx, opts);
-	  }
-	  // set default options
-	  if (isUndefined(ctx.showHidden)) ctx.showHidden = false;
-	  if (isUndefined(ctx.depth)) ctx.depth = 2;
-	  if (isUndefined(ctx.colors)) ctx.colors = false;
-	  if (isUndefined(ctx.customInspect)) ctx.customInspect = true;
-	  if (ctx.colors) ctx.stylize = stylizeWithColor;
-	  return formatValue(ctx, obj, ctx.depth);
-	}
-	exports.inspect = inspect;
-	
-	
-	// http://en.wikipedia.org/wiki/ANSI_escape_code#graphics
-	inspect.colors = {
-	  'bold' : [1, 22],
-	  'italic' : [3, 23],
-	  'underline' : [4, 24],
-	  'inverse' : [7, 27],
-	  'white' : [37, 39],
-	  'grey' : [90, 39],
-	  'black' : [30, 39],
-	  'blue' : [34, 39],
-	  'cyan' : [36, 39],
-	  'green' : [32, 39],
-	  'magenta' : [35, 39],
-	  'red' : [31, 39],
-	  'yellow' : [33, 39]
-	};
-	
-	// Don't use 'blue' not visible on cmd.exe
-	inspect.styles = {
-	  'special': 'cyan',
-	  'number': 'yellow',
-	  'boolean': 'yellow',
-	  'undefined': 'grey',
-	  'null': 'bold',
-	  'string': 'green',
-	  'date': 'magenta',
-	  // "name": intentionally not styling
-	  'regexp': 'red'
-	};
-	
-	
-	function stylizeWithColor(str, styleType) {
-	  var style = inspect.styles[styleType];
-	
-	  if (style) {
-	    return '\u001b[' + inspect.colors[style][0] + 'm' + str +
-	           '\u001b[' + inspect.colors[style][1] + 'm';
-	  } else {
-	    return str;
-	  }
-	}
-	
-	
-	function stylizeNoColor(str, styleType) {
-	  return str;
-	}
-	
-	
-	function arrayToHash(array) {
-	  var hash = {};
-	
-	  array.forEach(function(val, idx) {
-	    hash[val] = true;
-	  });
-	
-	  return hash;
-	}
-	
-	
-	function formatValue(ctx, value, recurseTimes) {
-	  // Provide a hook for user-specified inspect functions.
-	  // Check that value is an object with an inspect function on it
-	  if (ctx.customInspect &&
-	      value &&
-	      isFunction(value.inspect) &&
-	      // Filter out the util module, it's inspect function is special
-	      value.inspect !== exports.inspect &&
-	      // Also filter out any prototype objects using the circular check.
-	      !(value.constructor && value.constructor.prototype === value)) {
-	    var ret = value.inspect(recurseTimes, ctx);
-	    if (!isString(ret)) {
-	      ret = formatValue(ctx, ret, recurseTimes);
-	    }
-	    return ret;
-	  }
-	
-	  // Primitive types cannot have properties
-	  var primitive = formatPrimitive(ctx, value);
-	  if (primitive) {
-	    return primitive;
-	  }
-	
-	  // Look up the keys of the object.
-	  var keys = Object.keys(value);
-	  var visibleKeys = arrayToHash(keys);
-	
-	  if (ctx.showHidden) {
-	    keys = Object.getOwnPropertyNames(value);
-	  }
-	
-	  // IE doesn't make error fields non-enumerable
-	  // http://msdn.microsoft.com/en-us/library/ie/dww52sbt(v=vs.94).aspx
-	  if (isError(value)
-	      && (keys.indexOf('message') >= 0 || keys.indexOf('description') >= 0)) {
-	    return formatError(value);
-	  }
-	
-	  // Some type of object without properties can be shortcutted.
-	  if (keys.length === 0) {
-	    if (isFunction(value)) {
-	      var name = value.name ? ': ' + value.name : '';
-	      return ctx.stylize('[Function' + name + ']', 'special');
-	    }
-	    if (isRegExp(value)) {
-	      return ctx.stylize(RegExp.prototype.toString.call(value), 'regexp');
-	    }
-	    if (isDate(value)) {
-	      return ctx.stylize(Date.prototype.toString.call(value), 'date');
-	    }
-	    if (isError(value)) {
-	      return formatError(value);
-	    }
-	  }
-	
-	  var base = '', array = false, braces = ['{', '}'];
-	
-	  // Make Array say that they are Array
-	  if (isArray(value)) {
-	    array = true;
-	    braces = ['[', ']'];
-	  }
-	
-	  // Make functions say that they are functions
-	  if (isFunction(value)) {
-	    var n = value.name ? ': ' + value.name : '';
-	    base = ' [Function' + n + ']';
-	  }
-	
-	  // Make RegExps say that they are RegExps
-	  if (isRegExp(value)) {
-	    base = ' ' + RegExp.prototype.toString.call(value);
-	  }
-	
-	  // Make dates with properties first say the date
-	  if (isDate(value)) {
-	    base = ' ' + Date.prototype.toUTCString.call(value);
-	  }
-	
-	  // Make error with message first say the error
-	  if (isError(value)) {
-	    base = ' ' + formatError(value);
-	  }
-	
-	  if (keys.length === 0 && (!array || value.length == 0)) {
-	    return braces[0] + base + braces[1];
-	  }
-	
-	  if (recurseTimes < 0) {
-	    if (isRegExp(value)) {
-	      return ctx.stylize(RegExp.prototype.toString.call(value), 'regexp');
-	    } else {
-	      return ctx.stylize('[Object]', 'special');
-	    }
-	  }
-	
-	  ctx.seen.push(value);
-	
-	  var output;
-	  if (array) {
-	    output = formatArray(ctx, value, recurseTimes, visibleKeys, keys);
-	  } else {
-	    output = keys.map(function(key) {
-	      return formatProperty(ctx, value, recurseTimes, visibleKeys, key, array);
-	    });
-	  }
-	
-	  ctx.seen.pop();
-	
-	  return reduceToSingleString(output, base, braces);
-	}
-	
-	
-	function formatPrimitive(ctx, value) {
-	  if (isUndefined(value))
-	    return ctx.stylize('undefined', 'undefined');
-	  if (isString(value)) {
-	    var simple = '\'' + JSON.stringify(value).replace(/^"|"$/g, '')
-	                                             .replace(/'/g, "\\'")
-	                                             .replace(/\\"/g, '"') + '\'';
-	    return ctx.stylize(simple, 'string');
-	  }
-	  if (isNumber(value))
-	    return ctx.stylize('' + value, 'number');
-	  if (isBoolean(value))
-	    return ctx.stylize('' + value, 'boolean');
-	  // For some reason typeof null is "object", so special case here.
-	  if (isNull(value))
-	    return ctx.stylize('null', 'null');
-	}
-	
-	
-	function formatError(value) {
-	  return '[' + Error.prototype.toString.call(value) + ']';
-	}
-	
-	
-	function formatArray(ctx, value, recurseTimes, visibleKeys, keys) {
-	  var output = [];
-	  for (var i = 0, l = value.length; i < l; ++i) {
-	    if (hasOwnProperty(value, String(i))) {
-	      output.push(formatProperty(ctx, value, recurseTimes, visibleKeys,
-	          String(i), true));
-	    } else {
-	      output.push('');
-	    }
-	  }
-	  keys.forEach(function(key) {
-	    if (!key.match(/^\d+$/)) {
-	      output.push(formatProperty(ctx, value, recurseTimes, visibleKeys,
-	          key, true));
-	    }
-	  });
-	  return output;
-	}
-	
-	
-	function formatProperty(ctx, value, recurseTimes, visibleKeys, key, array) {
-	  var name, str, desc;
-	  desc = Object.getOwnPropertyDescriptor(value, key) || { value: value[key] };
-	  if (desc.get) {
-	    if (desc.set) {
-	      str = ctx.stylize('[Getter/Setter]', 'special');
-	    } else {
-	      str = ctx.stylize('[Getter]', 'special');
-	    }
-	  } else {
-	    if (desc.set) {
-	      str = ctx.stylize('[Setter]', 'special');
-	    }
-	  }
-	  if (!hasOwnProperty(visibleKeys, key)) {
-	    name = '[' + key + ']';
-	  }
-	  if (!str) {
-	    if (ctx.seen.indexOf(desc.value) < 0) {
-	      if (isNull(recurseTimes)) {
-	        str = formatValue(ctx, desc.value, null);
-	      } else {
-	        str = formatValue(ctx, desc.value, recurseTimes - 1);
-	      }
-	      if (str.indexOf('\n') > -1) {
-	        if (array) {
-	          str = str.split('\n').map(function(line) {
-	            return '  ' + line;
-	          }).join('\n').substr(2);
-	        } else {
-	          str = '\n' + str.split('\n').map(function(line) {
-	            return '   ' + line;
-	          }).join('\n');
-	        }
-	      }
-	    } else {
-	      str = ctx.stylize('[Circular]', 'special');
-	    }
-	  }
-	  if (isUndefined(name)) {
-	    if (array && key.match(/^\d+$/)) {
-	      return str;
-	    }
-	    name = JSON.stringify('' + key);
-	    if (name.match(/^"([a-zA-Z_][a-zA-Z_0-9]*)"$/)) {
-	      name = name.substr(1, name.length - 2);
-	      name = ctx.stylize(name, 'name');
-	    } else {
-	      name = name.replace(/'/g, "\\'")
-	                 .replace(/\\"/g, '"')
-	                 .replace(/(^"|"$)/g, "'");
-	      name = ctx.stylize(name, 'string');
-	    }
-	  }
-	
-	  return name + ': ' + str;
-	}
-	
-	
-	function reduceToSingleString(output, base, braces) {
-	  var numLinesEst = 0;
-	  var length = output.reduce(function(prev, cur) {
-	    numLinesEst++;
-	    if (cur.indexOf('\n') >= 0) numLinesEst++;
-	    return prev + cur.replace(/\u001b\[\d\d?m/g, '').length + 1;
-	  }, 0);
-	
-	  if (length > 60) {
-	    return braces[0] +
-	           (base === '' ? '' : base + '\n ') +
-	           ' ' +
-	           output.join(',\n  ') +
-	           ' ' +
-	           braces[1];
-	  }
-	
-	  return braces[0] + base + ' ' + output.join(', ') + ' ' + braces[1];
-	}
-	
-	
-	// NOTE: These type checking functions intentionally don't use `instanceof`
-	// because it is fragile and can be easily faked with `Object.create()`.
-	function isArray(ar) {
-	  return Array.isArray(ar);
-	}
-	exports.isArray = isArray;
-	
-	function isBoolean(arg) {
-	  return typeof arg === 'boolean';
-	}
-	exports.isBoolean = isBoolean;
-	
-	function isNull(arg) {
-	  return arg === null;
-	}
-	exports.isNull = isNull;
-	
-	function isNullOrUndefined(arg) {
-	  return arg == null;
-	}
-	exports.isNullOrUndefined = isNullOrUndefined;
-	
-	function isNumber(arg) {
-	  return typeof arg === 'number';
-	}
-	exports.isNumber = isNumber;
-	
-	function isString(arg) {
-	  return typeof arg === 'string';
-	}
-	exports.isString = isString;
-	
-	function isSymbol(arg) {
-	  return typeof arg === 'symbol';
-	}
-	exports.isSymbol = isSymbol;
-	
-	function isUndefined(arg) {
-	  return arg === void 0;
-	}
-	exports.isUndefined = isUndefined;
-	
-	function isRegExp(re) {
-	  return isObject(re) && objectToString(re) === '[object RegExp]';
-	}
-	exports.isRegExp = isRegExp;
-	
-	function isObject(arg) {
-	  return typeof arg === 'object' && arg !== null;
-	}
-	exports.isObject = isObject;
-	
-	function isDate(d) {
-	  return isObject(d) && objectToString(d) === '[object Date]';
-	}
-	exports.isDate = isDate;
-	
-	function isError(e) {
-	  return isObject(e) &&
-	      (objectToString(e) === '[object Error]' || e instanceof Error);
-	}
-	exports.isError = isError;
-	
-	function isFunction(arg) {
-	  return typeof arg === 'function';
-	}
-	exports.isFunction = isFunction;
-	
-	function isPrimitive(arg) {
-	  return arg === null ||
-	         typeof arg === 'boolean' ||
-	         typeof arg === 'number' ||
-	         typeof arg === 'string' ||
-	         typeof arg === 'symbol' ||  // ES6 symbol
-	         typeof arg === 'undefined';
-	}
-	exports.isPrimitive = isPrimitive;
-	
-	exports.isBuffer = __webpack_require__(/*! ./support/isBuffer */ 19);
-	
-	function objectToString(o) {
-	  return Object.prototype.toString.call(o);
-	}
-	
-	
-	function pad(n) {
-	  return n < 10 ? '0' + n.toString(10) : n.toString(10);
-	}
-	
-	
-	var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep',
-	              'Oct', 'Nov', 'Dec'];
-	
-	// 26 Feb 16:19:34
-	function timestamp() {
-	  var d = new Date();
-	  var time = [pad(d.getHours()),
-	              pad(d.getMinutes()),
-	              pad(d.getSeconds())].join(':');
-	  return [d.getDate(), months[d.getMonth()], time].join(' ');
-	}
-	
-	
-	// log is just a thin wrapper to console.log that prepends a timestamp
-	exports.log = function() {
-	  console.log('%s - %s', timestamp(), exports.format.apply(exports, arguments));
-	};
-	
-	
-	/**
-	 * Inherit the prototype methods from one constructor into another.
-	 *
-	 * The Function.prototype.inherits from lang.js rewritten as a standalone
-	 * function (not on Function.prototype). NOTE: If this file is to be loaded
-	 * during bootstrapping this function needs to be rewritten using some native
-	 * functions as prototype setup using normal JavaScript does not work as
-	 * expected during bootstrapping (see mirror.js in r114903).
-	 *
-	 * @param {function} ctor Constructor function which needs to inherit the
-	 *     prototype.
-	 * @param {function} superCtor Constructor function to inherit prototype from.
-	 */
-	exports.inherits = __webpack_require__(/*! inherits */ 20);
-	
-	exports._extend = function(origin, add) {
-	  // Don't do anything if add isn't an object
-	  if (!add || !isObject(add)) return origin;
-	
-	  var keys = Object.keys(add);
-	  var i = keys.length;
-	  while (i--) {
-	    origin[keys[i]] = add[keys[i]];
-	  }
-	  return origin;
-	};
-	
-	function hasOwnProperty(obj, prop) {
-	  return Object.prototype.hasOwnProperty.call(obj, prop);
-	}
-	
-	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }()), __webpack_require__(/*! /home/dp/Projects/sdk/~/process/browser.js */ 18)))
-
-/***/ },
-/* 18 */
-/*!**************************************************!*\
-  !*** /home/dp/Projects/sdk/~/process/browser.js ***!
-  \**************************************************/
-/***/ function(module, exports) {
-
-	// shim for using process in browser
-	
-	var process = module.exports = {};
-	var queue = [];
-	var draining = false;
-	var currentQueue;
-	var queueIndex = -1;
-	
-	function cleanUpNextTick() {
-	    draining = false;
-	    if (currentQueue.length) {
-	        queue = currentQueue.concat(queue);
-	    } else {
-	        queueIndex = -1;
-	    }
-	    if (queue.length) {
-	        drainQueue();
-	    }
-	}
-	
-	function drainQueue() {
-	    if (draining) {
-	        return;
-	    }
-	    var timeout = setTimeout(cleanUpNextTick);
-	    draining = true;
-	
-	    var len = queue.length;
-	    while(len) {
-	        currentQueue = queue;
-	        queue = [];
-	        while (++queueIndex < len) {
-	            if (currentQueue) {
-	                currentQueue[queueIndex].run();
-	            }
-	        }
-	        queueIndex = -1;
-	        len = queue.length;
-	    }
-	    currentQueue = null;
-	    draining = false;
-	    clearTimeout(timeout);
-	}
-	
-	process.nextTick = function (fun) {
-	    var args = new Array(arguments.length - 1);
-	    if (arguments.length > 1) {
-	        for (var i = 1; i < arguments.length; i++) {
-	            args[i - 1] = arguments[i];
-	        }
-	    }
-	    queue.push(new Item(fun, args));
-	    if (queue.length === 1 && !draining) {
-	        setTimeout(drainQueue, 0);
-	    }
-	};
-	
-	// v8 likes predictible objects
-	function Item(fun, array) {
-	    this.fun = fun;
-	    this.array = array;
-	}
-	Item.prototype.run = function () {
-	    this.fun.apply(null, this.array);
-	};
-	process.title = 'browser';
-	process.browser = true;
-	process.env = {};
-	process.argv = [];
-	process.version = ''; // empty string to avoid regexp issues
-	process.versions = {};
-	
-	function noop() {}
-	
-	process.on = noop;
-	process.addListener = noop;
-	process.once = noop;
-	process.off = noop;
-	process.removeListener = noop;
-	process.removeAllListeners = noop;
-	process.emit = noop;
-	
-	process.binding = function (name) {
-	    throw new Error('process.binding is not supported');
-	};
-	
-	process.cwd = function () { return '/' };
-	process.chdir = function (dir) {
-	    throw new Error('process.chdir is not supported');
-	};
-	process.umask = function() { return 0; };
-
-
-/***/ },
-/* 19 */
-/*!***************************************************************!*\
-  !*** /home/dp/Projects/sdk/~/util/support/isBufferBrowser.js ***!
-  \***************************************************************/
-/***/ function(module, exports) {
-
-	module.exports = function isBuffer(arg) {
-	  return arg && typeof arg === 'object'
-	    && typeof arg.copy === 'function'
-	    && typeof arg.fill === 'function'
-	    && typeof arg.readUInt8 === 'function';
-	}
-
-/***/ },
-/* 20 */
-/*!************************************************************!*\
-  !*** /home/dp/Projects/sdk/~/inherits/inherits_browser.js ***!
-  \************************************************************/
-/***/ function(module, exports) {
-
-	if (typeof Object.create === 'function') {
-	  // implementation from standard node.js 'util' module
-	  module.exports = function inherits(ctor, superCtor) {
-	    ctor.super_ = superCtor
-	    ctor.prototype = Object.create(superCtor.prototype, {
-	      constructor: {
-	        value: ctor,
-	        enumerable: false,
-	        writable: true,
-	        configurable: true
-	      }
-	    });
-	  };
-	} else {
-	  // old school shim for old browsers
-	  module.exports = function inherits(ctor, superCtor) {
-	    ctor.super_ = superCtor
-	    var TempCtor = function () {}
-	    TempCtor.prototype = superCtor.prototype
-	    ctor.prototype = new TempCtor()
-	    ctor.prototype.constructor = ctor
-	  }
-	}
-
-
-/***/ },
-/* 21 */
-/*!************************************!*\
-  !*** ../app/lib/develop/events.js ***!
-  \************************************/
-/***/ function(module, exports, __webpack_require__) {
-
-	/**
-	 * Additional dev events.
-	 *
-	 * @module stb/develop/events
-	 * @author Stanislav Kalashnik <darkpark.main@gmail.com>
-	 * @license GNU GENERAL PUBLIC LICENSE Version 3
-	 */
-	
-	'use strict';
-	
-	/* eslint new-cap: 0 */
-	
-	var util    = __webpack_require__(/*! util */ 17),
-	    app     = __webpack_require__(/*! spa-app */ 22),
-	    stringify = __webpack_require__(/*! cjs-query */ 5).stringify,
-	    //request = require('spa-request'),
-	    //dom     = require('spa-dom'),
-	    grid    = __webpack_require__(/*! ./grid */ 32),
-	    events  = {};
-	
-	
-	/**
-	 * Apply the given screen geometry and reload the page.
-	 *
-	 * @param {number} width screen param
-	 * @param {number} height screen param
-	 */
-	function changeScreenDimension ( width, height ) {
-	    app.query.screenHeight = height;
-	    location.search = '?' + stringify(app.query);
-	
-	    // check if it's necessary
-	    /*if ( Number(localStorage.getItem('screen.height')) === height ) {
-	        // not really
-	        debug.log('no resolution change: new and current values are identical', 'red');
-	    } else {
-	        // yes
-	        debug.log(util.format('switch to %sx%s', width, height), 'red');
-	
-	        // save in case of document reload
-	        localStorage.setItem('screen.height', height);
-	        localStorage.setItem('screen.width',  width);
-	
-	        // hide content to avoid raw HTML blinking
-	        document.body.style.display = 'none';
-	
-	        // apply new metrics
-	        app.setScreen(require('app:metrics')[height]);
-	
-	        // restore visibility
-	        document.body.style.display = '';
-	    }*/
-	}
-	
-	
-	// inherit SPA tools
-	__webpack_require__(/*! spa-develop/events */ 33);
-	
-	
-	events.load = function () {
-	    // export to globals div for develop HTML elements
-	    //window.$develop = document.body.appendChild(document.createElement('div'));
-	   // window.$develop.className = 'develop';
-	
-	    // apply dev css
-	    //document.body.classList.add('develop');
-	
-	    grid.init();
-	
-	    if ( localStorage.getItem('grid.active') === 'true' ) {
-	        grid.show();
-	    }
-	
-	    // stress-testing
-	    //window.gremlins = require('gremlins.js/gremlins.min.js');
-	    //window.horde    = window.gremlins.createHorde();
-	};
-	
-	
-	events.keydown = function ( event ) {
-	    switch ( event.keyCode ) {
-	        //// numpad 0
-	        //case 96:
-	        //    debug.log('full document reload', 'red');
-	        //    location.hash = '';
-	        //    location.reload();
-	        //    break;
-	
-	        // numpad 1
-	        case 97:
-	            // NTSC
-	            changeScreenDimension(720, 480);
-	            break;
-	
-	        // numpad 2
-	        case 98:
-	            // PAL
-	            changeScreenDimension(720, 576);
-	            break;
-	
-	        // numpad 3
-	        case 99:
-	            // 720p
-	            changeScreenDimension(1280, 720);
-	            break;
-	
-	        // numpad 4
-	        case 100:
-	            // 1080p
-	            changeScreenDimension(1920, 1080);
-	            break;
-	
-	        // numpad 5
-	        case 101:
-	            // debug grid
-	            if ( grid.active ) {
-	                grid.hide();
-	            } else {
-	                grid.show();
-	            }
-	            debug.log('show grid: ' + grid.active, 'red');
-	            localStorage.setItem('grid.active', grid.active.toString());
-	            break;
-	
-	        // numpad 6
-	        //case 102:
-	        //    // stress-testing for emulation
-	        //    window.horde.unleash({nb: 500});
-	        //    break;
-	
-	        // numpad 7
-	        //case 103:
-	        //    if ( !app.data.host ) {
-	        //        debug.log('SpyJS in this mode is available only on STB devices.', 'red');
-	        //    } else {
-	        //        // SpyJS enable/disable
-	        //        if ( !localStorage.getItem('spyjs.active') ) {
-	        //            // try to "ping" proxy server
-	        //            request.ajax(document.location.protocol + '//' + location.hostname + ':3546', {
-	        //                method: 'get',
-	        //                onload: function () {
-	        //                    // proxy seems ready
-	        //                    //isSpyJs = true;
-	        //                    localStorage.setItem('spyjs.active', true);
-	        //                    debug.log('SpyJS: enable', 'red');
-	        //                    debug.log('SpyJS: set proxy to ' + location.hostname + ':' + 3546);
-			//
-	        //                    gSTB.SetWebProxy(location.hostname, 3546, '', '', '');
-	        //                    location.reload();
-	        //                },
-	        //                onerror: function () {
-	        //                    debug.log('SpyJS: no connection (check SpyJS is started on the server)', 'red');
-	        //                }
-	        //            });
-	        //        } else {
-	        //            //isSpyJs = false;
-	        //            localStorage.setItem('spyjs.active', false);
-	        //            gSTB.ResetWebProxy();
-	        //            debug.log('SpyJS: disable', 'red');
-	        //            location.reload();
-	        //        }
-	        //    }
-	        //    break;
-	
-	        // numpad 8
-	        //case 104:
-	        //    // FireBug Lite
-	        //    debug.log('firebug-lite activation', 'red');
-	        //    document.head.appendChild(dom.tag('script', {
-	        //        type: 'text/javascript',
-	        //        src: 'http://getfirebug.com/firebug-lite.js#startOpened',
-	        //        onload: function () {
-	        //            debug.log('firebug-lite ready ...', 'green');
-	        //        },
-	        //        onerror: function ( error ) {
-	        //            debug.inspect(error);
-	        //        }
-	        //    }));
-	        //    break;
-	
-	        // numpad 9
-	        //case 105:
-	        //    // outline components and inner structures
-	        //    debug.log('toggle develop css layout', 'red');
-	        //    document.body.classList.toggle('develop');
-	        //    break;
-	
-	        // numpad .
-	        //case 110:
-	        //    // CSS reload
-	        //    debug.log('CSS reload', 'red');
-	        //    // get through all css links
-	        //    Array.prototype.slice.call(document.head.getElementsByTagName('link')).forEach(function forEachLink ( tag ) {
-	        //        // get base name, modify and apply
-	        //        tag.href = tag.href.split('?')[0] + '?' + (+new Date());
-	        //    });
-	        //    break;
-	    }
-	};
-	
-	
-	// additional top-level key handlers
-	window.addEventListener('load',    events.load);
-	window.addEventListener('keydown', events.keydown);
-	
-	
-	// public
-	module.exports = events;
-
-
-/***/ },
-/* 22 */
-/*!*************************************************!*\
-  !*** /home/dp/Projects/sdk/spasdk/app/index.js ***!
-  \*************************************************/
-/***/ function(module, exports, __webpack_require__) {
-
-	/**
-	 * @license The MIT License (MIT)
-	 * @copyright Stanislav Kalashnik <darkpark.main@gmail.com>
-	 */
-	
-	/* eslint no-path-concat: 0 */
-	
-	'use strict';
-	
-	var //Emitter = require('cjs-emitter'),
-	    //router  = require('spa-router'),
-	    //parse   = require('cjs-query').parse,
-	    app    = __webpack_require__(/*! ./lib/core */ 3),
-	    events = __webpack_require__(/*! ./lib/events */ 8);
-	
-	
-	// early return
-	//module.exports = app;
-	
-	
-	// url request params
-	//app.query = parse(document.location.search.substring(1));
-	
-	
-	// activate development mechanisms and tools
-	if ( true ) {
-	    __webpack_require__(/*! ./lib/develop/main */ 23);
-	}
-	
-	
-	// global application configuration
-	// in config.js file in js root
-	//app.config = require('app:config');
-	
-	
-	/*app.data = {
-	    /!**
-	     * Timestamps data.
-	     *
-	     * @type {Object}
-	     * @property {number} init application initialization time (right now)
-	     * @property {number} load document onload event
-	     * @property {number} done onload event sent and processed
-	     *!/
-	    // time: {
-	    //     init: +new Date(),
-	    //     load: 0,
-	    //     done: 0
-	    // }
-	
-	    // parameters from get request
-	    //query: parse(document.location.search.substring(1))
-	};*/
-	
-	
-	//app.activePage = null;
-	
-	
-	// /**
-	//  * Make the given inactive/hidden page active/visible.
-	//  * Pass some data to the page and trigger the corresponding event.
-	//  *
-	//  * @param {Page} page item to show
-	//  * @param {*} [data] data to send to page
-	//  *
-	//  * @return {boolean} operation status
-	//  */
-	// function show ( page, data ) {
-	//     // page available and can be hidden
-	//     if ( page && !page.active ) {
-	//         // apply visibility
-	//         page.$node.classList.add('active');
-	//         page.active = true;
-	//         app.activePage = page;
-	//
-	//         debug.info('show component ' + page.constructor.name + '#' + page.id, null, {
-	//             tags: ['show', 'component', page.constructor.name, page.id]
-	//         });
-	//         //console.log('component ' + page.constructor.name + '.' + page.id + ' show', 'green');
-	//
-	//         // there are some listeners
-	//         if ( page.events['show'] ) {
-	//             // notify listeners
-	//             page.emit('show', {page: page, data: data});
-	//         }
-	//
-	//         return true;
-	//     }
-	//
-	//     // nothing was done
-	//     return false;
-	// }
-	//
-	//
-	// /**
-	//  * Make the given active/visible page inactive/hidden and trigger the corresponding event.
-	//  *
-	//  * @param {Page} page item to hide
-	//  *
-	//  * @return {boolean} operation status
-	//  */
-	// function hide ( page ) {
-	//     // page available and can be hidden
-	//     if ( page && page.active ) {
-	//         // apply visibility
-	//         page.$node.classList.remove('active');
-	//         page.active  = false;
-	//         app.activePage = null;
-	//
-	//         debug.info('hide component ' + page.constructor.name + '#' + page.id, null, {
-	//             tags: ['hide', 'component', page.constructor.name, page.id]
-	//         });
-	//         //console.log('component ' + page.constructor.name + '.' + page.id + ' hide', 'grey');
-	//
-	//         // there are some listeners
-	//         if ( page.events['hide'] ) {
-	//             // notify listeners
-	//             page.emit('hide', {page: page});
-	//         }
-	//
-	//         return true;
-	//     }
-	//
-	//     // nothing was done
-	//     return false;
-	// }
-	//
-	//
-	// /**
-	//  * Browse to a given page.
-	//  * Do nothing if the link is invalid. Otherwise hide the current, show new and update the "previous" link.
-	//  *
-	//  * @param {Page} pageTo instance of the page to show
-	//  * @param {*} [data] options to pass to the page on show
-	//  *
-	//  * @return {boolean} operation status
-	//  */
-	// app.route = function ( pageTo, data ) {
-	//     var pageFrom = app.activePage;
-	//
-	//     if ( DEVELOP ) {
-	//         //if ( router.pages.length > 0 ) {
-	//             if ( !pageTo || typeof pageTo !== 'object' ) { throw new Error(__filename + ': wrong pageTo type'); }
-	//             if ( !('active' in pageTo) ) { throw new Error(__filename + ': missing field "active" in pageTo'); }
-	//         //}
-	//     }
-	//
-	//     // valid not already active page
-	//     if ( pageTo && !pageTo.active ) {
-	//         //debug.log('router.navigate: ' + pageTo.id, pageTo === pageFrom ? 'grey' : 'green');
-	//         debug.info('app route: ' + pageTo.id, null, {tags: ['route', 'page', pageTo.id]});
-	//
-	//         // update url
-	//         //location.hash = this.stringify(name, data);
-	//
-	//         // apply visibility
-	//         hide(app.activePage);
-	//         show(pageTo, data);
-	//
-	//         // there are some listeners
-	//         if ( this.events['route'] ) {
-	//             // notify listeners
-	//             this.emit('route', {from: pageFrom, to: pageTo});
-	//         }
-	//
-	//         // store
-	//         //this.history.push(pageTo);
-	//
-	//         return true;
-	//     }
-	//
-	//     debug.warn('invalid page to route: ' + pageTo.id, null, {tags: ['route', 'page', pageTo.id]});
-	//     //console.log('router.navigate: ' + pageTo.id, 'red');
-	//
-	//     // nothing was done
-	//     return false;
-	// };
-	
-	//app.route = require('./lib/route');
-	
-	
-	/*app.defaultEvents = {
-	    DOMContentLoaded: function ( event ) {
-	        //debug.event(event);
-	        //console.log(event);
-	
-	        debug.info('app event: ' + event.type, event, {tags: [event.type, 'event']});
-	
-	        // there are some listeners
-	        if ( app.events['dom'] ) {
-	            // notify listeners
-	            app.emit('dom', event);
-	            //console.log('DOMContentLoaded');
-	        }
-	    },
-	
-	    /!**
-	     * The load event is fired when a resource and its dependent resources have finished loading.
-	     *
-	     * Control flow:
-	     *   1. Global handler.
-	     *   2. Each page handler.
-	     *   3. Application DONE event.
-	     *
-	     * @see https://developer.mozilla.org/en-US/docs/Web/Reference/Events/load
-	     *
-	     * @param {Event} event generated object with event data
-	     *!/
-	    load: function ( event ) {
-	        //var path;
-	
-	        //debug.event(event);
-	        //console.log(event);
-	
-	        // time mark
-	        //app.data.time.load = event.timeStamp;
-	
-	        debug.info('app event: ' + event.type, event, {tags: [event.type, 'event']});
-	
-	        // global handler
-	        // there are some listeners
-	        if ( app.events[event.type] ) {
-	            // notify listeners
-	            app.emit(event.type, event);
-	        }
-	
-	        // local handler on each page
-	        /!*router.pages.forEach(function forEachPages ( page ) {
-	            debug.log('component ' + page.constructor.name + '.' + page.id + ' load', 'green');
-	
-	            // there are some listeners
-	            if ( page.events[event.type] ) {
-	                // notify listeners
-	                page.emit(event.type, event);
-	            }
-	        });*!/
-	
-	        // time mark
-	        //app.data.time.done = +new Date();
-	
-	        // everything is ready
-	        // and there are some listeners
-	        // if ( app.events['done'] ) {
-	        //     // notify listeners
-	        //     app.emit('done', event);
-	        // }
-	    },
-	
-	    /!**
-	     * The unload event is fired when the document or a child resource is being unloaded.
-	     *
-	     * Control flow:
-	     *   1. Each page handler.
-	     *   2. Global handler.
-	     *
-	     * @see https://developer.mozilla.org/en-US/docs/Web/Reference/Events/unload
-	     *
-	     * @param {Event} event generated object with event data
-	     *!/
-	    unload: function ( event ) {
-	        //debug.event(event);
-	        console.log(event);
-	
-	        debug.info('app event: ' + event.type, event, {tags: [event.type, 'event']});
-	
-	        // global handler
-	        // there are some listeners
-	        if ( app.events[event.type] ) {
-	            // notify listeners
-	            app.emit(event.type, event);
-	        }
-	
-	        // local handler on each page
-	        /!*router.pages.forEach(function forEachPages ( page ) {
-	            debug.log('component ' + page.constructor.name + '.' + page.id + ' unload', 'red');
-	
-	            // there are some listeners
-	            if ( page.events[event.type] ) {
-	                // notify listeners
-	                page.emit(event.type, event);
-	            }
-	        });*!/
-	    },
-	
-	    /!**
-	     * The error event is fired when a resource failed to load.
-	     *
-	     * @see https://developer.mozilla.org/en-US/docs/Web/Reference/Events/error
-	     *
-	     * @param {Event} event generated object with event data
-	     *!/
-	    error: function ( event ) {
-	        //debug.event(event);
-	        //console.log(event);
-	        debug.fail('app event: ' + event.message, event, {tags: [event.type, 'event']});
-	    },
-	
-	    /!**
-	     * The keydown event is fired when a key is pressed down.
-	     * Set event.stop to true in order to prevent bubbling.
-	     *
-	     * Control flow:
-	     *   1. Current active component on the active page.
-	     *   2. Current active page itself.
-	     *   3. Application.
-	     *
-	     * @see https://developer.mozilla.org/en-US/docs/Web/Reference/Events/keydown
-	     *
-	     * @param {Event} event generated object with event data
-	     *!/
-	    keydown: function ( event ) {
-	        var page = app.activePage,
-	            activeComponent;
-	
-	        if ( DEVELOP ) {
-	            if ( !page ) { throw new Error(__filename + ': app should have at least one page'); }
-	        }
-	
-	        // filter phantoms
-	        //if ( event.keyCode === 0 ) { return; }
-	
-	        // combined key code
-	        //event.code = event.keyCode;
-	
-	        // apply key modifiers
-	        //if ( event.shiftKey ) { event.code += 1000; }
-	        //if ( event.altKey )   { event.code += 2000; }
-	
-	        //debug.event(event);
-	        //console.log(event);
-	        debug.info('app event: ' + event.type, event, {tags: [event.type, 'event']});
-	
-	        // page.activeComponent can be set to null in event handles
-	        activeComponent = page.activeComponent;
-	
-	        // current component handler
-	        if ( activeComponent && activeComponent !== page ) {
-	            // component is available and not page itself
-	            if ( activeComponent.events[event.type] ) {
-	                // there are some listeners
-	                activeComponent.emit(event.type, event);
-	            }
-	
-	            // todo: bubble event recursively
-	            // bubbling
-	            /!*if (
-	                !event.stop &&
-	                activeComponent.propagate &&
-	                activeComponent.parent &&
-	                activeComponent.parent.events[event.type]
-	            ) {
-	                activeComponent.parent.emit(event.type, event);
-	            }*!/
-	        }
-	
-	        // page handler
-	        if ( !event.stop ) {
-	            // not prevented
-	            if ( page.events[event.type] ) {
-	                // there are some listeners
-	                page.emit(event.type, event);
-	            }
-	
-	            // global app handler
-	            if ( !event.stop ) {
-	                // not prevented
-	                if ( app.events[event.type] ) {
-	                    // there are some listeners
-	                    app.emit(event.type, event);
-	                }
-	            }
-	        }
-	
-	        //// suppress non-printable keys in stb device (not in your browser)
-	        //if ( app.data.host && keyCodes[event.code] ) {
-	        //    event.preventDefault();
-	        //}
-	    },
-	
-	    /!**
-	     * The keypress event is fired when press a printable character.
-	     * Delivers the event only to activeComponent at active page.
-	     *
-	     * @see https://developer.mozilla.org/en-US/docs/Web/Reference/Events/keypress
-	     *
-	     * @param {Event} event generated object with event data
-	     * @param {string} event.char entered character
-	     *!/
-	    keypress: function ( event ) {
-	        var page = app.activePage;
-	
-	        if ( DEVELOP ) {
-	            if ( page === null || page === undefined ) { throw new Error(__filename + ': app should have at least one page'); }
-	        }
-	
-	        //debug.event(event);
-	        debug.info('app event: ' + event.type, event, {tags: [event.type, 'event']});
-	
-	        // current component handler
-	        if ( page.activeComponent && page.activeComponent !== page ) {
-	            // component is available and not page itself
-	            if ( page.activeComponent.events[event.type] ) {
-	                // there are some listeners
-	                page.activeComponent.emit(event.type, event);
-	            }
-	        }
-	    },
-	
-	    /!**
-	     * The click event is fired when a pointing device button (usually a mouse button) is pressed and released on a single element.
-	     *
-	     * @see https://developer.mozilla.org/en-US/docs/Web/Reference/Events/click
-	     *
-	     * @param {Event} event generated object with event data
-	     *!/
-	    /!*click: function ( event ) {
-	        //debug.event(event);
-	        //console.log(event);
-	        debug.info('app event: ' + event.type, event, {tags: [event.type, 'event']});
-	    },*!/
-	
-	    /!**
-	     * The contextmenu event is fired when the right button of the mouse is clicked (before the context menu is displayed),
-	     * or when the context menu key is pressed (in which case the context menu is displayed at the bottom left of the focused
-	     * element, unless the element is a tree, in which case the context menu is displayed at the bottom left of the current row).
-	     *
-	     * @see https://developer.mozilla.org/en-US/docs/Web/Reference/Events/contextmenu
-	     *
-	     * @param {Event} event generated object with event data
-	     *!/
-	    /!*contextmenu: function ( event ) {
-	        //var kbEvent = {}; //Object.create(document.createEvent('KeyboardEvent'));
-	
-	        //debug.event(event);
-	        //console.log(event);
-	        debug.info('app event: ' + event.type, event, {tags: [event.type, 'event']});
-	
-	        //kbEvent.type    = 'keydown';
-	        //kbEvent.keyCode = 8;
-	
-	        //debug.log(kbEvent.type);
-	
-	        //globalEventListenerKeydown(kbEvent);
-	        //var event = document.createEvent('KeyboardEvent');
-	        //event.initEvent('keydown', true, true);
-	
-	        //document.dispatchEvent(kbEvent);
-	
-	        if ( !DEVELOP ) {
-	            // disable right click in release mode
-	            event.preventDefault();
-	        }
-	    },*!/
-	
-	    /!**
-	     * The wheel event is fired when a wheel button of a pointing device (usually a mouse) is rotated.
-	     *
-	     * @see https://developer.mozilla.org/en-US/docs/Web/Reference/Events/wheel
-	     *
-	     * @param {Event} event generated object with event data
-	     *!/
-	    mousewheel: function ( event ) {
-	        var page = app.activePage;
-	
-	        if ( DEVELOP ) {
-	            if ( page === null || page === undefined ) { throw new Error(__filename + ': app should have at least one page'); }
-	        }
-	
-	        //debug.event(event);
-	        //console.log(event);
-	        debug.info('app event: ' + event.type, event, {tags: [event.type, 'event']});
-	
-	        // current component handler
-	        if ( page.activeComponent && page.activeComponent !== page ) {
-	            // component is available and not page itself
-	            if ( page.activeComponent.events[event.type] ) {
-	                // there are some listeners
-	                page.activeComponent.emit(event.type, event);
-	            }
-	        }
-	
-	        // page handler
-	        if ( !event.stop ) {
-	            // not prevented
-	            if ( page.events[event.type] ) {
-	                // there are some listeners
-	                page.emit(event.type, event);
-	            }
-	        }
-	    }
-	};*/
-	
-	//events = require('./lib/events');
-	
-	
-	// apply DOM events
-	Object.keys(events).forEach(function ( name ) {
-	    window.addEventListener(name, events[name]);
-	});
-	
-	
-	// public
-	module.exports = app;
-
-
-/***/ },
-/* 23 */
-/*!************************************************************!*\
-  !*** /home/dp/Projects/sdk/spasdk/app/lib/develop/main.js ***!
-  \************************************************************/
-/***/ function(module, exports, __webpack_require__) {
-
-	/**
-	 * @license The MIT License (MIT)
-	 * @copyright Stanislav Kalashnik <darkpark.main@gmail.com>
-	 */
-	
-	'use strict';
-	
-	var app = __webpack_require__(/*! ../core */ 3);
-	
-	
-	// public app instance
-	window.app = app;
-	
-	// all development tools placeholder
-	app.develop = {};
-	
-	// browser logging
-	window.debug = __webpack_require__(/*! ./debug */ 14);
-	
-	// tools
-	__webpack_require__(/*! ./wamp */ 24);
-	__webpack_require__(/*! ./events */ 27);
-	__webpack_require__(/*! ./hooks */ 29);
-	__webpack_require__(/*! ./static */ 30);
-
-
-/***/ },
-/* 24 */
 /*!************************************************************!*\
   !*** /home/dp/Projects/sdk/spasdk/app/lib/develop/wamp.js ***!
   \************************************************************/
@@ -4120,11 +2397,14 @@
 	'use strict';
 	
 	var app       = __webpack_require__(/*! ../core */ 3),
-	    Wamp      = __webpack_require__(/*! spa-wamp */ 25),
+	    Wamp      = __webpack_require__(/*! spa-wamp */ 16),
 	    stringify = __webpack_require__(/*! cjs-query */ 5).stringify;
 	
 	
 	if ( app.query.wampPort ) {
+	    // correct type
+	    app.query.wampTargetId = parseInt(app.query.wampTargetId, 10);
+	
 	    app.develop.wamp = new Wamp(
 	        'ws://' + (app.query.wampHost || location.hostname) + ':' + app.query.wampPort + '/target/' + (app.query.wampTargetId || '')
 	    );
@@ -4135,7 +2415,7 @@
 	        // get target connection id
 	        app.develop.wamp.call('getConnectionInfo', {}, function ( error, data ) {
 	            // check if already linked
-	            if ( !error && parseInt(app.query.wampTargetId, 10) !== data.id ) {
+	            if ( !error && app.query.wampTargetId !== data.id ) {
 	                // disconnect
 	                app.develop.wamp.socket.close();
 	                // correct url
@@ -4160,7 +2440,7 @@
 
 
 /***/ },
-/* 25 */
+/* 16 */
 /*!**************************************************!*\
   !*** /home/dp/Projects/sdk/spasdk/wamp/index.js ***!
   \**************************************************/
@@ -4173,7 +2453,7 @@
 	
 	'use strict';
 	
-	var CjsWamp = __webpack_require__(/*! cjs-wamp */ 26),
+	var CjsWamp = __webpack_require__(/*! cjs-wamp */ 17),
 	    timeout = 5000,
 	    events  = {
 	        open:  'connection:open',
@@ -4247,7 +2527,7 @@
 
 
 /***/ },
-/* 26 */
+/* 17 */
 /*!**************************************************!*\
   !*** /home/dp/Projects/sdk/cjssdk/wamp/index.js ***!
   \**************************************************/
@@ -4411,7 +2691,7 @@
 
 
 /***/ },
-/* 27 */
+/* 18 */
 /*!**************************************************************!*\
   !*** /home/dp/Projects/sdk/spasdk/app/lib/develop/events.js ***!
   \**************************************************************/
@@ -4430,9 +2710,9 @@
 	
 	var //util    = require('util'),
 	    app      = __webpack_require__(/*! ../core */ 3),
-	    Wamp     = __webpack_require__(/*! spa-wamp */ 25),
+	    //Wamp     = require('spa-wamp'),
 	    //request  = require('spa-request'),
-	    gremlins = __webpack_require__(/*! gremlins.js/gremlins.min.js */ 28),
+	    gremlins = __webpack_require__(/*! gremlins.js/gremlins.min.js */ 19),
 	    events   = {};
 	    //app;
 	    //dom     = require('spa-dom'),
@@ -4590,7 +2870,7 @@
 
 
 /***/ },
-/* 28 */
+/* 19 */
 /*!***********************************************************!*\
   !*** /home/dp/Projects/sdk/~/gremlins.js/gremlins.min.js ***!
   \***********************************************************/
@@ -4600,7 +2880,7 @@
 	this._mogwais=[],this._strategies=[],this._beforeCallbacks=[],this._afterCallbacks=[],this._logger=console,this._randomizer=new a};return o.prototype.gremlin=function(e){return this._gremlins.push(e),this},o.prototype.allGremlins=function(){for(var e in r.species)this.gremlin(r.species[e]());return this},o.prototype.mogwai=function(e){return this._mogwais.push(e),this},o.prototype.allMogwais=function(){for(var e in r.mogwais)this.mogwai(r.mogwais[e]());return this},o.prototype.strategy=function(e){return this._strategies.push(e),this},o.prototype.before=function(e){return this._beforeCallbacks.push(e),this},o.prototype.after=function(e){return this._afterCallbacks.push(e),this},o.prototype.logger=function(e){return arguments.length?(this._logger=e,this):this._logger},o.prototype.log=function(e){this._logger.log(e)},o.prototype.randomizer=function(e){return arguments.length?(this._randomizer=e,this):this._randomizer},o.prototype.seed=function(e){return this._randomizer=new a(e),this},o.prototype.unleash=function(e,t){0===this._gremlins.length&&this.allGremlins(),0===this._mogwais.length&&this.allMogwais(),0===this._strategies.length&&this.strategy(r.strategies.distribution());var a=[].concat(this._gremlins,this._mogwais),o=a.concat(this._strategies,this._beforeCallbacks,this._afterCallbacks);n({logger:this._logger,randomizer:this._randomizer},o);var s=this._beforeCallbacks;s=s.concat(this._mogwais);for(var l=this._afterCallbacks,u=0,c=a.length;c>u;u++)"function"==typeof a[u].cleanUp&&l.push(a[u].cleanUp);var m=this;i(s,[],m,function(){i(m._strategies,[m._gremlins,e],m,function(){i(l,[],m,function(){"function"==typeof t&&t()})})})},o.prototype.stop=function(){for(var e=this._strategies,n=0,t=e.length;t>n;n++)e[n].stop()},r.createHorde=function(){return new o},window&&(window.gremlins=r),r}.call(n,t,n,e),!(void 0!==a&&(e.exports=a))},function(e,n,t){var a;a=function(e){"use strict";var n=t(1),a=(t(2),t(5));return function(){function e(){return o.randomizer.bool()}function t(){return o.randomizer.sentence()}function r(){if(!o.logger)throw new a;-1!==o.watchEvents.indexOf("alert")&&(window.alert=function(e){o.logger.warn("mogwai ","alert     ",e,"alert")}),-1!==o.watchEvents.indexOf("confirm")&&(window.confirm=function(e){o.confirmResponse(),o.logger.warn("mogwai ","alert     ",e,"confirm")}),-1!==o.watchEvents.indexOf("prompt")&&(window.prompt=function(e){o.promptResponse(),o.logger.warn("mogwai ","alert     ",e,"prompt")})}var i=["alert","confirm","prompt"],o={watchEvents:i,confirmResponse:e,promptResponse:t,logger:null,randomizer:null},s=window.alert,l=window.confirm,u=window.prompt;return r.cleanUp=function(){return window.alert=s,window.confirm=l,window.prompt=u,r},n(r,o),r}}.call(n,t,n,e),!(void 0!==a&&(e.exports=a))},function(e,n,t){var a;a=function(e){"use strict";var n=t(1),a=t(5);return function(){function e(e){return 10>e?"error":20>e?"warn":"log"}function t(e){e-l>s.delay&&(r(e),l=e),o&&window.requestAnimationFrame(t)}function r(){function e(e){t=e,window.requestAnimationFrame(n)}function n(e){var n=16>e-t?60:1e3/(e-t),a=s.levelSelector(n);s.logger[a]("mogwai ","fps       ",n)}var t;window.requestAnimationFrame(e)}function i(){if(!s.logger)throw new a;o=!0,window.requestAnimationFrame(t)}window.requestAnimationFrame||(window.requestAnimationFrame=window.mozRequestAnimationFrame||window.webkitRequestAnimationFrame||window.msRequestAnimationFrame||function(e){window.setTimeout(e,1e3/60)});var o,s={delay:500,levelSelector:e,logger:null},l=-(1/0);return i.cleanUp=function(){return o=!1,i},n(i,s),i}}.call(n,t,n,e),!(void 0!==a&&(e.exports=a))},function(e,n,t){var a;a=function(e){"use strict";var n=t(1);return function(){function e(){function e(){if(n++,n==r.maxErrors){if(i.stop(),!r.logger)return;window.setTimeout(function(){r.logger.warn("mogwai ","gizmo     ","stopped test execution after ",r.maxErrors,"errors")},4)}}var n=0,i=this;t=window.onerror,window.onerror=function(n,a,r){return e(),t?t(n,a,r):!1},a=console.error,console.error=function(){e(),a.apply(console,arguments)}}var t,a,r={maxErrors:10,logger:null};return e.cleanUp=function(){return window.onerror=t,console.error=a.bind(console),e},n(e,r),e}}.call(n,t,n,e),!(void 0!==a&&(e.exports=a))},function(e,n,t){var a;a=function(e){"use strict";var n=t(1),a=(t(2),t(3));return function(){function e(){return[u.randomizer.natural({max:o.documentElement.clientWidth-1}),u.randomizer.natural({max:o.documentElement.clientHeight-1})]}function t(e,n){var t=o.createElement("div");t.style.zIndex=2e3,t.style.border="3px solid red",t.style["border-radius"]="50%",t.style.borderRadius="50%",t.style.width="40px",t.style.height="40px",t.style["box-sizing"]="border-box",t.style.position="absolute",t.style.webkitTransition="opacity 1s ease-out",t.style.mozTransition="opacity 1s ease-out",t.style.transition="opacity 1s ease-out",t.style.left=e-20+"px",t.style.top=n-20+"px";var a=s.appendChild(t);setTimeout(function(){s.removeChild(a)},1e3),setTimeout(function(){a.style.opacity=0},50)}function r(){return!0}function i(){if(!u.randomizer)throw new a;var e,n,t,r,i=0;do if(e=u.positionSelector(),n=e[0],t=e[1],r=o.elementFromPoint(n,t),i++,i>u.maxNbTries)return!1;while(!r||!u.canClick(r));var s=o.createEvent("MouseEvents"),l=u.randomizer.pick(u.clickTypes);s.initMouseEvent(l,!0,!0,window,0,0,0,n,t,!1,!1,!1,!1,0,null),r.dispatchEvent(s),"function"==typeof u.showAction&&u.showAction(n,t,l),u.logger&&"function"==typeof u.logger.log&&u.logger.log("gremlin","clicker   ",l,"at",n,t)}var o=window.document,s=o.body,l=["click","click","click","click","click","click","dblclick","dblclick","mousedown","mouseup","mouseover","mouseover","mouseover","mousemove","mouseout"],u={clickTypes:l,positionSelector:e,showAction:t,canClick:r,maxNbTries:10,logger:null,randomizer:null};return n(i,u),i}}.call(n,t,n,e),!(void 0!==a&&(e.exports=a))},function(e,n,t){var a;a=function(e){"use strict";var n=t(1),a=(t(2),t(3));return function(){function e(e){"undefined"==typeof e.attributes["data-old-border"]&&(e.attributes["data-old-border"]=e.style.border);var n=e.attributes["data-old-border"];e.style.border="1px solid red",setTimeout(function(){e.style.border=n},500)}function t(){return!0}function r(){if(!p.randomizer)throw new a;var e=[];for(var n in p.elementMapTypes)p.elementMapTypes.hasOwnProperty(n)&&e.push(n);var t,r=0;do{var i=h.querySelectorAll(e.join(","));if(0===i.length)return!1;if(t=p.randomizer.pick(i),r++,r>p.maxNbTries)return!1}while(!t||!p.canFillElement(t));var o=null;for(var s in p.elementMapTypes)if(m(t,s)){o=s;break}var l=p.elementMapTypes[o](t);"function"==typeof p.showAction&&p.showAction(t),p.logger&&"function"==typeof p.logger.log&&p.logger.log("gremlin","formFiller","input",l,"in",t)}function i(e){var n=p.randomizer.character();return e.value+=n,n}function o(e){var n=p.randomizer.character({pool:"0123456789"});return e.value+=n,n}function s(e){var n=e.querySelectorAll("option");if(0!==n.length){for(var t=p.randomizer.pick(n),a=0,r=n.length;r>a;a++){var i=n[a];i.selected=i.value==t.value}return t.value}}function l(e){var n=h.createEvent("MouseEvents");return n.initMouseEvent("click",!0,!0,window,0,0,0,0,0,!1,!1,!1,!1,0,null),e.dispatchEvent(n),e.value}function u(e){var n=h.createEvent("MouseEvents");return n.initMouseEvent("click",!0,!0,window,0,0,0,0,0,!1,!1,!1,!1,0,null),e.dispatchEvent(n),e.value}function c(e){var n=p.randomizer.email();return e.value=n,n}function m(e,n){if(e.webkitMatchesSelector)m=function(e,n){return e.webkitMatchesSelector(n)};else if(e.mozMatchesSelector)m=function(e,n){return e.mozMatchesSelector(n)};else if(e.msMatchesSelector)m=function(e,n){return e.msMatchesSelector(n)};else{if(!e.oMatchesSelector)throw new Error("Unsupported browser");m=function(e,n){return e.oMatchesSelector(n)}}return m(e,n)}var h=window.document,d={textarea:i,'input[type="text"]':i,'input[type="password"]':i,'input[type="number"]':o,select:s,'input[type="radio"]':l,'input[type="checkbox"]':u,'input[type="email"]':c,"input:not([type])":i},p={elementMapTypes:d,showAction:e,canFillElement:t,maxNbTries:10,logger:null,randomizer:null};return n(r,p),r}}.call(n,t,n,e),!(void 0!==a&&(e.exports=a))},function(e,n,t){var a;a=function(e){"use strict";var n=t(1),a=(t(2),t(3));return function(){function e(){var e=Math.max(s.scrollWidth,s.offsetWidth,o.scrollWidth,o.offsetWidth,o.clientWidth),n=Math.max(s.scrollHeight,s.offsetHeight,o.scrollHeight,o.offsetHeight,o.clientHeight);return[l.randomizer.natural({max:e-o.clientWidth}),l.randomizer.natural({max:n-o.clientHeight})]}function t(e,n){var t=i.createElement("div");t.style.zIndex=2e3,t.style.border="3px solid red",t.style.width=o.clientWidth-25+"px",t.style.height=o.clientHeight-25+"px",t.style.position="absolute",t.style.webkitTransition="opacity 1s ease-out",t.style.mozTransition="opacity 1s ease-out",t.style.transition="opacity 1s ease-out",t.style.left=e+10+"px",t.style.top=n+10+"px";var a=s.appendChild(t);setTimeout(function(){s.removeChild(a)},1e3),setTimeout(function(){a.style.opacity=0},50)}function r(){if(!l.randomizer)throw new a;var e=l.positionSelector(),n=e[0],t=e[1];window.scrollTo(n,t),"function"==typeof l.showAction&&l.showAction(n,t),"function"==typeof l.logger.log&&l.logger.log("gremlin","scroller  ","scroll to",n,t)}var i=window.document,o=i.documentElement,s=i.body,l={positionSelector:e,showAction:t,logger:null,randomizer:null};return n(r,l),r}}.call(n,t,n,e),!(void 0!==a&&(e.exports=a))},function(e,n,t){var a;a=function(e){"use strict";var n=t(1),a=(t(2),t(3));return function(){function e(){return[h.randomizer.natural({max:u.documentElement.clientWidth-1}),h.randomizer.natural({max:u.documentElement.clientHeight-1})]}function t(e){var n=u.createDocumentFragment();e.forEach(function(e){var t=u.createElement("div");t.style.zIndex=2e3,t.style.background="red",t.style["border-radius"]="50%",t.style.borderRadius="50%",t.style.width="20px",t.style.height="20px",t.style.position="absolute",t.style.webkitTransition="opacity .5s ease-out",t.style.mozTransition="opacity .5s ease-out",t.style.transition="opacity .5s ease-out",t.style.left=e.x-10+"px",t.style.top=e.y-10+"px";var a=n.appendChild(t);setTimeout(function(){c.removeChild(a)},500),setTimeout(function(){a.style.opacity=0},50)}),u.body.appendChild(n)}function r(){return!0}function i(e,n,t,a){var r,i,o,s=e[0],l=e[1],u=[];if(1===n)return[{x:s,y:l}];for(t=t||100,a=null!==a?a*Math.PI/180:0,r=2*Math.PI/n,i=0;n>i;i++)o=r*i+a,u.push({x:s+t*Math.cos(o),y:l+t*Math.sin(o)});return u}function o(e,n,t){var a=[],r=u.createEvent("Event");r.initEvent("touch"+t,!0,!0),a.identifiedTouch=a.item=function(e){return this[e]||{}},e.forEach(function(e,t){var r=Math.round(e.x),i=Math.round(e.y);a.push({pageX:r,pageY:i,clientX:r,clientY:i,screenX:r,screenY:i,target:n,identifier:t})}),r.touches="end"==t?[]:a,r.targetTouches="end"==t?[]:a,r.changedTouches=a,n.dispatchEvent(r),h.showAction(e)}function s(e,n,t,a,r){function s(){var m=a.radius;1!==a.scale&&(m=a.radius-a.radius*(1-a.scale)*(1/u)*c);var h=n[0]+a.distanceX/u*c,d=n[1]+a.distanceY/u*c,p="number"==typeof a.rotation?a.rotation/u*c:null,f=i([h,d],t.length,m,p),y=1==c,b=c==u;if(y)o(f,e,"start");else{if(b)return o(f,e,"end"),r(f);o(f,e,"move")}setTimeout(s,l),c++}var l=10,u=Math.ceil(a.duration/l),c=1;s()}function l(e){function n(n,t){"function"==typeof h.showAction&&h.showAction(n),h.logger&&"function"==typeof h.logger.log&&h.logger.log("gremlin","toucher   ",l,"at",r,i,t),e()}if(!h.randomizer)throw new a;var t,r,i,o,s=0;do if(t=h.positionSelector(),r=t[0],i=t[1],o=u.elementFromPoint(r,i),s++,s>h.maxNbTries)return;while(!o||!h.canTouch(o));var l=h.randomizer.pick(h.touchTypes);d[l](t,o,n)}var u=window.document,c=u.body,m=["tap","tap","tap","doubletap","gesture","gesture","gesture","multitouch","multitouch"],h={touchTypes:m,positionSelector:e,showAction:t,canTouch:r,maxNbTries:10,logger:null,randomizer:null,maxTouches:2},d={tap:function(e,n,t){var a=i(e,1),r={duration:h.randomizer.integer({min:20,max:700})};o(a,n,"start"),setTimeout(function(){o(a,n,"end"),t(a,r)},r.duration)},doubletap:function(e,n,t){d.tap(e,n,function(){setTimeout(function(){d.tap(e,n,t)},30)})},gesture:function p(e,n,t){var p={distanceX:h.randomizer.integer({min:-100,max:200}),distanceY:h.randomizer.integer({min:-100,max:200}),duration:h.randomizer.integer({min:20,max:500})},a=i(e,1,p.radius);s(n,e,a,p,function(e){t(e,p)})},multitouch:function(e,n,t){var a=h.randomizer.integer({min:2,max:h.maxTouches}),r={scale:h.randomizer.floating({min:0,max:2}),rotation:h.randomizer.natural({min:-100,max:100}),radius:h.randomizer.integer({min:50,max:200}),distanceX:h.randomizer.integer({min:-20,max:20}),distanceY:h.randomizer.integer({min:-20,max:20}),duration:h.randomizer.integer({min:100,max:1500})},o=i(e,a,r.radius);s(n,e,o,r,function(e){t(e,r)})}};return n(l,h),l}}.call(n,t,n,e),!(void 0!==a&&(e.exports=a))},function(e,n,t){var a;a=function(e){"use strict";var n=t(1),a=(t(2),t(3));return function(){function e(){return c.randomizer.natural({min:3,max:254})}function t(e,n){return o.elementFromPoint(e,n)}function r(e,n,t,a){var r=o.createElement("div");r.style.zIndex=2e3,r.style.border="3px solid orange",r.style["border-radius"]="50%",r.style.borderRadius="50%",r.style.width="40px",r.style.height="40px",r.style["box-sizing"]="border-box",r.style.position="absolute",r.style.webkitTransition="opacity 1s ease-out",r.style.mozTransition="opacity 1s ease-out",r.style.transition="opacity 1s ease-out",r.style.left=n+"px",r.style.top=t+"px",r.style.textAlign="center",r.style.paddingTop="7px",r.innerHTML=String.fromCharCode(a);var i=l.appendChild(r);setTimeout(function(){l.removeChild(i)},1e3),setTimeout(function(){i.style.opacity=0},50)}function i(){if(!c.randomizer)throw new a;var e=o.createEventObject?o.createEventObject():o.createEvent("Events"),n=c.randomizer.pick(c.eventTypes),t=c.keyGenerator(),r=c.randomizer.natural({max:s.clientWidth-1}),i=c.randomizer.natural({max:s.clientHeight-1}),l=c.targetElement(r,i);e.initEvent&&e.initEvent(n,!0,!0),e.keyCode=t,e.which=t,e.keyCodeVal=t,l.dispatchEvent?l.dispatchEvent(e):l.fireEvent("on"+n,e),"function"==typeof c.showAction&&c.showAction(l,r,i,t),c.logger&&"function"==typeof c.logger.log&&c.logger.log("gremlin","typer       type",String.fromCharCode(t),"at",r,i)}var o=window.document,s=o.documentElement,l=o.body,u=["keypress","keyup","keydown"],c={eventTypes:u,showAction:r,keyGenerator:e,targetElement:t,logger:null,randomizer:null};return n(i,c),i}}.call(n,t,n,e),!(void 0!==a&&(e.exports=a))},function(e,n,t){var a;a=function(e){"use strict";var n=t(4),a=t(1);return function(){function e(e,a,s){function l(t){n(e,[],m,t)}function u(e){return r?void 0:e>=c?t():void l(function(){setTimeout(function(){u(++e)},o.delay)})}var c=a&&a.nb?a.nb:o.nb,m=this;r=!1,i=s,u(0)}function t(){"function"==typeof i&&i(),i=null}var r,i,o={delay:10,nb:100};return e.stop=function(){r=!0,setTimeout(t,4)},a(e,o),e}}.call(n,t,n,e),!(void 0!==a&&(e.exports=a))},function(e,n,t){var a;a=function(e){"use strict";var n=t(4),a=t(1);return function(){function e(e,a,s){function l(e,t,a){return r?void 0:t>=c?a():void n([e],[],m,function(){setTimeout(function(){l(e,++t,a)},o.delay)})}function u(){return r?void 0:0===e.length?t():void l(e.shift(),0,u)}var c=a&&a.nb?a.nb:o.nb,e=e.slice(0),m=this;r=!1,i=s,u()}function t(){"function"==typeof i&&i(),i=null}var r,i,o={delay:10,nb:200};return e.stop=function(){r=!0,setTimeout(t,4)},a(e,o),e}}.call(n,t,n,e),!(void 0!==a&&(e.exports=a))},function(e,n,t){var a;a=function(e){"use strict";var n=t(4),a=t(1),r=t(2);return function(){function e(e,a,r){function c(t,a,r){return s?void 0:a>=m?o():void n([t],[],d,function(){setTimeout(function(){c(i(e,h),++a,r)},u.delay)})}var m=a&&a.nb?a.nb:u.nb,e=e.slice(0),h=0===u.distribution.length?t(e):u.distribution,d=this;return 0===m?r():(s=!1,l=r,void c(i(e,h),0,c))}function t(e){var n=e.length;if(0===n)return[];for(var t=[],a=1/n,r=0;n>r;r++)t.push(a);return t}function i(e,n){for(var t=0,a=u.randomizer.floating({min:0,max:1}),r=0,i=e.length;i>r;r++)if(t+=n[r],t>=a)return e[r];return function(){}}function o(){"function"==typeof l&&l(),l=null}var s,l,u={distribution:[],delay:10,nb:1e3,randomizer:new r};return e.stop=function(){s=!0,setTimeout(o,4)},a(e,u),e}}.call(n,t,n,e),!(void 0!==a&&(e.exports=a))}])});
 
 /***/ },
-/* 29 */
+/* 20 */
 /*!*************************************************************!*\
   !*** /home/dp/Projects/sdk/spasdk/app/lib/develop/hooks.js ***!
   \*************************************************************/
@@ -4643,7 +2923,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, "../../spasdk/app/lib/develop/hooks.js"))
 
 /***/ },
-/* 30 */
+/* 21 */
 /*!**************************************************************!*\
   !*** /home/dp/Projects/sdk/spasdk/app/lib/develop/static.js ***!
   \**************************************************************/
@@ -4669,7 +2949,7 @@
 	//console.log(require('spa-gulp-livereload/config').default.tinylr);
 	//console.log(LIVERELOAD);
 	
-	__webpack_require__(/*! livereload-js/dist/livereload.js */ 31);
+	__webpack_require__(/*! livereload-js/dist/livereload.js */ 22);
 	
 	// livereload activation
 	//if ( config.livereload ) {
@@ -4682,7 +2962,7 @@
 
 
 /***/ },
-/* 31 */
+/* 22 */
 /*!****************************************************************!*\
   !*** /home/dp/Projects/sdk/~/livereload-js/dist/livereload.js ***!
   \****************************************************************/
@@ -5874,7 +4154,1185 @@
 
 
 /***/ },
-/* 32 */
+/* 23 */
+/*!************************************!*\
+  !*** ../app/lib/develop/weinre.js ***!
+  \************************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	/**
+	 * Web Inspector Remote.
+	 *
+	 * @module stb/develop/weinre
+	 * @author Stanislav Kalashnik <darkpark.main@gmail.com>
+	 * @license GNU GENERAL PUBLIC LICENSE Version 3
+	 */
+	
+	'use strict';
+	
+	var tag    = __webpack_require__(/*! spa-dom */ 24).tag,
+	    util   = __webpack_require__(/*! util */ 25),
+	    config = {} /*require('../../config/weinre')*/;
+	
+	
+	// web inspector is allowed only without SpyJS
+	if ( config.active && !localStorage.getItem('spyjs.active') ) {
+	    // load external script
+	    document.head.appendChild(tag('script', {
+	        type: 'text/javascript',
+	        src: util.format('//%s:%s/target/target-script-min.js#%s', location.hostname, config.port, config.name)
+	    }));
+	}
+
+
+/***/ },
+/* 24 */
+/*!*************************************************!*\
+  !*** /home/dp/Projects/sdk/spasdk/dom/index.js ***!
+  \*************************************************/
+/***/ function(module, exports) {
+
+	/**
+	 * HTML elements low-level handling.
+	 *
+	 * @license The MIT License (MIT)
+	 * @copyright Stanislav Kalashnik <darkpark.main@gmail.com>
+	 */
+	
+	'use strict';
+	
+	/* eslint no-unused-vars: 0 */
+	
+	/**
+	 * DOM manipulation module
+	 */
+	var dom = {};
+	
+	
+	/**
+	 * Create a new HTML element.
+	 *
+	 * @param {string} tagName mandatory tag name
+	 * @param {Object|null} [attrList] element attributes
+	 * @param {...*} [content] element content (primitive value/values or other nodes)
+	 * @return {Node|null} HTML element or null on failure
+	 *
+	 * @example
+	 * dom.tag('table');
+	 * dom.tag('div', {}, 'some text');
+	 * dom.tag('div', {className:'top'}, dom.tag('span'), dom.tag('br'));
+	 * dom.tag('link', {rel:'stylesheet', type:'text/css', href:'http://some.url/'});
+	 */
+	dom.tag = function ( tagName, attrList, content ) {
+	    var node = null,
+	        index, name;
+	
+	    // minimal param is given
+	    if ( tagName ) {
+	        // empty element
+	        node = document.createElement(tagName);
+	
+	        // optional attribute list is given
+	        if ( attrList && typeof attrList === 'object' ) {
+	            for ( name in attrList ) {
+	                // extend a new node with the given attributes
+	                node[name] = attrList[name];
+	            }
+	        }
+	
+	        // content (arguments except the first two)
+	        for ( index = 2; index < arguments.length; index++ ) {
+	            // some data is given
+	            if ( arguments[index] ) {
+	                // regular HTML tag or plain data
+	                node.appendChild(
+	                    typeof arguments[index] === 'object' ?
+	                    arguments[index] :
+	                    document.createTextNode(arguments[index])
+	                );
+	            }
+	        }
+	
+	    }
+	
+	    return node;
+	};
+	
+	
+	/**
+	 * Create a new DocumentFragment filled with the given non-empty elements if any.
+	 *
+	 * @param {...*} [node] fragment content (primitive value/values or other nodes)
+	 * @return {DocumentFragment} new placeholder
+	 *
+	 * @example
+	 * // gives an empty fragment element
+	 * dom.fragment();
+	 * // gives a fragment element with 3 div element inside
+	 * dom.fragment(dom.tag('div'), div2, div3);
+	 * // mixed case
+	 * dom.fragment('some text', 123, div3);
+	 */
+	dom.fragment = function ( node ) {
+	    // prepare placeholder
+	    var fragment = document.createDocumentFragment(),
+	        index;
+	
+	    // walk through all the given elements
+	    for ( index = 0; index < arguments.length; index++ ) {
+	        node = arguments[index];
+	        // some data is given
+	        if ( node ) {
+	            // regular HTML tag or plain data
+	            fragment.appendChild(typeof node === 'object' ? node : document.createTextNode(node));
+	        }
+	    }
+	
+	    return fragment;
+	};
+	
+	
+	/**
+	 * Add the given non-empty data (HTML element/text or list) to the destination element.
+	 *
+	 * @param {Node} tagDst element to receive children
+	 * @param {...*} [content] element content (primitive value/values or other nodes)
+	 * @return {Node|null} the destination element - owner of all added data
+	 *
+	 * @example
+	 * // simple text value
+	 * add(some_div, 'Hello world');
+	 * // single DOM Element
+	 * add(some_div, some_other_div);
+	 * // DOM Element list
+	 * add(some_div, div1, div2, div3);
+	 * // mixed case
+	 * add(some_div, div1, 'hello', 'world');
+	 */
+	dom.add = function ( tagDst, content ) {
+	    var index;
+	
+	    // valid HTML tag as the destination
+	    if ( tagDst instanceof Node ) {
+	        // append all except the first one
+	        for ( index = 1; index < arguments.length; index++ ) {
+	            // some data is given
+	            if ( arguments[index] ) {
+	                // regular HTML tag or plain data
+	                tagDst.appendChild(
+	                    typeof arguments[index] === 'object' ?
+	                    arguments[index] :
+	                    document.createTextNode(arguments[index])
+	                );
+	            }
+	        }
+	        return tagDst;
+	    }
+	
+	    return null;
+	};
+	
+	
+	/**
+	 * Remove the given elements from the DOM.
+	 *
+	 * @param {...Node} [nodes] element to be removed
+	 * @return {boolean} operation status (true - all given elements removed)
+	 *
+	 * @example
+	 * dom.remove(document.querySelector('div.test'));
+	 * dom.remove(div1, div2, div3);
+	 */
+	dom.remove = function ( nodes ) {
+	    var count = 0,  // amount of successfully removed nodes
+	        index;
+	
+	    // walk through all the given elements
+	    for ( index = 0; index < arguments.length; index++ ) {
+	        // valid non-empty tag
+	        if ( arguments[index] && arguments[index].parentNode ) {
+	            if ( arguments[index].parentNode.removeChild(arguments[index]) === arguments[index] ) {
+	                count++;
+	            }
+	        }
+	    }
+	
+	    return arguments.length > 0 && count === arguments.length;
+	};
+	
+	
+	dom.clear = function ( node ) {
+	    while ( node.lastChild ) {
+	        node.removeChild(node.lastChild);
+	    }
+	};
+	
+	
+	// public
+	module.exports = dom;
+
+
+/***/ },
+/* 25 */
+/*!********************************************!*\
+  !*** /home/dp/Projects/sdk/~/util/util.js ***!
+  \********************************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	/* WEBPACK VAR INJECTION */(function(global, process) {// Copyright Joyent, Inc. and other Node contributors.
+	//
+	// Permission is hereby granted, free of charge, to any person obtaining a
+	// copy of this software and associated documentation files (the
+	// "Software"), to deal in the Software without restriction, including
+	// without limitation the rights to use, copy, modify, merge, publish,
+	// distribute, sublicense, and/or sell copies of the Software, and to permit
+	// persons to whom the Software is furnished to do so, subject to the
+	// following conditions:
+	//
+	// The above copyright notice and this permission notice shall be included
+	// in all copies or substantial portions of the Software.
+	//
+	// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+	// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+	// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
+	// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+	// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+	// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
+	// USE OR OTHER DEALINGS IN THE SOFTWARE.
+	
+	var formatRegExp = /%[sdj%]/g;
+	exports.format = function(f) {
+	  if (!isString(f)) {
+	    var objects = [];
+	    for (var i = 0; i < arguments.length; i++) {
+	      objects.push(inspect(arguments[i]));
+	    }
+	    return objects.join(' ');
+	  }
+	
+	  var i = 1;
+	  var args = arguments;
+	  var len = args.length;
+	  var str = String(f).replace(formatRegExp, function(x) {
+	    if (x === '%%') return '%';
+	    if (i >= len) return x;
+	    switch (x) {
+	      case '%s': return String(args[i++]);
+	      case '%d': return Number(args[i++]);
+	      case '%j':
+	        try {
+	          return JSON.stringify(args[i++]);
+	        } catch (_) {
+	          return '[Circular]';
+	        }
+	      default:
+	        return x;
+	    }
+	  });
+	  for (var x = args[i]; i < len; x = args[++i]) {
+	    if (isNull(x) || !isObject(x)) {
+	      str += ' ' + x;
+	    } else {
+	      str += ' ' + inspect(x);
+	    }
+	  }
+	  return str;
+	};
+	
+	
+	// Mark that a method should not be used.
+	// Returns a modified function which warns once by default.
+	// If --no-deprecation is set, then it is a no-op.
+	exports.deprecate = function(fn, msg) {
+	  // Allow for deprecating things in the process of starting up.
+	  if (isUndefined(global.process)) {
+	    return function() {
+	      return exports.deprecate(fn, msg).apply(this, arguments);
+	    };
+	  }
+	
+	  if (process.noDeprecation === true) {
+	    return fn;
+	  }
+	
+	  var warned = false;
+	  function deprecated() {
+	    if (!warned) {
+	      if (process.throwDeprecation) {
+	        throw new Error(msg);
+	      } else if (process.traceDeprecation) {
+	        console.trace(msg);
+	      } else {
+	        console.error(msg);
+	      }
+	      warned = true;
+	    }
+	    return fn.apply(this, arguments);
+	  }
+	
+	  return deprecated;
+	};
+	
+	
+	var debugs = {};
+	var debugEnviron;
+	exports.debuglog = function(set) {
+	  if (isUndefined(debugEnviron))
+	    debugEnviron = process.env.NODE_DEBUG || '';
+	  set = set.toUpperCase();
+	  if (!debugs[set]) {
+	    if (new RegExp('\\b' + set + '\\b', 'i').test(debugEnviron)) {
+	      var pid = process.pid;
+	      debugs[set] = function() {
+	        var msg = exports.format.apply(exports, arguments);
+	        console.error('%s %d: %s', set, pid, msg);
+	      };
+	    } else {
+	      debugs[set] = function() {};
+	    }
+	  }
+	  return debugs[set];
+	};
+	
+	
+	/**
+	 * Echos the value of a value. Trys to print the value out
+	 * in the best way possible given the different types.
+	 *
+	 * @param {Object} obj The object to print out.
+	 * @param {Object} opts Optional options object that alters the output.
+	 */
+	/* legacy: obj, showHidden, depth, colors*/
+	function inspect(obj, opts) {
+	  // default options
+	  var ctx = {
+	    seen: [],
+	    stylize: stylizeNoColor
+	  };
+	  // legacy...
+	  if (arguments.length >= 3) ctx.depth = arguments[2];
+	  if (arguments.length >= 4) ctx.colors = arguments[3];
+	  if (isBoolean(opts)) {
+	    // legacy...
+	    ctx.showHidden = opts;
+	  } else if (opts) {
+	    // got an "options" object
+	    exports._extend(ctx, opts);
+	  }
+	  // set default options
+	  if (isUndefined(ctx.showHidden)) ctx.showHidden = false;
+	  if (isUndefined(ctx.depth)) ctx.depth = 2;
+	  if (isUndefined(ctx.colors)) ctx.colors = false;
+	  if (isUndefined(ctx.customInspect)) ctx.customInspect = true;
+	  if (ctx.colors) ctx.stylize = stylizeWithColor;
+	  return formatValue(ctx, obj, ctx.depth);
+	}
+	exports.inspect = inspect;
+	
+	
+	// http://en.wikipedia.org/wiki/ANSI_escape_code#graphics
+	inspect.colors = {
+	  'bold' : [1, 22],
+	  'italic' : [3, 23],
+	  'underline' : [4, 24],
+	  'inverse' : [7, 27],
+	  'white' : [37, 39],
+	  'grey' : [90, 39],
+	  'black' : [30, 39],
+	  'blue' : [34, 39],
+	  'cyan' : [36, 39],
+	  'green' : [32, 39],
+	  'magenta' : [35, 39],
+	  'red' : [31, 39],
+	  'yellow' : [33, 39]
+	};
+	
+	// Don't use 'blue' not visible on cmd.exe
+	inspect.styles = {
+	  'special': 'cyan',
+	  'number': 'yellow',
+	  'boolean': 'yellow',
+	  'undefined': 'grey',
+	  'null': 'bold',
+	  'string': 'green',
+	  'date': 'magenta',
+	  // "name": intentionally not styling
+	  'regexp': 'red'
+	};
+	
+	
+	function stylizeWithColor(str, styleType) {
+	  var style = inspect.styles[styleType];
+	
+	  if (style) {
+	    return '\u001b[' + inspect.colors[style][0] + 'm' + str +
+	           '\u001b[' + inspect.colors[style][1] + 'm';
+	  } else {
+	    return str;
+	  }
+	}
+	
+	
+	function stylizeNoColor(str, styleType) {
+	  return str;
+	}
+	
+	
+	function arrayToHash(array) {
+	  var hash = {};
+	
+	  array.forEach(function(val, idx) {
+	    hash[val] = true;
+	  });
+	
+	  return hash;
+	}
+	
+	
+	function formatValue(ctx, value, recurseTimes) {
+	  // Provide a hook for user-specified inspect functions.
+	  // Check that value is an object with an inspect function on it
+	  if (ctx.customInspect &&
+	      value &&
+	      isFunction(value.inspect) &&
+	      // Filter out the util module, it's inspect function is special
+	      value.inspect !== exports.inspect &&
+	      // Also filter out any prototype objects using the circular check.
+	      !(value.constructor && value.constructor.prototype === value)) {
+	    var ret = value.inspect(recurseTimes, ctx);
+	    if (!isString(ret)) {
+	      ret = formatValue(ctx, ret, recurseTimes);
+	    }
+	    return ret;
+	  }
+	
+	  // Primitive types cannot have properties
+	  var primitive = formatPrimitive(ctx, value);
+	  if (primitive) {
+	    return primitive;
+	  }
+	
+	  // Look up the keys of the object.
+	  var keys = Object.keys(value);
+	  var visibleKeys = arrayToHash(keys);
+	
+	  if (ctx.showHidden) {
+	    keys = Object.getOwnPropertyNames(value);
+	  }
+	
+	  // IE doesn't make error fields non-enumerable
+	  // http://msdn.microsoft.com/en-us/library/ie/dww52sbt(v=vs.94).aspx
+	  if (isError(value)
+	      && (keys.indexOf('message') >= 0 || keys.indexOf('description') >= 0)) {
+	    return formatError(value);
+	  }
+	
+	  // Some type of object without properties can be shortcutted.
+	  if (keys.length === 0) {
+	    if (isFunction(value)) {
+	      var name = value.name ? ': ' + value.name : '';
+	      return ctx.stylize('[Function' + name + ']', 'special');
+	    }
+	    if (isRegExp(value)) {
+	      return ctx.stylize(RegExp.prototype.toString.call(value), 'regexp');
+	    }
+	    if (isDate(value)) {
+	      return ctx.stylize(Date.prototype.toString.call(value), 'date');
+	    }
+	    if (isError(value)) {
+	      return formatError(value);
+	    }
+	  }
+	
+	  var base = '', array = false, braces = ['{', '}'];
+	
+	  // Make Array say that they are Array
+	  if (isArray(value)) {
+	    array = true;
+	    braces = ['[', ']'];
+	  }
+	
+	  // Make functions say that they are functions
+	  if (isFunction(value)) {
+	    var n = value.name ? ': ' + value.name : '';
+	    base = ' [Function' + n + ']';
+	  }
+	
+	  // Make RegExps say that they are RegExps
+	  if (isRegExp(value)) {
+	    base = ' ' + RegExp.prototype.toString.call(value);
+	  }
+	
+	  // Make dates with properties first say the date
+	  if (isDate(value)) {
+	    base = ' ' + Date.prototype.toUTCString.call(value);
+	  }
+	
+	  // Make error with message first say the error
+	  if (isError(value)) {
+	    base = ' ' + formatError(value);
+	  }
+	
+	  if (keys.length === 0 && (!array || value.length == 0)) {
+	    return braces[0] + base + braces[1];
+	  }
+	
+	  if (recurseTimes < 0) {
+	    if (isRegExp(value)) {
+	      return ctx.stylize(RegExp.prototype.toString.call(value), 'regexp');
+	    } else {
+	      return ctx.stylize('[Object]', 'special');
+	    }
+	  }
+	
+	  ctx.seen.push(value);
+	
+	  var output;
+	  if (array) {
+	    output = formatArray(ctx, value, recurseTimes, visibleKeys, keys);
+	  } else {
+	    output = keys.map(function(key) {
+	      return formatProperty(ctx, value, recurseTimes, visibleKeys, key, array);
+	    });
+	  }
+	
+	  ctx.seen.pop();
+	
+	  return reduceToSingleString(output, base, braces);
+	}
+	
+	
+	function formatPrimitive(ctx, value) {
+	  if (isUndefined(value))
+	    return ctx.stylize('undefined', 'undefined');
+	  if (isString(value)) {
+	    var simple = '\'' + JSON.stringify(value).replace(/^"|"$/g, '')
+	                                             .replace(/'/g, "\\'")
+	                                             .replace(/\\"/g, '"') + '\'';
+	    return ctx.stylize(simple, 'string');
+	  }
+	  if (isNumber(value))
+	    return ctx.stylize('' + value, 'number');
+	  if (isBoolean(value))
+	    return ctx.stylize('' + value, 'boolean');
+	  // For some reason typeof null is "object", so special case here.
+	  if (isNull(value))
+	    return ctx.stylize('null', 'null');
+	}
+	
+	
+	function formatError(value) {
+	  return '[' + Error.prototype.toString.call(value) + ']';
+	}
+	
+	
+	function formatArray(ctx, value, recurseTimes, visibleKeys, keys) {
+	  var output = [];
+	  for (var i = 0, l = value.length; i < l; ++i) {
+	    if (hasOwnProperty(value, String(i))) {
+	      output.push(formatProperty(ctx, value, recurseTimes, visibleKeys,
+	          String(i), true));
+	    } else {
+	      output.push('');
+	    }
+	  }
+	  keys.forEach(function(key) {
+	    if (!key.match(/^\d+$/)) {
+	      output.push(formatProperty(ctx, value, recurseTimes, visibleKeys,
+	          key, true));
+	    }
+	  });
+	  return output;
+	}
+	
+	
+	function formatProperty(ctx, value, recurseTimes, visibleKeys, key, array) {
+	  var name, str, desc;
+	  desc = Object.getOwnPropertyDescriptor(value, key) || { value: value[key] };
+	  if (desc.get) {
+	    if (desc.set) {
+	      str = ctx.stylize('[Getter/Setter]', 'special');
+	    } else {
+	      str = ctx.stylize('[Getter]', 'special');
+	    }
+	  } else {
+	    if (desc.set) {
+	      str = ctx.stylize('[Setter]', 'special');
+	    }
+	  }
+	  if (!hasOwnProperty(visibleKeys, key)) {
+	    name = '[' + key + ']';
+	  }
+	  if (!str) {
+	    if (ctx.seen.indexOf(desc.value) < 0) {
+	      if (isNull(recurseTimes)) {
+	        str = formatValue(ctx, desc.value, null);
+	      } else {
+	        str = formatValue(ctx, desc.value, recurseTimes - 1);
+	      }
+	      if (str.indexOf('\n') > -1) {
+	        if (array) {
+	          str = str.split('\n').map(function(line) {
+	            return '  ' + line;
+	          }).join('\n').substr(2);
+	        } else {
+	          str = '\n' + str.split('\n').map(function(line) {
+	            return '   ' + line;
+	          }).join('\n');
+	        }
+	      }
+	    } else {
+	      str = ctx.stylize('[Circular]', 'special');
+	    }
+	  }
+	  if (isUndefined(name)) {
+	    if (array && key.match(/^\d+$/)) {
+	      return str;
+	    }
+	    name = JSON.stringify('' + key);
+	    if (name.match(/^"([a-zA-Z_][a-zA-Z_0-9]*)"$/)) {
+	      name = name.substr(1, name.length - 2);
+	      name = ctx.stylize(name, 'name');
+	    } else {
+	      name = name.replace(/'/g, "\\'")
+	                 .replace(/\\"/g, '"')
+	                 .replace(/(^"|"$)/g, "'");
+	      name = ctx.stylize(name, 'string');
+	    }
+	  }
+	
+	  return name + ': ' + str;
+	}
+	
+	
+	function reduceToSingleString(output, base, braces) {
+	  var numLinesEst = 0;
+	  var length = output.reduce(function(prev, cur) {
+	    numLinesEst++;
+	    if (cur.indexOf('\n') >= 0) numLinesEst++;
+	    return prev + cur.replace(/\u001b\[\d\d?m/g, '').length + 1;
+	  }, 0);
+	
+	  if (length > 60) {
+	    return braces[0] +
+	           (base === '' ? '' : base + '\n ') +
+	           ' ' +
+	           output.join(',\n  ') +
+	           ' ' +
+	           braces[1];
+	  }
+	
+	  return braces[0] + base + ' ' + output.join(', ') + ' ' + braces[1];
+	}
+	
+	
+	// NOTE: These type checking functions intentionally don't use `instanceof`
+	// because it is fragile and can be easily faked with `Object.create()`.
+	function isArray(ar) {
+	  return Array.isArray(ar);
+	}
+	exports.isArray = isArray;
+	
+	function isBoolean(arg) {
+	  return typeof arg === 'boolean';
+	}
+	exports.isBoolean = isBoolean;
+	
+	function isNull(arg) {
+	  return arg === null;
+	}
+	exports.isNull = isNull;
+	
+	function isNullOrUndefined(arg) {
+	  return arg == null;
+	}
+	exports.isNullOrUndefined = isNullOrUndefined;
+	
+	function isNumber(arg) {
+	  return typeof arg === 'number';
+	}
+	exports.isNumber = isNumber;
+	
+	function isString(arg) {
+	  return typeof arg === 'string';
+	}
+	exports.isString = isString;
+	
+	function isSymbol(arg) {
+	  return typeof arg === 'symbol';
+	}
+	exports.isSymbol = isSymbol;
+	
+	function isUndefined(arg) {
+	  return arg === void 0;
+	}
+	exports.isUndefined = isUndefined;
+	
+	function isRegExp(re) {
+	  return isObject(re) && objectToString(re) === '[object RegExp]';
+	}
+	exports.isRegExp = isRegExp;
+	
+	function isObject(arg) {
+	  return typeof arg === 'object' && arg !== null;
+	}
+	exports.isObject = isObject;
+	
+	function isDate(d) {
+	  return isObject(d) && objectToString(d) === '[object Date]';
+	}
+	exports.isDate = isDate;
+	
+	function isError(e) {
+	  return isObject(e) &&
+	      (objectToString(e) === '[object Error]' || e instanceof Error);
+	}
+	exports.isError = isError;
+	
+	function isFunction(arg) {
+	  return typeof arg === 'function';
+	}
+	exports.isFunction = isFunction;
+	
+	function isPrimitive(arg) {
+	  return arg === null ||
+	         typeof arg === 'boolean' ||
+	         typeof arg === 'number' ||
+	         typeof arg === 'string' ||
+	         typeof arg === 'symbol' ||  // ES6 symbol
+	         typeof arg === 'undefined';
+	}
+	exports.isPrimitive = isPrimitive;
+	
+	exports.isBuffer = __webpack_require__(/*! ./support/isBuffer */ 27);
+	
+	function objectToString(o) {
+	  return Object.prototype.toString.call(o);
+	}
+	
+	
+	function pad(n) {
+	  return n < 10 ? '0' + n.toString(10) : n.toString(10);
+	}
+	
+	
+	var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep',
+	              'Oct', 'Nov', 'Dec'];
+	
+	// 26 Feb 16:19:34
+	function timestamp() {
+	  var d = new Date();
+	  var time = [pad(d.getHours()),
+	              pad(d.getMinutes()),
+	              pad(d.getSeconds())].join(':');
+	  return [d.getDate(), months[d.getMonth()], time].join(' ');
+	}
+	
+	
+	// log is just a thin wrapper to console.log that prepends a timestamp
+	exports.log = function() {
+	  console.log('%s - %s', timestamp(), exports.format.apply(exports, arguments));
+	};
+	
+	
+	/**
+	 * Inherit the prototype methods from one constructor into another.
+	 *
+	 * The Function.prototype.inherits from lang.js rewritten as a standalone
+	 * function (not on Function.prototype). NOTE: If this file is to be loaded
+	 * during bootstrapping this function needs to be rewritten using some native
+	 * functions as prototype setup using normal JavaScript does not work as
+	 * expected during bootstrapping (see mirror.js in r114903).
+	 *
+	 * @param {function} ctor Constructor function which needs to inherit the
+	 *     prototype.
+	 * @param {function} superCtor Constructor function to inherit prototype from.
+	 */
+	exports.inherits = __webpack_require__(/*! inherits */ 28);
+	
+	exports._extend = function(origin, add) {
+	  // Don't do anything if add isn't an object
+	  if (!add || !isObject(add)) return origin;
+	
+	  var keys = Object.keys(add);
+	  var i = keys.length;
+	  while (i--) {
+	    origin[keys[i]] = add[keys[i]];
+	  }
+	  return origin;
+	};
+	
+	function hasOwnProperty(obj, prop) {
+	  return Object.prototype.hasOwnProperty.call(obj, prop);
+	}
+	
+	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }()), __webpack_require__(/*! /home/dp/Projects/sdk/~/process/browser.js */ 26)))
+
+/***/ },
+/* 26 */
+/*!**************************************************!*\
+  !*** /home/dp/Projects/sdk/~/process/browser.js ***!
+  \**************************************************/
+/***/ function(module, exports) {
+
+	// shim for using process in browser
+	
+	var process = module.exports = {};
+	var queue = [];
+	var draining = false;
+	var currentQueue;
+	var queueIndex = -1;
+	
+	function cleanUpNextTick() {
+	    draining = false;
+	    if (currentQueue.length) {
+	        queue = currentQueue.concat(queue);
+	    } else {
+	        queueIndex = -1;
+	    }
+	    if (queue.length) {
+	        drainQueue();
+	    }
+	}
+	
+	function drainQueue() {
+	    if (draining) {
+	        return;
+	    }
+	    var timeout = setTimeout(cleanUpNextTick);
+	    draining = true;
+	
+	    var len = queue.length;
+	    while(len) {
+	        currentQueue = queue;
+	        queue = [];
+	        while (++queueIndex < len) {
+	            if (currentQueue) {
+	                currentQueue[queueIndex].run();
+	            }
+	        }
+	        queueIndex = -1;
+	        len = queue.length;
+	    }
+	    currentQueue = null;
+	    draining = false;
+	    clearTimeout(timeout);
+	}
+	
+	process.nextTick = function (fun) {
+	    var args = new Array(arguments.length - 1);
+	    if (arguments.length > 1) {
+	        for (var i = 1; i < arguments.length; i++) {
+	            args[i - 1] = arguments[i];
+	        }
+	    }
+	    queue.push(new Item(fun, args));
+	    if (queue.length === 1 && !draining) {
+	        setTimeout(drainQueue, 0);
+	    }
+	};
+	
+	// v8 likes predictible objects
+	function Item(fun, array) {
+	    this.fun = fun;
+	    this.array = array;
+	}
+	Item.prototype.run = function () {
+	    this.fun.apply(null, this.array);
+	};
+	process.title = 'browser';
+	process.browser = true;
+	process.env = {};
+	process.argv = [];
+	process.version = ''; // empty string to avoid regexp issues
+	process.versions = {};
+	
+	function noop() {}
+	
+	process.on = noop;
+	process.addListener = noop;
+	process.once = noop;
+	process.off = noop;
+	process.removeListener = noop;
+	process.removeAllListeners = noop;
+	process.emit = noop;
+	
+	process.binding = function (name) {
+	    throw new Error('process.binding is not supported');
+	};
+	
+	process.cwd = function () { return '/' };
+	process.chdir = function (dir) {
+	    throw new Error('process.chdir is not supported');
+	};
+	process.umask = function() { return 0; };
+
+
+/***/ },
+/* 27 */
+/*!***************************************************************!*\
+  !*** /home/dp/Projects/sdk/~/util/support/isBufferBrowser.js ***!
+  \***************************************************************/
+/***/ function(module, exports) {
+
+	module.exports = function isBuffer(arg) {
+	  return arg && typeof arg === 'object'
+	    && typeof arg.copy === 'function'
+	    && typeof arg.fill === 'function'
+	    && typeof arg.readUInt8 === 'function';
+	}
+
+/***/ },
+/* 28 */
+/*!************************************************************!*\
+  !*** /home/dp/Projects/sdk/~/inherits/inherits_browser.js ***!
+  \************************************************************/
+/***/ function(module, exports) {
+
+	if (typeof Object.create === 'function') {
+	  // implementation from standard node.js 'util' module
+	  module.exports = function inherits(ctor, superCtor) {
+	    ctor.super_ = superCtor
+	    ctor.prototype = Object.create(superCtor.prototype, {
+	      constructor: {
+	        value: ctor,
+	        enumerable: false,
+	        writable: true,
+	        configurable: true
+	      }
+	    });
+	  };
+	} else {
+	  // old school shim for old browsers
+	  module.exports = function inherits(ctor, superCtor) {
+	    ctor.super_ = superCtor
+	    var TempCtor = function () {}
+	    TempCtor.prototype = superCtor.prototype
+	    ctor.prototype = new TempCtor()
+	    ctor.prototype.constructor = ctor
+	  }
+	}
+
+
+/***/ },
+/* 29 */
+/*!************************************!*\
+  !*** ../app/lib/develop/events.js ***!
+  \************************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	/**
+	 * Additional dev events.
+	 *
+	 * @module stb/develop/events
+	 * @author Stanislav Kalashnik <darkpark.main@gmail.com>
+	 * @license GNU GENERAL PUBLIC LICENSE Version 3
+	 */
+	
+	'use strict';
+	
+	/* eslint new-cap: 0 */
+	
+	var util    = __webpack_require__(/*! util */ 25),
+	    app     = __webpack_require__(/*! ../core */ 2),
+	    stringify = __webpack_require__(/*! cjs-query */ 5).stringify,
+	    //request = require('spa-request'),
+	    //dom     = require('spa-dom'),
+	    grid    = __webpack_require__(/*! ./grid */ 30),
+	    events  = {};
+	
+	
+	/**
+	 * Apply the given screen geometry and reload the page.
+	 *
+	 * @param {number} width screen param
+	 * @param {number} height screen param
+	 */
+	function changeScreenDimension ( width, height ) {
+	    app.query.screenHeight = height;
+	    location.search = '?' + stringify(app.query);
+	
+	    // check if it's necessary
+	    /*if ( Number(localStorage.getItem('screen.height')) === height ) {
+	        // not really
+	        debug.log('no resolution change: new and current values are identical', 'red');
+	    } else {
+	        // yes
+	        debug.log(util.format('switch to %sx%s', width, height), 'red');
+	
+	        // save in case of document reload
+	        localStorage.setItem('screen.height', height);
+	        localStorage.setItem('screen.width',  width);
+	
+	        // hide content to avoid raw HTML blinking
+	        document.body.style.display = 'none';
+	
+	        // apply new metrics
+	        app.setScreen(require('app:metrics')[height]);
+	
+	        // restore visibility
+	        document.body.style.display = '';
+	    }*/
+	}
+	
+	
+	// inherit SPA tools
+	//require('spa-develop/events');
+	
+	
+	events.load = function () {
+	    // export to globals div for develop HTML elements
+	    //window.$develop = document.body.appendChild(document.createElement('div'));
+	   // window.$develop.className = 'develop';
+	
+	    // apply dev css
+	    //document.body.classList.add('develop');
+	
+	    grid.init();
+	
+	    if ( localStorage.getItem('grid.active') === 'true' ) {
+	        grid.show();
+	    }
+	
+	    // stress-testing
+	    //window.gremlins = require('gremlins.js/gremlins.min.js');
+	    //window.horde    = window.gremlins.createHorde();
+	};
+	
+	
+	events.keydown = function ( event ) {
+	    switch ( event.keyCode ) {
+	        //// numpad 0
+	        //case 96:
+	        //    debug.log('full document reload', 'red');
+	        //    location.hash = '';
+	        //    location.reload();
+	        //    break;
+	
+	        // numpad 1
+	        case 97:
+	            // NTSC
+	            changeScreenDimension(720, 480);
+	            break;
+	
+	        // numpad 2
+	        case 98:
+	            // PAL
+	            changeScreenDimension(720, 576);
+	            break;
+	
+	        // numpad 3
+	        case 99:
+	            // 720p
+	            changeScreenDimension(1280, 720);
+	            break;
+	
+	        // numpad 4
+	        case 100:
+	            // 1080p
+	            changeScreenDimension(1920, 1080);
+	            break;
+	
+	        // numpad 5
+	        case 101:
+	            // debug grid
+	            if ( grid.active ) {
+	                grid.hide();
+	            } else {
+	                grid.show();
+	            }
+	            debug.log('show grid: ' + grid.active, 'red');
+	            localStorage.setItem('grid.active', grid.active.toString());
+	            break;
+	
+	        // numpad 6
+	        //case 102:
+	        //    // stress-testing for emulation
+	        //    window.horde.unleash({nb: 500});
+	        //    break;
+	
+	        // numpad 7
+	        //case 103:
+	        //    if ( !app.data.host ) {
+	        //        debug.log('SpyJS in this mode is available only on STB devices.', 'red');
+	        //    } else {
+	        //        // SpyJS enable/disable
+	        //        if ( !localStorage.getItem('spyjs.active') ) {
+	        //            // try to "ping" proxy server
+	        //            request.ajax(document.location.protocol + '//' + location.hostname + ':3546', {
+	        //                method: 'get',
+	        //                onload: function () {
+	        //                    // proxy seems ready
+	        //                    //isSpyJs = true;
+	        //                    localStorage.setItem('spyjs.active', true);
+	        //                    debug.log('SpyJS: enable', 'red');
+	        //                    debug.log('SpyJS: set proxy to ' + location.hostname + ':' + 3546);
+			//
+	        //                    gSTB.SetWebProxy(location.hostname, 3546, '', '', '');
+	        //                    location.reload();
+	        //                },
+	        //                onerror: function () {
+	        //                    debug.log('SpyJS: no connection (check SpyJS is started on the server)', 'red');
+	        //                }
+	        //            });
+	        //        } else {
+	        //            //isSpyJs = false;
+	        //            localStorage.setItem('spyjs.active', false);
+	        //            gSTB.ResetWebProxy();
+	        //            debug.log('SpyJS: disable', 'red');
+	        //            location.reload();
+	        //        }
+	        //    }
+	        //    break;
+	
+	        // numpad 8
+	        //case 104:
+	        //    // FireBug Lite
+	        //    debug.log('firebug-lite activation', 'red');
+	        //    document.head.appendChild(dom.tag('script', {
+	        //        type: 'text/javascript',
+	        //        src: 'http://getfirebug.com/firebug-lite.js#startOpened',
+	        //        onload: function () {
+	        //            debug.log('firebug-lite ready ...', 'green');
+	        //        },
+	        //        onerror: function ( error ) {
+	        //            debug.inspect(error);
+	        //        }
+	        //    }));
+	        //    break;
+	
+	        // numpad 9
+	        //case 105:
+	        //    // outline components and inner structures
+	        //    debug.log('toggle develop css layout', 'red');
+	        //    document.body.classList.toggle('develop');
+	        //    break;
+	
+	        // numpad .
+	        //case 110:
+	        //    // CSS reload
+	        //    debug.log('CSS reload', 'red');
+	        //    // get through all css links
+	        //    Array.prototype.slice.call(document.head.getElementsByTagName('link')).forEach(function forEachLink ( tag ) {
+	        //        // get base name, modify and apply
+	        //        tag.href = tag.href.split('?')[0] + '?' + (+new Date());
+	        //    });
+	        //    break;
+	    }
+	};
+	
+	
+	// additional top-level key handlers
+	window.addEventListener('load',    events.load);
+	window.addEventListener('keydown', events.keydown);
+	
+	
+	// public
+	module.exports = events;
+
+
+/***/ },
+/* 30 */
 /*!**********************************!*\
   !*** ../app/lib/develop/grid.js ***!
   \**********************************/
@@ -5890,7 +5348,7 @@
 	
 	'use strict';
 	
-	var metrics = __webpack_require__(/*! spa-app */ 22).metrics;
+	var metrics = __webpack_require__(/*! ../core */ 2).metrics;
 	
 	
 	// public
@@ -6173,304 +5631,7 @@
 
 
 /***/ },
-/* 33 */
-/*!******************************************************!*\
-  !*** /home/dp/Projects/sdk/spasdk/develop/events.js ***!
-  \******************************************************/
-/***/ function(module, exports, __webpack_require__) {
-
-	/**
-	 * Additional dev events.
-	 *
-	 * @module stb/develop/events
-	 * @author Stanislav Kalashnik <darkpark.main@gmail.com>
-	 * @license GNU GENERAL PUBLIC LICENSE Version 3
-	 */
-	
-	'use strict';
-	
-	/* eslint new-cap: 0 */
-	
-	var //util    = require('util'),
-	    //app     = require('spa-app'),
-	    Wamp    = __webpack_require__(/*! spa-wamp */ 25),
-	    request = __webpack_require__(/*! spa-request */ 34),
-	    events  = {},
-	    app;
-	    //dom     = require('spa-dom'),
-	    //grid    = require('./grid');
-	
-	
-	events.load = function () {
-	    // app instance
-	    window.app = app = __webpack_require__(/*! spa-app */ 22);
-	
-	    if ( app.query.wampPort ) {
-	        //console.log('connect to WAMP server');
-	        window.app.wampTarget = new Wamp(
-	            //new WebSocket('ws://' + (app.query.wampHost || location.hostname) + ':' + app.query.wampPort + '/target')
-	            'ws://' + (app.query.wampHost || location.hostname) + ':' + app.query.wampPort + '/target'
-	        );
-	
-	        // ready
-	        /*window.app.wamp.socket.onopen = function () {
-	            console.log('wamp is ready!');
-	        };*/
-	    }
-	
-	    // export to globals div for develop HTML elements
-	    window.$develop = document.body.appendChild(document.createElement('div'));
-	    window.$develop.className = 'develop';
-	
-	    // apply dev css
-	    document.body.classList.add('develop');
-	
-	    //grid.init();
-	
-	    //if ( localStorage.getItem('grid.active') ) {
-	    //    grid.show();
-	    //}
-	
-	    // stress-testing
-	    window.gremlins = __webpack_require__(/*! gremlins.js/gremlins.min.js */ 28);
-	    window.horde    = window.gremlins.createHorde();
-	};
-	
-	
-	events.keydown = function ( event ) {
-	    switch ( event.keyCode ) {
-	        // numpad 0
-	        case 96:
-	            debug.log('full document reload', 'red');
-	            location.hash = '';
-	            location.reload();
-	            break;
-	
-	        // numpad 5
-	        //case 101:
-	        //    // debug grid
-	        //    if ( grid.active ) {
-	        //        grid.hide();
-	        //    } else {
-	        //        grid.show();
-	        //    }
-	        //    debug.log('show grid: ' + grid.active, 'red');
-	        //    localStorage.setItem('grid.active', grid.active);
-	        //    break;
-	
-	        // numpad 6
-	        case 102:
-	            // stress-testing for emulation
-	            window.horde.unleash({nb: 500});
-	            break;
-	
-	        // numpad 7
-	        case 103:
-	            //if ( !app.data.host ) {
-	            //    debug.log('SpyJS in this mode is available only on STB devices.', 'red');
-	            //} else {
-	            // SpyJS enable/disable
-	            if ( localStorage.getItem('spyjs.active') ) {
-	                //isSpyJs = false;
-	                localStorage.setItem('spyjs.active', false);
-	                gSTB.ResetWebProxy();
-	                debug.log('SpyJS: disable', 'red');
-	                location.reload();
-	            } else {
-	                // try to "ping" proxy server
-	                request.ajax(document.location.protocol + '//' + location.hostname + ':3546', {
-	                    method: 'get',
-	                    onload: function () {
-	                        // proxy seems ready
-	                        //isSpyJs = true;
-	                        localStorage.setItem('spyjs.active', true);
-	                        debug.log('SpyJS: enable', 'red');
-	                        debug.log('SpyJS: set proxy to ' + location.hostname + ':' + 3546);
-	
-	                        gSTB.SetWebProxy(location.hostname, 3546, '', '', '');
-	                        location.reload();
-	                    },
-	                    onerror: function () {
-	                        debug.log('SpyJS: no connection (check SpyJS is started on the server)', 'red');
-	                    }
-	                });
-	            }
-	            //}
-	            break;
-	
-	        //// numpad 8
-	        //case 104:
-	        //    // FireBug Lite
-	        //    debug.log('firebug-lite activation', 'red');
-	        //    document.head.appendChild(dom.tag('script', {
-	        //        type: 'text/javascript',
-	        //        src: 'http://getfirebug.com/firebug-lite.js#startOpened',
-	        //        onload: function () {
-	        //            debug.log('firebug-lite ready ...', 'green');
-	        //        },
-	        //        onerror: function ( error ) {
-	        //            debug.inspect(error);
-	        //        }
-	        //    }));
-	        //    break;
-	
-	        // numpad 9
-	        case 105:
-	            // outline components and inner structures
-	            debug.log('toggle develop css layout', 'red');
-	            document.body.classList.toggle('develop');
-	            break;
-	
-	        // numpad .
-	        case 110:
-	            // CSS reload
-	            debug.log('CSS reload', 'red');
-	            // get through all css links
-	            Array.prototype.slice.call(document.head.getElementsByTagName('link')).forEach(function forEachLink ( tag ) {
-	                // get base name, modify and apply
-	                tag.href = tag.href.split('?')[0] + '?' + (+new Date());
-	            });
-	            break;
-	    }
-	};
-	
-	
-	// additional top-level key handlers
-	window.addEventListener('load',    events.load);
-	window.addEventListener('keydown', events.keydown);
-	
-	
-	// public
-	module.exports = events;
-
-
-/***/ },
-/* 34 */
-/*!*****************************************************!*\
-  !*** /home/dp/Projects/sdk/spasdk/request/index.js ***!
-  \*****************************************************/
-/***/ function(module, exports) {
-
-	/**
-	 * @license The MIT License (MIT)
-	 * @copyright Stanislav Kalashnik <darkpark.main@gmail.com>
-	 */
-	
-	'use strict';
-	
-	var request  = {},
-	    defaults = {
-	        method:    'GET',  // HTTP method to use, such as "GET", "POST", "PUT", "DELETE", etc.
-	        async:     true,   // whether or not to perform the operation asynchronously
-	        headers:   {},     // list of HTTP request headers
-	        type:      'text', // "", "arraybuffer", "blob", "document", "json", "text"
-	        data:      null,   // data to send (plain object)
-	        timeout:   30000,  // amount of milliseconds a request can take before being terminated
-	        onload:    null,   // callback when the request has successfully completed
-	        onerror:   null,   // callback when the request has failed
-	        ontimeout: null    // callback when the author specified timeout has passed before the request could complete
-	    },
-	    defaultsKeys = Object.keys(defaults);
-	
-	
-	/**
-	 * Main method to send ajax requests.
-	 *
-	 * @param {string} url address
-	 * @param {Object} options Plain object with call parameters
-	 * @return {XMLHttpRequest|boolean} false in case of wrong params
-	 *
-	 * @example
-	 * TODO: add
-	 */
-	request.ajax = function ( url, options ) {
-	    var index, headersKeys, client;
-	
-	    // init
-	    options = options || {};
-	    // valid non-empty string
-	    if ( url && (typeof url === 'string' || url instanceof String) && url.length > 0 ) {
-	        // plain object is given as param
-	        if ( options && typeof options === 'object') {
-	            // extend with default options
-	            for ( index = 0; index < defaultsKeys.length; index++ ) {
-	                // in case not redefined
-	                if ( options[defaultsKeys[index]] === undefined ) {
-	                    options[defaultsKeys[index]] = defaults[defaultsKeys[index]];
-	                }
-	            }
-	        }
-	
-	        client = new XMLHttpRequest();
-	        // init a request
-	        client.open(options.method, url, options.async);
-	
-	        // apply the given headers
-	        if ( options.headers && typeof options.headers === 'object') {
-	            headersKeys = Object.keys(options.headers);
-	            for ( index = 0; index < headersKeys.length; index++ ) {
-	                client.setRequestHeader(headersKeys[index], options.headers[headersKeys[index]]);
-	            }
-	        }
-	
-	        // set response type and timeout
-	        client.responseType = options.type;
-	        client.timeout      = options.timeout;
-	
-	        // callbacks
-	        if ( options.onload && typeof options.onload === 'function' ) {
-	            client.onload = function onload () {
-	                options.onload.call(this, this.response || this.responseText, this.status);
-	            };
-	        }
-	        client.onerror   = options.onerror;
-	        client.ontimeout = options.ontimeout;
-	
-	        // actual request
-	        //client.send(this.encode(options.data));
-	        client.send(options.data ? JSON.stringify(options.data) : null);
-	
-	        return client;
-	    }
-	    return false;
-	};
-	
-	
-	/**
-	 * Serializes the given data for sending to the server via ajax call.
-	 *
-	 * @param {Object} data Plain object to serialize
-	 * @return {string} null if no data to encode
-	 *
-	 * @example
-	 * TODO: add
-	 */
-	request.encode = function ( data ) {
-	    var result = [],
-	        index, keys;
-	
-	    // input plain object validation
-	    if ( data && typeof data === 'object') {
-	        keys = Object.keys(data);
-	        // apply encoding
-	        for ( index = 0; index < keys.length; index++ ) {
-	            result.push(encodeURIComponent(keys[index]) + '=' + encodeURIComponent(data[keys[index]]));
-	        }
-	        // build the list of params
-	        if ( result.length > 0 ) {
-	            return result.join('&');
-	        }
-	    }
-	    return null;
-	};
-	
-	
-	// public
-	module.exports = request;
-
-
-/***/ },
-/* 35 */
+/* 31 */
 /*!******************************!*\
   !*** ./src/js/pages/init.js ***!
   \******************************/
@@ -6482,7 +5643,7 @@
 	
 	'use strict';
 	
-	var Page = __webpack_require__(/*! stb-component-page */ 36),
+	var Page = __webpack_require__(/*! stb-component-page */ 32),
 	    page = new Page({$node: window.pageInit});
 	
 	
@@ -6491,7 +5652,7 @@
 
 
 /***/ },
-/* 36 */
+/* 32 */
 /*!**********************************!*\
   !*** ../component-page/index.js ***!
   \**********************************/
@@ -6505,11 +5666,11 @@
 	'use strict';
 	
 	// public
-	module.exports = __webpack_require__(/*! spa-component-page */ 37);
+	module.exports = __webpack_require__(/*! spa-component-page */ 33);
 
 
 /***/ },
-/* 37 */
+/* 33 */
 /*!************************************************************!*\
   !*** /home/dp/Projects/sdk/spasdk/component-page/index.js ***!
   \************************************************************/
@@ -6524,7 +5685,7 @@
 	
 	'use strict';
 	
-	var Component = __webpack_require__(/*! spa-component */ 38);
+	var Component = __webpack_require__(/*! spa-component */ 34);
 	
 	
 	/**
@@ -6606,7 +5767,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, "../../spasdk/component-page/index.js"))
 
 /***/ },
-/* 38 */
+/* 34 */
 /*!*******************************************************!*\
   !*** /home/dp/Projects/sdk/spasdk/component/index.js ***!
   \*******************************************************/
@@ -6621,7 +5782,7 @@
 	
 	'use strict';
 	
-	var app     = __webpack_require__(/*! spa-app */ 22),
+	var app     = __webpack_require__(/*! spa-app/lib/core */ 3),
 	    Emitter = __webpack_require__(/*! cjs-emitter */ 4),
 	    counter = 0;
 	
@@ -7176,7 +6337,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, "../../spasdk/component/index.js"))
 
 /***/ },
-/* 39 */
+/* 35 */
 /*!******************************!*\
   !*** ./src/js/pages/main.js ***!
   \******************************/
@@ -7188,7 +6349,7 @@
 	
 	'use strict';
 	
-	var Page = __webpack_require__(/*! stb-component-page */ 36),
+	var Page = __webpack_require__(/*! stb-component-page */ 32),
 	    page = new Page({$node: window.pageMain});
 	
 	
