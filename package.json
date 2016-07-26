@@ -19,7 +19,9 @@
     "dependencies": {
         "stb-app": "stbsdk/app",
         "stb-rc": "stbsdk/rc",
-        "stb-component-page": "stbsdk/component-page",
+        "stb-component-page": "stbsdk/component-page"
+    },
+    "devDependencies": {
         "stb-eslint-config": "stbsdk/eslint-config"
     },
     "license": "MIT"
