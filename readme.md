@@ -13,6 +13,15 @@ Create a new project base:
 git clone https://github.com/stbsdk/boilerplate.git my-project
 ```
 
+Build and start services:
+
+```bash
+cd my-project
+stbsdk
+# or
+DEBUG=* stbsdk
+```
+
 
 ## Contribution ##
 
