@@ -60,8 +60,8 @@
 	app.once('load', function () {
 	    // load pages
 	    app.pages = {
-	        init: __webpack_require__(/*! ./pages/init */ 31),
-	        main: __webpack_require__(/*! ./pages/main */ 35)
+	        init: __webpack_require__(/*! ./pages/init */ 32),
+	        main: __webpack_require__(/*! ./pages/main */ 36)
 	    };
 	
 	    // show splash screen
@@ -88,115 +88,8 @@
 	
 	'use strict';
 	
-	var app    = __webpack_require__(/*! ./lib/core */ 2),
-	    events = __webpack_require__(/*! spa-app/lib/events */ 8);
-	    //router   = require('spa-router'),
-	    //codes    = require('stb-rc').codes,
-	    //metrics  = require('../../src/js/metrics'),
-	    //keyCodes = {},
-	    //metrics, key, linkCSS;
-	
-	
-	// early return
-	//module.exports = app;
-	
-	
-	// inside frame/iframe
-	// if ( window.parent && window.parent.gSTB ) {
-	//     // link to the outer global objects
-	//     window.dvbManager         = window.parent.dvbManager;
-	//     window.epgManager         = window.parent.epgManager;
-	//     window.gSTB               = window.parent.gSTB;
-	//     window.pvrManager         = window.parent.pvrManager;
-	//     window.stbDownloadManager = window.parent.stbDownloadManager;
-	//     window.stbStorage         = window.parent.stbStorage;
-	//     window.stbUpdate          = window.parent.stbUpdate;
-	//     window.stbUPnP            = window.parent.stbUPnP;
-	//     window.stbWebWindow       = window.parent.stbWebWindow;
-	//     window.stbWindowMgr       = window.parent.stbWindowMgr;
-	//     window.timeShift          = window.parent.timeShift;
-	// }
-	
-	
-	// global application configuration
-	// in metrics.js file in js root
-	//metrics = require('app:metrics');
-	
-	
-	/**
-	 * True if executed on the STB device, set by debug module at runtime.
-	 *
-	 * @type {boolean}
-	 */
-	//app.host = true;
-	
-	
-	/**
-	 * Screen geometry and margins.
-	 *
-	 * @type {Object}
-	 * @property {number} height Total screen height
-	 * @property {number} width Total screen width
-	 * @property {number} availTop top safe zone margin
-	 * @property {number} availRight right safe zone margin
-	 * @property {number} availBottom bottom safe zone margin
-	 * @property {number} availLeft left safe zone margin
-	 * @property {number} availHeight safe zone height
-	 * @property {number} availWidth safe zone width
-	 */
-	//app.screen = null;
-	
-	
-	// /**
-	//  * Set crops, total, content size and link the corresponding CSS file.
-	//  *
-	//  * @param {Object} metrics screen params specific to resolution
-	//  *
-	//  * @return {boolean} operation status
-	//  */
-	// app.setScreen = function ( metrics ) {
-	//     if ( DEVELOP ) {
-	//         if ( arguments.length !== 1 ) { throw new Error(__filename + ': wrong arguments number'); }
-	//     }
-	//
-	//     if ( metrics ) {
-	//         if ( DEVELOP ) {
-	//             if ( typeof metrics !== 'object' ) { throw new Error(__filename + ': wrong metrics type'); }
-	//         }
-	//
-	//         // calculate and extend
-	//         metrics.availHeight = metrics.height - (metrics.availTop + metrics.availBottom);
-	//         metrics.availWidth  = metrics.width - (metrics.availLeft + metrics.availRight);
-	//
-	//         // set max browser window size
-	//         window.moveTo(0, 0);
-	//         window.resizeTo(metrics.width, metrics.height);
-	//
-	//         // already was initialized
-	//         if ( linkCSS && linkCSS instanceof HTMLLinkElement ) {
-	//             // remove all current CSS styles
-	//             document.head.removeChild(linkCSS);
-	//         }
-	//
-	//         // load CSS file base on resolution
-	//         linkCSS = document.createElement('link');
-	//         linkCSS.rel  = 'stylesheet';
-	//         linkCSS.href = 'css/' + (DEVELOP ? 'develop.' : 'release.') + metrics.height + '.css?' + +new Date();
-	//         document.head.appendChild(linkCSS);
-	//
-	//         // provide global access
-	//         app.metrics = metrics;
-	//
-	//         return true;
-	//     }
-	//
-	//     // nothing has applied
-	//     return false;
-	// };
-	//
-	//
-	// // apply screen size, position and margins
-	// app.setScreen(metrics[app.query.screenHeight] || metrics[screen.height] || metrics[720]);
+	var app    = __webpack_require__(/*! spa-app/lib/core */ 2),
+	    events = __webpack_require__(/*! spa-app/lib/events */ 6);
 	
 	
 	// extract key codes
@@ -209,270 +102,20 @@
 	// }
 	
 	
-	// create stbEvent global object
-	window.stbEvent = __webpack_require__(/*! ./lib/events */ 9);
+	// apply geometry
+	__webpack_require__(/*! ./lib/metrics */ 7);
 	
-	//
-	//
-	// /**
-	//  * Device media events.
-	//  *
-	//  * @event module:stb/app#media
-	//  * @type object
-	//  * @property {number} code of event
-	//  */
-	//
-	//
-	// /**
-	//  * Event on messages from a window.
-	//  *
-	//  * @event module:stb/app#message
-	//  * @type object
-	//  * @property {boolean} broadcast message flag
-	//  * @property {string} message received from window
-	//  * @property {object} data received from window
-	//  */
-	//
-	//
-	// /**
-	//  * Fires stb device media events.
-	//  *
-	//  * @param {number} event code
-	//  * @param {string} info associated data in **JSON** format
-	//  */
-	// window.stbEvent.onEvent = function ( event, info ) {
-	//     // proxy to all frames
-	//     Array.prototype.forEach.call(window.frames, function ( frame ) {
-	//         // necessary global object is present
-	//         if ( frame.stbEvent && frame.stbEvent.onEvent ) {
-	//             // proxy call
-	//             frame.stbEvent.onEvent(event, info);
-	//         }
-	//     });
-	//
-	//     // there are some listeners
-	//     if ( app.events['media'] ) {
-	//         // additional data
-	//         if ( info ) {
-	//             try {
-	//                 info = JSON.parse(info);
-	//             } catch ( e ) {
-	//                 debug.log(e);
-	//             }
-	//         }
-	//
-	//         // notify listeners
-	//         app.emit('media', {code: parseInt(event, 10), info: info});
-	//     }
-	// };
-	//
-	//
-	// /**
-	//  * Fires event on broadcast messages from a window.
-	//  *
-	//  * @param {number} windowId that sent message
-	//  * @param {string} message text
-	//  * @param {object} data in sent message
-	//  * @fires module:/stb/app#message
-	//  */
-	// window.stbEvent.onBroadcastMessage = function ( windowId, message, data ) {
-	//     // proxy to all frames
-	//     Array.prototype.forEach.call(window.frames, function ( frame ) {
-	//         // necessary global object is present
-	//         if ( frame.stbEvent && frame.stbEvent.onBroadcastMessage ) {
-	//             // proxy call
-	//             frame.stbEvent.onBroadcastMessage(windowId, message, data);
-	//         }
-	//     });
-	//
-	//     if ( app.events['message'] ) {
-	//         // notify listeners
-	//         app.emit('message', {
-	//             broadcast: true,
-	//             windowId: windowId,
-	//             message: message,
-	//             data: data
-	//         });
-	//     }
-	// };
-	//
-	//
-	// /**
-	//  * Fires event on messages from a window.
-	//  *
-	//  * @param {number} windowId that sent message
-	//  * @param {string} message text
-	//  * @param {object} data in sent message
-	//  * @fires module:/stb/app#message
-	//  */
-	// window.stbEvent.onMessage = function ( windowId, message, data ) {
-	//     // proxy to all frames
-	//     Array.prototype.forEach.call(window.frames, function ( frame ) {
-	//         // necessary global object is present
-	//         if ( frame.stbEvent && frame.stbEvent.onMessage ) {
-	//             // proxy call
-	//             frame.stbEvent.onMessage(windowId, message, data);
-	//         }
-	//     });
-	//
-	//     if ( app.events['message'] ) {
-	//         // notify listeners
-	//         app.emit('message', {
-	//             broadcast: false,
-	//             windowId: windowId,
-	//             message: message,
-	//             data: data
-	//         });
-	//     }
-	// };
-	//
-	//
-	// /**
-	//  * Event on device mount state.
-	//  *
-	//  * @event module:stb/app#mount
-	//  * @type object
-	//  * @property {boolean} state of mount device
-	//  */
-	//
-	//
-	// /**
-	//  * Fires device mount state event.
-	//  *
-	//  * @param {boolean} state of mount device
-	//  * @fires module:/stb/app#mount
-	//  */
-	// window.stbEvent.onMount = function ( state ) {
-	//     // proxy to all frames
-	//     Array.prototype.forEach.call(window.frames, function ( frame ) {
-	//         // necessary global object is present
-	//         if ( frame.stbEvent && frame.stbEvent.onMount ) {
-	//             // proxy call
-	//             frame.stbEvent.onMount(state);
-	//         }
-	//     });
-	//
-	//     if ( app.events['device:mount'] ) {
-	//         // notify listeners
-	//         app.emit('device:mount', {state: state});
-	//     }
-	// };
-	//
-	//
-	// /**
-	//  * Event on callback on internet browser link clicked.
-	//  *
-	//  * @event module:stb/app#media:available
-	//  */
-	//
-	//
-	// /**
-	//  * Fires event of callback on internet browser link clicked to ask user what to do with link: play or download.
-	//  *
-	//  * @param {string} mime file type
-	//  * @param {string} url resource link
-	//  *
-	//  * @fires module:/stb/app#media:available
-	//  */
-	// window.stbEvent.onMediaAvailable = function ( mime, url ) {
-	//     // proxy to all frames
-	//     Array.prototype.forEach.call(window.frames, function ( frame ) {
-	//         // necessary global object is present
-	//         if ( frame.stbEvent && frame.stbEvent.onMediaAvailable ) {
-	//             // proxy call
-	//             frame.stbEvent.onMediaAvailable(mime, url);
-	//         }
-	//     });
-	//
-	//     if ( app.events['media:available'] ) {
-	//         // notify listeners
-	//         app.emit('media:available', {mime: mime, url: url});
-	//     }
-	// };
-	//
-	//
-	// /**
-	//  * Event on internet connection state.
-	//  *
-	//  * @event module:stb/app#internet:state
-	//  * @type object
-	//  * @property {boolean} state of internet connection
-	//  */
-	//
-	//
-	// /**
-	//  * Fires new internet connection state event.
-	//  *
-	//  * @param {boolean} state of internet connection
-	//  * @fires module:/stb/app#internet:state
-	//  */
-	// window.stbEvent.onNetworkStateChange = function ( state ) {
-	//     if ( app.events['internet:state'] ) {
-	//         // notify listeners
-	//         app.emit('internet:state', {state: state});
-	//     }
-	// };
-	//
-	//
-	// /**
-	//  * Event on document loading progress changes.
-	//  *
-	//  * @event module:stb/app#browser:progress
-	//  * @type object
-	//  * @property {number} progress of document loading
-	//  */
-	//
-	//
-	// /**
-	//  * Fires document loading progress changes event.
-	//  *
-	//  * @param {number} progress of document loading
-	//  * fires module:/stb/app#browser:progress
-	//  */
-	// window.stbEvent.onWebBrowserProgress = function ( progress ) {
-	//     // proxy to all frames
-	//     Array.prototype.forEach.call(window.frames, function ( frame ) {
-	//         // necessary global object is present
-	//         if ( frame.stbEvent && frame.stbEvent.onWebBrowserProgress ) {
-	//             // proxy call
-	//             frame.stbEvent.onWebBrowserProgress(progress);
-	//         }
-	//     });
-	//
-	//     if ( app.events['browser:progress'] ) {
-	//         // notify listeners
-	//         app.emit('browser:progress', {progress: progress});
-	//     }
-	// };
-	//
-	//
-	// /**
-	//  * Event on browser web window activation event.
-	//  *
-	//  * @event module:stb/app#window:focus
-	//  */
-	//
-	//
-	// /**
-	//  * Fires browser web window activation event.
-	//  *
-	//  * fires module:/stb/app#window:focus
-	//  */
-	// window.stbEvent.onWindowActivated = function () {
-	//     // proxy to all frames
-	//     Array.prototype.forEach.call(window.frames, function ( frame ) {
-	//         // necessary global object is present
-	//         if ( frame.stbEvent && frame.stbEvent.onWindowActivated ) {
-	//             // proxy call
-	//             frame.stbEvent.onWindowActivated();
-	//         }
-	//     });
-	//
-	//     if ( app.events['window:focus'] ) {
-	//         // notify listeners
-	//         app.emit('window:focus');
-	//     }
-	// };
+	// load app css
+	__webpack_require__(/*! ./lib/css */ 9);
+	
+	
+	// set max browser window size
+	window.moveTo(0, 0);
+	window.resizeTo(app.metrics.width, app.metrics.height);
+	
+	
+	// create stbEvent global object
+	window.stbEvent = __webpack_require__(/*! ./lib/events */ 10);
 	
 	
 	// new way of string handling
@@ -486,8 +129,7 @@
 	
 	// activate development mechanisms and tools
 	if ( true ) {
-	    //require('stb-develop');
-	    __webpack_require__(/*! ./lib/develop/main */ 10);
+	    __webpack_require__(/*! ./lib/develop/main */ 11);
 	}
 	
 	
@@ -503,95 +145,6 @@
 
 /***/ },
 /* 2 */
-/*!**************************!*\
-  !*** ../app/lib/core.js ***!
-  \**************************/
-/***/ function(module, exports, __webpack_require__) {
-
-	/**
-	 * @license The MIT License (MIT)
-	 * @copyright Stanislav Kalashnik <darkpark.main@gmail.com>
-	 */
-	
-	/* eslint no-path-concat: 0 */
-	
-	'use strict';
-	
-	var app     = __webpack_require__(/*! spa-app/lib/core */ 3),
-	    metrics = __webpack_require__(/*! app:metrics */ 7),
-	    linkCSS;
-	
-	
-	/**
-	 * Set crops, total, content size and link the corresponding CSS file.
-	 *
-	 * @param {Object} metrics screen params specific to resolution
-	 *
-	 * @return {boolean} operation status
-	 */
-	// function setScreen ( metrics ) {
-	//     if ( DEVELOP ) {
-	//         if ( arguments.length !== 1 ) { throw new Error(__filename + ': wrong arguments number'); }
-	//     }
-	//
-	//     if ( metrics ) {
-	//         if ( DEVELOP ) {
-	//             if ( typeof metrics !== 'object' ) { throw new Error(__filename + ': wrong metrics type'); }
-	//         }
-	//
-	//         // calculate and extend
-	//         metrics.availHeight = metrics.height - (metrics.availTop + metrics.availBottom);
-	//         metrics.availWidth  = metrics.width - (metrics.availLeft + metrics.availRight);
-	//
-	//         // set max browser window size
-	//         window.moveTo(0, 0);
-	//         window.resizeTo(metrics.width, metrics.height);
-	//
-	//         // already was initialized
-	//         if ( linkCSS && linkCSS instanceof HTMLLinkElement ) {
-	//             // remove all current CSS styles
-	//             document.head.removeChild(linkCSS);
-	//         }
-	//
-	//         // load CSS file base on resolution
-	//         linkCSS = document.createElement('link');
-	//         linkCSS.rel  = 'stylesheet';
-	//         linkCSS.href = 'css/' + (DEVELOP ? 'develop.' : 'release.') + metrics.height + '.css?' + +new Date();
-	//         document.head.appendChild(linkCSS);
-	//
-	//         // provide global access
-	//         app.metrics = metrics;
-	//
-	//         return true;
-	//     }
-	//
-	//     // nothing has applied
-	//     return false;
-	// }
-	
-	
-	// apply screen size, position and margins
-	//setScreen(metrics[app.query.screenHeight] || metrics[screen.height] || metrics[720]);
-	
-	app.metrics = metrics[app.query.screenHeight] || metrics[screen.height] || metrics[720];
-	
-	// calculate and extend
-	app.metrics.availHeight = app.metrics.height - (app.metrics.availTop  + app.metrics.availBottom);
-	app.metrics.availWidth  = app.metrics.width  - (app.metrics.availLeft + app.metrics.availRight);
-	
-	// load CSS file base on resolution
-	linkCSS = document.createElement('link');
-	linkCSS.rel  = 'stylesheet';
-	linkCSS.href = 'css/' + ( true ? 'develop.' : 'release.') + app.metrics.height + '.css?' + +new Date();
-	document.head.appendChild(linkCSS);
-	
-	
-	// public
-	module.exports = app;
-
-
-/***/ },
-/* 3 */
 /*!****************************************************!*\
   !*** /home/dp/Projects/sdk/spasdk/app/lib/core.js ***!
   \****************************************************/
@@ -606,8 +159,8 @@
 	
 	'use strict';
 	
-	var Emitter = __webpack_require__(/*! cjs-emitter */ 4),
-	    parse   = __webpack_require__(/*! cjs-query */ 5).parse,
+	var Emitter = __webpack_require__(/*! cjs-emitter */ 3),
+	    parse   = __webpack_require__(/*! cjs-query */ 4).parse,
 	    app     = new Emitter();
 	
 	
@@ -687,7 +240,7 @@
 	
 	// global application configuration
 	// in config.js file in js root
-	app.config = __webpack_require__(/*! app:config */ 6);
+	app.config = __webpack_require__(/*! app:config */ 5);
 	
 	
 	// the only visible page
@@ -751,7 +304,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, "../../spasdk/app/lib/core.js"))
 
 /***/ },
-/* 4 */
+/* 3 */
 /*!*****************************************************!*\
   !*** /home/dp/Projects/sdk/cjssdk/emitter/index.js ***!
   \*****************************************************/
@@ -1012,7 +565,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, "../../cjssdk/emitter/index.js"))
 
 /***/ },
-/* 5 */
+/* 4 */
 /*!***************************************************!*\
   !*** /home/dp/Projects/sdk/cjssdk/query/index.js ***!
   \***************************************************/
@@ -1069,7 +622,7 @@
 
 
 /***/ },
-/* 6 */
+/* 5 */
 /*!**************************!*\
   !*** ./src/js/config.js ***!
   \**************************/
@@ -1088,77 +641,7 @@
 
 
 /***/ },
-/* 7 */
-/*!***************************!*\
-  !*** ./src/js/metrics.js ***!
-  \***************************/
-/***/ function(module, exports) {
-
-	/**
-	 * Application geometry options.
-	 * Automatically loaded on application initialization and available as app.metrics.
-	 */
-	
-	'use strict';
-	
-	// public
-	module.exports = {
-	    480: {
-	        // screen base dimension
-	        height: 480,
-	        width:  720,
-	        // safe zone margins
-	        availTop:    24,
-	        availBottom: 24,
-	        availRight:  32,
-	        availLeft:   48
-	        // project-specific vars
-	        // put here ...
-	    },
-	
-	    576: {
-	        // screen base dimension
-	        height: 576,
-	        width:  720,
-	        // safe zone margins
-	        availTop:    24,
-	        availBottom: 24,
-	        availRight:  26,
-	        availLeft:   54
-	        // project-specific vars
-	        // put here ...
-	    },
-	
-	    720: {
-	        // screen base dimension
-	        height: 720,
-	        width:  1280,
-	        // safe zone margins
-	        availTop:    30,
-	        availBottom: 30,
-	        availRight:  40,
-	        availLeft:   40
-	        // project-specific vars
-	        // put here ...
-	    },
-	
-	    1080: {
-	        // screen base dimension
-	        height: 1080,
-	        width:  1920,
-	        // safe zone margins
-	        availTop:    45,
-	        availBottom: 45,
-	        availRight:  60,
-	        availLeft:   60
-	        // project-specific vars
-	        // put here ...
-	    }
-	};
-
-
-/***/ },
-/* 8 */
+/* 6 */
 /*!******************************************************!*\
   !*** /home/dp/Projects/sdk/spasdk/app/lib/events.js ***!
   \******************************************************/
@@ -1173,7 +656,7 @@
 	
 	'use strict';
 	
-	var app = __webpack_require__(/*! ./core */ 3);
+	var app = __webpack_require__(/*! ./core */ 2);
 	
 	
 	// public
@@ -1341,14 +824,14 @@
 	
 	            // todo: bubble event recursively
 	            // bubbling
-	            /*if (
-	             !event.stop &&
-	             activeComponent.propagate &&
-	             activeComponent.parent &&
-	             activeComponent.parent.events[event.type]
-	             ) {
-	             activeComponent.parent.emit(event.type, event);
-	             }*/
+	            if (
+	                !event.stop &&
+	                activeComponent.propagate &&
+	                activeComponent.parent &&
+	                activeComponent.parent.events[event.type]
+	            ) {
+	                activeComponent.parent.emit(event.type, event);
+	            }
 	        }
 	
 	        // page handler
@@ -1491,7 +974,152 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, "../../spasdk/app/lib/events.js"))
 
 /***/ },
+/* 7 */
+/*!*****************************!*\
+  !*** ../app/lib/metrics.js ***!
+  \*****************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	/**
+	 * @license The MIT License (MIT)
+	 * @copyright Stanislav Kalashnik <darkpark.main@gmail.com>
+	 */
+	
+	/* eslint no-path-concat: 0 */
+	
+	'use strict';
+	
+	var app     = __webpack_require__(/*! spa-app/lib/core */ 2),
+	    metrics = __webpack_require__(/*! app:metrics */ 8);
+	
+	
+	// global link
+	app.metrics = metrics[app.query.screenHeight] || metrics[screen.height] || metrics[720];
+	
+	// calculate and extend
+	app.metrics.availHeight = app.metrics.height - (app.metrics.availTop  + app.metrics.availBottom);
+	app.metrics.availWidth  = app.metrics.width  - (app.metrics.availLeft + app.metrics.availRight);
+	
+	
+	// public
+	//module.exports = app;
+
+
+/***/ },
+/* 8 */
+/*!***************************!*\
+  !*** ./src/js/metrics.js ***!
+  \***************************/
+/***/ function(module, exports) {
+
+	/**
+	 * Application geometry options.
+	 * Automatically loaded on application initialization and available as app.metrics.
+	 */
+	
+	'use strict';
+	
+	// public
+	module.exports = {
+	    480: {
+	        // screen base dimension
+	        height: 480,
+	        width:  720,
+	        // safe zone margins
+	        availTop:    24,
+	        availBottom: 24,
+	        availRight:  32,
+	        availLeft:   48
+	        // project-specific vars
+	        // put here ...
+	    },
+	
+	    576: {
+	        // screen base dimension
+	        height: 576,
+	        width:  720,
+	        // safe zone margins
+	        availTop:    24,
+	        availBottom: 24,
+	        availRight:  26,
+	        availLeft:   54
+	        // project-specific vars
+	        // put here ...
+	    },
+	
+	    720: {
+	        // screen base dimension
+	        height: 720,
+	        width:  1280,
+	        // safe zone margins
+	        availTop:    30,
+	        availBottom: 30,
+	        availRight:  40,
+	        availLeft:   40
+	        // project-specific vars
+	        // put here ...
+	    },
+	
+	    1080: {
+	        // screen base dimension
+	        height: 1080,
+	        width:  1920,
+	        // safe zone margins
+	        availTop:    45,
+	        availBottom: 45,
+	        availRight:  60,
+	        availLeft:   60
+	        // project-specific vars
+	        // put here ...
+	    }
+	};
+
+
+/***/ },
 /* 9 */
+/*!*************************!*\
+  !*** ../app/lib/css.js ***!
+  \*************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	/**
+	 * @license The MIT License (MIT)
+	 * @copyright Stanislav Kalashnik <darkpark.main@gmail.com>
+	 */
+	
+	/* eslint no-path-concat: 0 */
+	
+	'use strict';
+	
+	var app = __webpack_require__(/*! spa-app/lib/core */ 2),
+	    //metrics = require('app:metrics'),
+	    linkCSS;
+	
+	
+	// global link
+	//app.metrics = metrics[app.query.screenHeight] || metrics[screen.height] || metrics[720];
+	
+	// calculate and extend
+	//app.metrics.availHeight = app.metrics.height - (app.metrics.availTop  + app.metrics.availBottom);
+	//app.metrics.availWidth  = app.metrics.width  - (app.metrics.availLeft + app.metrics.availRight);
+	
+	// // set max browser window size
+	// window.moveTo(0, 0);
+	// window.resizeTo(metrics.width, metrics.height);
+	
+	// load CSS file base on resolution
+	linkCSS = document.createElement('link');
+	linkCSS.rel  = 'stylesheet';
+	linkCSS.href = 'css/' + ( true ? 'develop.' : 'release.') + app.metrics.height + '.css' + ( true ? '?' + Date.now() : '');
+	document.head.appendChild(linkCSS);
+	
+	
+	// public
+	module.exports = linkCSS;
+
+
+/***/ },
+/* 10 */
 /*!****************************!*\
   !*** ../app/lib/events.js ***!
   \****************************/
@@ -1506,7 +1134,7 @@
 	
 	'use strict';
 	
-	var app = __webpack_require__(/*! ./core */ 2);
+	var app = __webpack_require__(/*! spa-app/lib/core */ 2);
 	
 	
 	/**
@@ -1540,72 +1168,72 @@
 	     * Information on audio and video tracks of the media content is received. It's now possible to call gSTB.GetAudioPIDs etc.
 	     */
 	    EVENT_GET_MEDIA_INFO: 2,
-	    
+	
 	    /**
 	     * Video and/or audio playback has begun.
 	     */
 	    EVENT_PLAYBACK_BEGIN: 4,
-	    
+	
 	    /**
 	     * Error when opening the content: content not found on the server or connection with the server was rejected
 	     */
 	    EVENT_CONTENT_ERROR: 5,
-	    
+	
 	    /**
 	     * Detected DualMono AC-3 sound
 	     */
 	    EVENT_DUAL_MONO_DETECT: 6,
-	    
+	
 	    /**
 	     * The decoder has received info about the content and started to play. It's now possible to call gSTB.GetVideoInfo
 	     */
 	    EVENT_INFO_GET: 7,
-	    
+	
 	    /**
 	     * Error occurred while loading external subtitles
 	     */
 	    EVENT_SUBTITLE_LOAD_ERROR: 8,
-	    
+	
 	    /**
 	     * Found new teletext subtitles in stream
 	     */
 	    EVENT_SUBTITLE_FIND: 9,
-	    
+	
 	    /**
 	     * HDMI device has been connected
 	     */
 	    EVENT_HDMI_CONNECT: 32,
-	    
+	
 	    /**
 	     * HDMI device has been disconnected
 	     */
 	    EVENT_HDMI_DISCONNECT: 33,
-	    
+	
 	    /**
 	     * Recording task has been finished successfully. See appendix 13. JavaScript API for PVR subsystem
 	     */
 	    EVENT_RECORD_FINISH_SUCCESSFUL: 34,
-	    
+	
 	    /**
 	     * Recording task has been finished with error. See appendix 13. JavaScript API for PVR subsystem
 	     */
 	    EVENT_RECORD_FINISH_ERROR: 35,
-	    
+	
 	    /**
 	     * Scanning DVB Channel in progress
 	     */
 	    EVENT_DVB_SCANING: 40,
-	    
+	
 	    /**
 	     * Scanning DVB Channel found
 	     */
 	    EVENT_DVB_FOUND: 41,
-	    
+	
 	    /**
 	     * DVB Channel EPG update
 	     */
 	    EVENT_DVB_CHANNEL_EPG_UPDATE: 42,
-	    
+	
 	    /**
 	     * DVB antenna power off
 	     */
@@ -1855,7 +1483,7 @@
 
 
 /***/ },
-/* 10 */
+/* 11 */
 /*!**********************************!*\
   !*** ../app/lib/develop/main.js ***!
   \**********************************/
@@ -1868,31 +1496,33 @@
 	
 	'use strict';
 	
-	var app = __webpack_require__(/*! ../core */ 2);
+	var app = __webpack_require__(/*! spa-app/lib/core */ 2);
 	
 	
 	// shims
-	__webpack_require__(/*! stb-shim-bind */ 11);
-	__webpack_require__(/*! stb-shim-classlist */ 12);
-	__webpack_require__(/*! stb-shim-frame */ 13);
+	__webpack_require__(/*! stb-shim-bind */ 12);
+	__webpack_require__(/*! stb-shim-classlist */ 13);
+	__webpack_require__(/*! stb-shim-frame */ 14);
 	
 	// public app instance
 	window.app = app;
 	
 	// all development tools placeholder
-	app.develop = {};
+	app.develop = {
+	    storage: window.localStorage || window.stbStorage
+	};
 	
 	// execution environment
 	// STB device or desktop browser
 	app.host = !!(window.gSTB || (window.parent && window.parent.gSTB));
 	
 	// browser logging
-	window.debug = __webpack_require__(/*! spa-app/lib/develop/debug */ 14);
+	window.debug = __webpack_require__(/*! spa-app/lib/develop/debug */ 15);
 	// STB logging
 	//window.debug = app.host ? require('./debug') : require('spa-develop/debug');
 	
 	// universal storage
-	window.localStorage = window.localStorage || window.stbStorage;
+	//window.localStorage = window.localStorage || window.stbStorage;
 	
 	// apply screen size, position, margins and styles
 	// app.setScreen(
@@ -1902,19 +1532,19 @@
 	// );
 	
 	// inherit SPA tools
-	__webpack_require__(/*! spa-app/lib/develop/wamp */ 15);
-	__webpack_require__(/*! spa-app/lib/develop/events */ 18);
-	__webpack_require__(/*! spa-app/lib/develop/hooks */ 20);
-	__webpack_require__(/*! spa-app/lib/develop/static */ 21);
+	__webpack_require__(/*! spa-app/lib/develop/wamp */ 16);
+	__webpack_require__(/*! spa-app/lib/develop/events */ 19);
+	__webpack_require__(/*! spa-app/lib/develop/hooks */ 21);
+	__webpack_require__(/*! spa-app/lib/develop/static */ 22);
 	
 	// STB tools
 	if ( app.host ) {
 	    // web inspector
-	    __webpack_require__(/*! ./weinre */ 23);
+	    __webpack_require__(/*! ./weinre */ 24);
 	}
 	
 	//require('./proxy');
-	__webpack_require__(/*! ./events */ 29);
+	__webpack_require__(/*! ./events */ 30);
 	
 	// the application itself
 	// "js" directory is resolved by webpack to
@@ -1923,7 +1553,7 @@
 
 
 /***/ },
-/* 11 */
+/* 12 */
 /*!*****************************!*\
   !*** ../shim-bind/index.js ***!
   \*****************************/
@@ -1966,7 +1596,7 @@
 
 
 /***/ },
-/* 12 */
+/* 13 */
 /*!**********************************!*\
   !*** ../shim-classlist/index.js ***!
   \**********************************/
@@ -2050,7 +1680,7 @@
 
 
 /***/ },
-/* 13 */
+/* 14 */
 /*!******************************!*\
   !*** ../shim-frame/index.js ***!
   \******************************/
@@ -2080,7 +1710,7 @@
 
 
 /***/ },
-/* 14 */
+/* 15 */
 /*!*************************************************************!*\
   !*** /home/dp/Projects/sdk/spasdk/app/lib/develop/debug.js ***!
   \*************************************************************/
@@ -2099,7 +1729,7 @@
 	'use strict';
 	
 	var //host      = require('../app').data.host,
-	    app       = __webpack_require__(/*! ../core */ 3),
+	    app       = __webpack_require__(/*! ../core */ 2),
 	    //util      = require('util'),
 	    timeMarks = {},  // storage for timers (debug.time, debug.timeEnd)
 	    buffer    = [],
@@ -2194,11 +1824,14 @@
 		//
 	    // console.log('%c%s', 'color:' + (color || 'black'), message);
 	
+	    // sanitize
+	    config = config || {};
+	
 	    config.info = info;
 	    //config.data = data ? util.inspect(data, {depth: debug.config.depth}) : null;
 	    config.data = data !== undefined ? wrapData(data) : undefined;
 	    //config.data = wrapData(data);
-	    config.time = +new Date();
+	    config.time = Date.now();
 	    config.targetId = app.query.wampTargetId;
 	    //config.tags = config.tags.sort();
 	
@@ -2320,7 +1953,7 @@
 	 * // prints 'time (done): +60ms'
 	 */
 	debug.time = function ( name, title ) {
-	    var time = +new Date();
+	    var time = Date.now();
 	
 	    // sanitize
 	    name  = name  || '';
@@ -2360,7 +1993,7 @@
 	 * // prints 'request (done): 934ms'
 	 */
 	debug.timeEnd = function ( name, title ) {
-	    var time = +new Date();
+	    var time = Date.now();
 	
 	    // sanitize
 	    name  = name  || '';
@@ -2383,7 +2016,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, "../../spasdk/app/lib/develop/debug.js"))
 
 /***/ },
-/* 15 */
+/* 16 */
 /*!************************************************************!*\
   !*** /home/dp/Projects/sdk/spasdk/app/lib/develop/wamp.js ***!
   \************************************************************/
@@ -2396,9 +2029,9 @@
 	
 	'use strict';
 	
-	var app       = __webpack_require__(/*! ../core */ 3),
-	    Wamp      = __webpack_require__(/*! spa-wamp */ 16),
-	    stringify = __webpack_require__(/*! cjs-query */ 5).stringify;
+	var app       = __webpack_require__(/*! ../core */ 2),
+	    Wamp      = __webpack_require__(/*! spa-wamp */ 17),
+	    stringify = __webpack_require__(/*! cjs-query */ 4).stringify;
 	
 	
 	if ( app.query.wampPort ) {
@@ -2440,7 +2073,7 @@
 
 
 /***/ },
-/* 16 */
+/* 17 */
 /*!**************************************************!*\
   !*** /home/dp/Projects/sdk/spasdk/wamp/index.js ***!
   \**************************************************/
@@ -2453,7 +2086,7 @@
 	
 	'use strict';
 	
-	var CjsWamp = __webpack_require__(/*! cjs-wamp */ 17),
+	var CjsWamp = __webpack_require__(/*! cjs-wamp */ 18),
 	    timeout = 5000,
 	    events  = {
 	        open:  'connection:open',
@@ -2527,7 +2160,7 @@
 
 
 /***/ },
-/* 17 */
+/* 18 */
 /*!**************************************************!*\
   !*** /home/dp/Projects/sdk/cjssdk/wamp/index.js ***!
   \**************************************************/
@@ -2541,7 +2174,7 @@
 	'use strict';
 	
 	/** @private */
-	var Emitter   = __webpack_require__(/*! cjs-emitter */ 4),
+	var Emitter   = __webpack_require__(/*! cjs-emitter */ 3),
 	    messageId = 0,
 	    callbacks = {};
 	
@@ -2691,7 +2324,7 @@
 
 
 /***/ },
-/* 18 */
+/* 19 */
 /*!**************************************************************!*\
   !*** /home/dp/Projects/sdk/spasdk/app/lib/develop/events.js ***!
   \**************************************************************/
@@ -2709,10 +2342,10 @@
 	/* eslint new-cap: 0 */
 	
 	var //util    = require('util'),
-	    app      = __webpack_require__(/*! ../core */ 3),
+	    app      = __webpack_require__(/*! ../core */ 2),
 	    //Wamp     = require('spa-wamp'),
 	    //request  = require('spa-request'),
-	    gremlins = __webpack_require__(/*! gremlins.js/gremlins.min.js */ 19),
+	    gremlins = __webpack_require__(/*! gremlins.js/gremlins.min.js */ 20),
 	    events   = {};
 	    //app;
 	    //dom     = require('spa-dom'),
@@ -2853,7 +2486,7 @@
 	            // get through all css links
 	            Array.prototype.slice.call(document.head.getElementsByTagName('link')).forEach(function forEachLink ( tag ) {
 	                // get base name, modify and apply
-	                tag.href = tag.href.split('?')[0] + '?' + (+new Date());
+	                tag.href = tag.href.split('?')[0] + '?' + Date.now();
 	            });
 	            break;
 	    }
@@ -2870,7 +2503,7 @@
 
 
 /***/ },
-/* 19 */
+/* 20 */
 /*!***********************************************************!*\
   !*** /home/dp/Projects/sdk/~/gremlins.js/gremlins.min.js ***!
   \***********************************************************/
@@ -2880,7 +2513,7 @@
 	this._mogwais=[],this._strategies=[],this._beforeCallbacks=[],this._afterCallbacks=[],this._logger=console,this._randomizer=new a};return o.prototype.gremlin=function(e){return this._gremlins.push(e),this},o.prototype.allGremlins=function(){for(var e in r.species)this.gremlin(r.species[e]());return this},o.prototype.mogwai=function(e){return this._mogwais.push(e),this},o.prototype.allMogwais=function(){for(var e in r.mogwais)this.mogwai(r.mogwais[e]());return this},o.prototype.strategy=function(e){return this._strategies.push(e),this},o.prototype.before=function(e){return this._beforeCallbacks.push(e),this},o.prototype.after=function(e){return this._afterCallbacks.push(e),this},o.prototype.logger=function(e){return arguments.length?(this._logger=e,this):this._logger},o.prototype.log=function(e){this._logger.log(e)},o.prototype.randomizer=function(e){return arguments.length?(this._randomizer=e,this):this._randomizer},o.prototype.seed=function(e){return this._randomizer=new a(e),this},o.prototype.unleash=function(e,t){0===this._gremlins.length&&this.allGremlins(),0===this._mogwais.length&&this.allMogwais(),0===this._strategies.length&&this.strategy(r.strategies.distribution());var a=[].concat(this._gremlins,this._mogwais),o=a.concat(this._strategies,this._beforeCallbacks,this._afterCallbacks);n({logger:this._logger,randomizer:this._randomizer},o);var s=this._beforeCallbacks;s=s.concat(this._mogwais);for(var l=this._afterCallbacks,u=0,c=a.length;c>u;u++)"function"==typeof a[u].cleanUp&&l.push(a[u].cleanUp);var m=this;i(s,[],m,function(){i(m._strategies,[m._gremlins,e],m,function(){i(l,[],m,function(){"function"==typeof t&&t()})})})},o.prototype.stop=function(){for(var e=this._strategies,n=0,t=e.length;t>n;n++)e[n].stop()},r.createHorde=function(){return new o},window&&(window.gremlins=r),r}.call(n,t,n,e),!(void 0!==a&&(e.exports=a))},function(e,n,t){var a;a=function(e){"use strict";var n=t(1),a=(t(2),t(5));return function(){function e(){return o.randomizer.bool()}function t(){return o.randomizer.sentence()}function r(){if(!o.logger)throw new a;-1!==o.watchEvents.indexOf("alert")&&(window.alert=function(e){o.logger.warn("mogwai ","alert     ",e,"alert")}),-1!==o.watchEvents.indexOf("confirm")&&(window.confirm=function(e){o.confirmResponse(),o.logger.warn("mogwai ","alert     ",e,"confirm")}),-1!==o.watchEvents.indexOf("prompt")&&(window.prompt=function(e){o.promptResponse(),o.logger.warn("mogwai ","alert     ",e,"prompt")})}var i=["alert","confirm","prompt"],o={watchEvents:i,confirmResponse:e,promptResponse:t,logger:null,randomizer:null},s=window.alert,l=window.confirm,u=window.prompt;return r.cleanUp=function(){return window.alert=s,window.confirm=l,window.prompt=u,r},n(r,o),r}}.call(n,t,n,e),!(void 0!==a&&(e.exports=a))},function(e,n,t){var a;a=function(e){"use strict";var n=t(1),a=t(5);return function(){function e(e){return 10>e?"error":20>e?"warn":"log"}function t(e){e-l>s.delay&&(r(e),l=e),o&&window.requestAnimationFrame(t)}function r(){function e(e){t=e,window.requestAnimationFrame(n)}function n(e){var n=16>e-t?60:1e3/(e-t),a=s.levelSelector(n);s.logger[a]("mogwai ","fps       ",n)}var t;window.requestAnimationFrame(e)}function i(){if(!s.logger)throw new a;o=!0,window.requestAnimationFrame(t)}window.requestAnimationFrame||(window.requestAnimationFrame=window.mozRequestAnimationFrame||window.webkitRequestAnimationFrame||window.msRequestAnimationFrame||function(e){window.setTimeout(e,1e3/60)});var o,s={delay:500,levelSelector:e,logger:null},l=-(1/0);return i.cleanUp=function(){return o=!1,i},n(i,s),i}}.call(n,t,n,e),!(void 0!==a&&(e.exports=a))},function(e,n,t){var a;a=function(e){"use strict";var n=t(1);return function(){function e(){function e(){if(n++,n==r.maxErrors){if(i.stop(),!r.logger)return;window.setTimeout(function(){r.logger.warn("mogwai ","gizmo     ","stopped test execution after ",r.maxErrors,"errors")},4)}}var n=0,i=this;t=window.onerror,window.onerror=function(n,a,r){return e(),t?t(n,a,r):!1},a=console.error,console.error=function(){e(),a.apply(console,arguments)}}var t,a,r={maxErrors:10,logger:null};return e.cleanUp=function(){return window.onerror=t,console.error=a.bind(console),e},n(e,r),e}}.call(n,t,n,e),!(void 0!==a&&(e.exports=a))},function(e,n,t){var a;a=function(e){"use strict";var n=t(1),a=(t(2),t(3));return function(){function e(){return[u.randomizer.natural({max:o.documentElement.clientWidth-1}),u.randomizer.natural({max:o.documentElement.clientHeight-1})]}function t(e,n){var t=o.createElement("div");t.style.zIndex=2e3,t.style.border="3px solid red",t.style["border-radius"]="50%",t.style.borderRadius="50%",t.style.width="40px",t.style.height="40px",t.style["box-sizing"]="border-box",t.style.position="absolute",t.style.webkitTransition="opacity 1s ease-out",t.style.mozTransition="opacity 1s ease-out",t.style.transition="opacity 1s ease-out",t.style.left=e-20+"px",t.style.top=n-20+"px";var a=s.appendChild(t);setTimeout(function(){s.removeChild(a)},1e3),setTimeout(function(){a.style.opacity=0},50)}function r(){return!0}function i(){if(!u.randomizer)throw new a;var e,n,t,r,i=0;do if(e=u.positionSelector(),n=e[0],t=e[1],r=o.elementFromPoint(n,t),i++,i>u.maxNbTries)return!1;while(!r||!u.canClick(r));var s=o.createEvent("MouseEvents"),l=u.randomizer.pick(u.clickTypes);s.initMouseEvent(l,!0,!0,window,0,0,0,n,t,!1,!1,!1,!1,0,null),r.dispatchEvent(s),"function"==typeof u.showAction&&u.showAction(n,t,l),u.logger&&"function"==typeof u.logger.log&&u.logger.log("gremlin","clicker   ",l,"at",n,t)}var o=window.document,s=o.body,l=["click","click","click","click","click","click","dblclick","dblclick","mousedown","mouseup","mouseover","mouseover","mouseover","mousemove","mouseout"],u={clickTypes:l,positionSelector:e,showAction:t,canClick:r,maxNbTries:10,logger:null,randomizer:null};return n(i,u),i}}.call(n,t,n,e),!(void 0!==a&&(e.exports=a))},function(e,n,t){var a;a=function(e){"use strict";var n=t(1),a=(t(2),t(3));return function(){function e(e){"undefined"==typeof e.attributes["data-old-border"]&&(e.attributes["data-old-border"]=e.style.border);var n=e.attributes["data-old-border"];e.style.border="1px solid red",setTimeout(function(){e.style.border=n},500)}function t(){return!0}function r(){if(!p.randomizer)throw new a;var e=[];for(var n in p.elementMapTypes)p.elementMapTypes.hasOwnProperty(n)&&e.push(n);var t,r=0;do{var i=h.querySelectorAll(e.join(","));if(0===i.length)return!1;if(t=p.randomizer.pick(i),r++,r>p.maxNbTries)return!1}while(!t||!p.canFillElement(t));var o=null;for(var s in p.elementMapTypes)if(m(t,s)){o=s;break}var l=p.elementMapTypes[o](t);"function"==typeof p.showAction&&p.showAction(t),p.logger&&"function"==typeof p.logger.log&&p.logger.log("gremlin","formFiller","input",l,"in",t)}function i(e){var n=p.randomizer.character();return e.value+=n,n}function o(e){var n=p.randomizer.character({pool:"0123456789"});return e.value+=n,n}function s(e){var n=e.querySelectorAll("option");if(0!==n.length){for(var t=p.randomizer.pick(n),a=0,r=n.length;r>a;a++){var i=n[a];i.selected=i.value==t.value}return t.value}}function l(e){var n=h.createEvent("MouseEvents");return n.initMouseEvent("click",!0,!0,window,0,0,0,0,0,!1,!1,!1,!1,0,null),e.dispatchEvent(n),e.value}function u(e){var n=h.createEvent("MouseEvents");return n.initMouseEvent("click",!0,!0,window,0,0,0,0,0,!1,!1,!1,!1,0,null),e.dispatchEvent(n),e.value}function c(e){var n=p.randomizer.email();return e.value=n,n}function m(e,n){if(e.webkitMatchesSelector)m=function(e,n){return e.webkitMatchesSelector(n)};else if(e.mozMatchesSelector)m=function(e,n){return e.mozMatchesSelector(n)};else if(e.msMatchesSelector)m=function(e,n){return e.msMatchesSelector(n)};else{if(!e.oMatchesSelector)throw new Error("Unsupported browser");m=function(e,n){return e.oMatchesSelector(n)}}return m(e,n)}var h=window.document,d={textarea:i,'input[type="text"]':i,'input[type="password"]':i,'input[type="number"]':o,select:s,'input[type="radio"]':l,'input[type="checkbox"]':u,'input[type="email"]':c,"input:not([type])":i},p={elementMapTypes:d,showAction:e,canFillElement:t,maxNbTries:10,logger:null,randomizer:null};return n(r,p),r}}.call(n,t,n,e),!(void 0!==a&&(e.exports=a))},function(e,n,t){var a;a=function(e){"use strict";var n=t(1),a=(t(2),t(3));return function(){function e(){var e=Math.max(s.scrollWidth,s.offsetWidth,o.scrollWidth,o.offsetWidth,o.clientWidth),n=Math.max(s.scrollHeight,s.offsetHeight,o.scrollHeight,o.offsetHeight,o.clientHeight);return[l.randomizer.natural({max:e-o.clientWidth}),l.randomizer.natural({max:n-o.clientHeight})]}function t(e,n){var t=i.createElement("div");t.style.zIndex=2e3,t.style.border="3px solid red",t.style.width=o.clientWidth-25+"px",t.style.height=o.clientHeight-25+"px",t.style.position="absolute",t.style.webkitTransition="opacity 1s ease-out",t.style.mozTransition="opacity 1s ease-out",t.style.transition="opacity 1s ease-out",t.style.left=e+10+"px",t.style.top=n+10+"px";var a=s.appendChild(t);setTimeout(function(){s.removeChild(a)},1e3),setTimeout(function(){a.style.opacity=0},50)}function r(){if(!l.randomizer)throw new a;var e=l.positionSelector(),n=e[0],t=e[1];window.scrollTo(n,t),"function"==typeof l.showAction&&l.showAction(n,t),"function"==typeof l.logger.log&&l.logger.log("gremlin","scroller  ","scroll to",n,t)}var i=window.document,o=i.documentElement,s=i.body,l={positionSelector:e,showAction:t,logger:null,randomizer:null};return n(r,l),r}}.call(n,t,n,e),!(void 0!==a&&(e.exports=a))},function(e,n,t){var a;a=function(e){"use strict";var n=t(1),a=(t(2),t(3));return function(){function e(){return[h.randomizer.natural({max:u.documentElement.clientWidth-1}),h.randomizer.natural({max:u.documentElement.clientHeight-1})]}function t(e){var n=u.createDocumentFragment();e.forEach(function(e){var t=u.createElement("div");t.style.zIndex=2e3,t.style.background="red",t.style["border-radius"]="50%",t.style.borderRadius="50%",t.style.width="20px",t.style.height="20px",t.style.position="absolute",t.style.webkitTransition="opacity .5s ease-out",t.style.mozTransition="opacity .5s ease-out",t.style.transition="opacity .5s ease-out",t.style.left=e.x-10+"px",t.style.top=e.y-10+"px";var a=n.appendChild(t);setTimeout(function(){c.removeChild(a)},500),setTimeout(function(){a.style.opacity=0},50)}),u.body.appendChild(n)}function r(){return!0}function i(e,n,t,a){var r,i,o,s=e[0],l=e[1],u=[];if(1===n)return[{x:s,y:l}];for(t=t||100,a=null!==a?a*Math.PI/180:0,r=2*Math.PI/n,i=0;n>i;i++)o=r*i+a,u.push({x:s+t*Math.cos(o),y:l+t*Math.sin(o)});return u}function o(e,n,t){var a=[],r=u.createEvent("Event");r.initEvent("touch"+t,!0,!0),a.identifiedTouch=a.item=function(e){return this[e]||{}},e.forEach(function(e,t){var r=Math.round(e.x),i=Math.round(e.y);a.push({pageX:r,pageY:i,clientX:r,clientY:i,screenX:r,screenY:i,target:n,identifier:t})}),r.touches="end"==t?[]:a,r.targetTouches="end"==t?[]:a,r.changedTouches=a,n.dispatchEvent(r),h.showAction(e)}function s(e,n,t,a,r){function s(){var m=a.radius;1!==a.scale&&(m=a.radius-a.radius*(1-a.scale)*(1/u)*c);var h=n[0]+a.distanceX/u*c,d=n[1]+a.distanceY/u*c,p="number"==typeof a.rotation?a.rotation/u*c:null,f=i([h,d],t.length,m,p),y=1==c,b=c==u;if(y)o(f,e,"start");else{if(b)return o(f,e,"end"),r(f);o(f,e,"move")}setTimeout(s,l),c++}var l=10,u=Math.ceil(a.duration/l),c=1;s()}function l(e){function n(n,t){"function"==typeof h.showAction&&h.showAction(n),h.logger&&"function"==typeof h.logger.log&&h.logger.log("gremlin","toucher   ",l,"at",r,i,t),e()}if(!h.randomizer)throw new a;var t,r,i,o,s=0;do if(t=h.positionSelector(),r=t[0],i=t[1],o=u.elementFromPoint(r,i),s++,s>h.maxNbTries)return;while(!o||!h.canTouch(o));var l=h.randomizer.pick(h.touchTypes);d[l](t,o,n)}var u=window.document,c=u.body,m=["tap","tap","tap","doubletap","gesture","gesture","gesture","multitouch","multitouch"],h={touchTypes:m,positionSelector:e,showAction:t,canTouch:r,maxNbTries:10,logger:null,randomizer:null,maxTouches:2},d={tap:function(e,n,t){var a=i(e,1),r={duration:h.randomizer.integer({min:20,max:700})};o(a,n,"start"),setTimeout(function(){o(a,n,"end"),t(a,r)},r.duration)},doubletap:function(e,n,t){d.tap(e,n,function(){setTimeout(function(){d.tap(e,n,t)},30)})},gesture:function p(e,n,t){var p={distanceX:h.randomizer.integer({min:-100,max:200}),distanceY:h.randomizer.integer({min:-100,max:200}),duration:h.randomizer.integer({min:20,max:500})},a=i(e,1,p.radius);s(n,e,a,p,function(e){t(e,p)})},multitouch:function(e,n,t){var a=h.randomizer.integer({min:2,max:h.maxTouches}),r={scale:h.randomizer.floating({min:0,max:2}),rotation:h.randomizer.natural({min:-100,max:100}),radius:h.randomizer.integer({min:50,max:200}),distanceX:h.randomizer.integer({min:-20,max:20}),distanceY:h.randomizer.integer({min:-20,max:20}),duration:h.randomizer.integer({min:100,max:1500})},o=i(e,a,r.radius);s(n,e,o,r,function(e){t(e,r)})}};return n(l,h),l}}.call(n,t,n,e),!(void 0!==a&&(e.exports=a))},function(e,n,t){var a;a=function(e){"use strict";var n=t(1),a=(t(2),t(3));return function(){function e(){return c.randomizer.natural({min:3,max:254})}function t(e,n){return o.elementFromPoint(e,n)}function r(e,n,t,a){var r=o.createElement("div");r.style.zIndex=2e3,r.style.border="3px solid orange",r.style["border-radius"]="50%",r.style.borderRadius="50%",r.style.width="40px",r.style.height="40px",r.style["box-sizing"]="border-box",r.style.position="absolute",r.style.webkitTransition="opacity 1s ease-out",r.style.mozTransition="opacity 1s ease-out",r.style.transition="opacity 1s ease-out",r.style.left=n+"px",r.style.top=t+"px",r.style.textAlign="center",r.style.paddingTop="7px",r.innerHTML=String.fromCharCode(a);var i=l.appendChild(r);setTimeout(function(){l.removeChild(i)},1e3),setTimeout(function(){i.style.opacity=0},50)}function i(){if(!c.randomizer)throw new a;var e=o.createEventObject?o.createEventObject():o.createEvent("Events"),n=c.randomizer.pick(c.eventTypes),t=c.keyGenerator(),r=c.randomizer.natural({max:s.clientWidth-1}),i=c.randomizer.natural({max:s.clientHeight-1}),l=c.targetElement(r,i);e.initEvent&&e.initEvent(n,!0,!0),e.keyCode=t,e.which=t,e.keyCodeVal=t,l.dispatchEvent?l.dispatchEvent(e):l.fireEvent("on"+n,e),"function"==typeof c.showAction&&c.showAction(l,r,i,t),c.logger&&"function"==typeof c.logger.log&&c.logger.log("gremlin","typer       type",String.fromCharCode(t),"at",r,i)}var o=window.document,s=o.documentElement,l=o.body,u=["keypress","keyup","keydown"],c={eventTypes:u,showAction:r,keyGenerator:e,targetElement:t,logger:null,randomizer:null};return n(i,c),i}}.call(n,t,n,e),!(void 0!==a&&(e.exports=a))},function(e,n,t){var a;a=function(e){"use strict";var n=t(4),a=t(1);return function(){function e(e,a,s){function l(t){n(e,[],m,t)}function u(e){return r?void 0:e>=c?t():void l(function(){setTimeout(function(){u(++e)},o.delay)})}var c=a&&a.nb?a.nb:o.nb,m=this;r=!1,i=s,u(0)}function t(){"function"==typeof i&&i(),i=null}var r,i,o={delay:10,nb:100};return e.stop=function(){r=!0,setTimeout(t,4)},a(e,o),e}}.call(n,t,n,e),!(void 0!==a&&(e.exports=a))},function(e,n,t){var a;a=function(e){"use strict";var n=t(4),a=t(1);return function(){function e(e,a,s){function l(e,t,a){return r?void 0:t>=c?a():void n([e],[],m,function(){setTimeout(function(){l(e,++t,a)},o.delay)})}function u(){return r?void 0:0===e.length?t():void l(e.shift(),0,u)}var c=a&&a.nb?a.nb:o.nb,e=e.slice(0),m=this;r=!1,i=s,u()}function t(){"function"==typeof i&&i(),i=null}var r,i,o={delay:10,nb:200};return e.stop=function(){r=!0,setTimeout(t,4)},a(e,o),e}}.call(n,t,n,e),!(void 0!==a&&(e.exports=a))},function(e,n,t){var a;a=function(e){"use strict";var n=t(4),a=t(1),r=t(2);return function(){function e(e,a,r){function c(t,a,r){return s?void 0:a>=m?o():void n([t],[],d,function(){setTimeout(function(){c(i(e,h),++a,r)},u.delay)})}var m=a&&a.nb?a.nb:u.nb,e=e.slice(0),h=0===u.distribution.length?t(e):u.distribution,d=this;return 0===m?r():(s=!1,l=r,void c(i(e,h),0,c))}function t(e){var n=e.length;if(0===n)return[];for(var t=[],a=1/n,r=0;n>r;r++)t.push(a);return t}function i(e,n){for(var t=0,a=u.randomizer.floating({min:0,max:1}),r=0,i=e.length;i>r;r++)if(t+=n[r],t>=a)return e[r];return function(){}}function o(){"function"==typeof l&&l(),l=null}var s,l,u={distribution:[],delay:10,nb:1e3,randomizer:new r};return e.stop=function(){s=!0,setTimeout(o,4)},a(e,u),e}}.call(n,t,n,e),!(void 0!==a&&(e.exports=a))}])});
 
 /***/ },
-/* 20 */
+/* 21 */
 /*!*************************************************************!*\
   !*** /home/dp/Projects/sdk/spasdk/app/lib/develop/hooks.js ***!
   \*************************************************************/
@@ -2923,7 +2556,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, "../../spasdk/app/lib/develop/hooks.js"))
 
 /***/ },
-/* 21 */
+/* 22 */
 /*!**************************************************************!*\
   !*** /home/dp/Projects/sdk/spasdk/app/lib/develop/static.js ***!
   \**************************************************************/
@@ -2949,7 +2582,7 @@
 	//console.log(require('spa-gulp-livereload/config').default.tinylr);
 	//console.log(LIVERELOAD);
 	
-	__webpack_require__(/*! livereload-js/dist/livereload.js */ 22);
+	__webpack_require__(/*! livereload-js/dist/livereload.js */ 23);
 	
 	// livereload activation
 	//if ( config.livereload ) {
@@ -2962,7 +2595,7 @@
 
 
 /***/ },
-/* 22 */
+/* 23 */
 /*!****************************************************************!*\
   !*** /home/dp/Projects/sdk/~/livereload-js/dist/livereload.js ***!
   \****************************************************************/
@@ -4154,7 +3787,7 @@
 
 
 /***/ },
-/* 23 */
+/* 24 */
 /*!************************************!*\
   !*** ../app/lib/develop/weinre.js ***!
   \************************************/
@@ -4170,13 +3803,15 @@
 	
 	'use strict';
 	
-	var tag    = __webpack_require__(/*! spa-dom */ 24).tag,
-	    util   = __webpack_require__(/*! util */ 25),
-	    config = {} /*require('../../config/weinre')*/;
+	var app     = __webpack_require__(/*! spa-app/lib/core */ 2),
+	    tag     = __webpack_require__(/*! spa-dom */ 25).tag,
+	    //storage = require('./storage'),
+	    util    = __webpack_require__(/*! util */ 26),
+	    config  = {} /*require('../../config/weinre')*/;
 	
 	
 	// web inspector is allowed only without SpyJS
-	if ( config.active && !localStorage.getItem('spyjs.active') ) {
+	if ( config.active && !app.develop.storage.getItem('spyjs.active') ) {
 	    // load external script
 	    document.head.appendChild(tag('script', {
 	        type: 'text/javascript',
@@ -4186,7 +3821,7 @@
 
 
 /***/ },
-/* 24 */
+/* 25 */
 /*!*************************************************!*\
   !*** /home/dp/Projects/sdk/spasdk/dom/index.js ***!
   \*************************************************/
@@ -4373,7 +4008,7 @@
 
 
 /***/ },
-/* 25 */
+/* 26 */
 /*!********************************************!*\
   !*** /home/dp/Projects/sdk/~/util/util.js ***!
   \********************************************/
@@ -4904,7 +4539,7 @@
 	}
 	exports.isPrimitive = isPrimitive;
 	
-	exports.isBuffer = __webpack_require__(/*! ./support/isBuffer */ 27);
+	exports.isBuffer = __webpack_require__(/*! ./support/isBuffer */ 28);
 	
 	function objectToString(o) {
 	  return Object.prototype.toString.call(o);
@@ -4948,7 +4583,7 @@
 	 *     prototype.
 	 * @param {function} superCtor Constructor function to inherit prototype from.
 	 */
-	exports.inherits = __webpack_require__(/*! inherits */ 28);
+	exports.inherits = __webpack_require__(/*! inherits */ 29);
 	
 	exports._extend = function(origin, add) {
 	  // Don't do anything if add isn't an object
@@ -4966,24 +4601,113 @@
 	  return Object.prototype.hasOwnProperty.call(obj, prop);
 	}
 	
-	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }()), __webpack_require__(/*! /home/dp/Projects/sdk/~/process/browser.js */ 26)))
+	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }()), __webpack_require__(/*! /home/dp/Projects/sdk/~/process/browser.js */ 27)))
 
 /***/ },
-/* 26 */
+/* 27 */
 /*!**************************************************!*\
   !*** /home/dp/Projects/sdk/~/process/browser.js ***!
   \**************************************************/
 /***/ function(module, exports) {
 
 	// shim for using process in browser
-	
 	var process = module.exports = {};
+	
+	// cached from whatever global is present so that test runners that stub it
+	// don't break things.  But we need to wrap it in a try catch in case it is
+	// wrapped in strict mode code which doesn't define any globals.  It's inside a
+	// function because try/catches deoptimize in certain engines.
+	
+	var cachedSetTimeout;
+	var cachedClearTimeout;
+	
+	function defaultSetTimout() {
+	    throw new Error('setTimeout has not been defined');
+	}
+	function defaultClearTimeout () {
+	    throw new Error('clearTimeout has not been defined');
+	}
+	(function () {
+	    try {
+	        if (typeof setTimeout === 'function') {
+	            cachedSetTimeout = setTimeout;
+	        } else {
+	            cachedSetTimeout = defaultSetTimout;
+	        }
+	    } catch (e) {
+	        cachedSetTimeout = defaultSetTimout;
+	    }
+	    try {
+	        if (typeof clearTimeout === 'function') {
+	            cachedClearTimeout = clearTimeout;
+	        } else {
+	            cachedClearTimeout = defaultClearTimeout;
+	        }
+	    } catch (e) {
+	        cachedClearTimeout = defaultClearTimeout;
+	    }
+	} ())
+	function runTimeout(fun) {
+	    if (cachedSetTimeout === setTimeout) {
+	        //normal enviroments in sane situations
+	        return setTimeout(fun, 0);
+	    }
+	    // if setTimeout wasn't available but was latter defined
+	    if ((cachedSetTimeout === defaultSetTimout || !cachedSetTimeout) && setTimeout) {
+	        cachedSetTimeout = setTimeout;
+	        return setTimeout(fun, 0);
+	    }
+	    try {
+	        // when when somebody has screwed with setTimeout but no I.E. maddness
+	        return cachedSetTimeout(fun, 0);
+	    } catch(e){
+	        try {
+	            // When we are in I.E. but the script has been evaled so I.E. doesn't trust the global object when called normally
+	            return cachedSetTimeout.call(null, fun, 0);
+	        } catch(e){
+	            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error
+	            return cachedSetTimeout.call(this, fun, 0);
+	        }
+	    }
+	
+	
+	}
+	function runClearTimeout(marker) {
+	    if (cachedClearTimeout === clearTimeout) {
+	        //normal enviroments in sane situations
+	        return clearTimeout(marker);
+	    }
+	    // if clearTimeout wasn't available but was latter defined
+	    if ((cachedClearTimeout === defaultClearTimeout || !cachedClearTimeout) && clearTimeout) {
+	        cachedClearTimeout = clearTimeout;
+	        return clearTimeout(marker);
+	    }
+	    try {
+	        // when when somebody has screwed with setTimeout but no I.E. maddness
+	        return cachedClearTimeout(marker);
+	    } catch (e){
+	        try {
+	            // When we are in I.E. but the script has been evaled so I.E. doesn't  trust the global object when called normally
+	            return cachedClearTimeout.call(null, marker);
+	        } catch (e){
+	            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error.
+	            // Some versions of I.E. have different rules for clearTimeout vs setTimeout
+	            return cachedClearTimeout.call(this, marker);
+	        }
+	    }
+	
+	
+	
+	}
 	var queue = [];
 	var draining = false;
 	var currentQueue;
 	var queueIndex = -1;
 	
 	function cleanUpNextTick() {
+	    if (!draining || !currentQueue) {
+	        return;
+	    }
 	    draining = false;
 	    if (currentQueue.length) {
 	        queue = currentQueue.concat(queue);
@@ -4999,7 +4723,7 @@
 	    if (draining) {
 	        return;
 	    }
-	    var timeout = setTimeout(cleanUpNextTick);
+	    var timeout = runTimeout(cleanUpNextTick);
 	    draining = true;
 	
 	    var len = queue.length;
@@ -5016,7 +4740,7 @@
 	    }
 	    currentQueue = null;
 	    draining = false;
-	    clearTimeout(timeout);
+	    runClearTimeout(timeout);
 	}
 	
 	process.nextTick = function (fun) {
@@ -5028,7 +4752,7 @@
 	    }
 	    queue.push(new Item(fun, args));
 	    if (queue.length === 1 && !draining) {
-	        setTimeout(drainQueue, 0);
+	        runTimeout(drainQueue);
 	    }
 	};
 	
@@ -5069,7 +4793,7 @@
 
 
 /***/ },
-/* 27 */
+/* 28 */
 /*!***************************************************************!*\
   !*** /home/dp/Projects/sdk/~/util/support/isBufferBrowser.js ***!
   \***************************************************************/
@@ -5083,7 +4807,7 @@
 	}
 
 /***/ },
-/* 28 */
+/* 29 */
 /*!************************************************************!*\
   !*** /home/dp/Projects/sdk/~/inherits/inherits_browser.js ***!
   \************************************************************/
@@ -5115,7 +4839,7 @@
 
 
 /***/ },
-/* 29 */
+/* 30 */
 /*!************************************!*\
   !*** ../app/lib/develop/events.js ***!
   \************************************/
@@ -5133,13 +4857,14 @@
 	
 	/* eslint new-cap: 0 */
 	
-	var util    = __webpack_require__(/*! util */ 25),
-	    app     = __webpack_require__(/*! ../core */ 2),
-	    stringify = __webpack_require__(/*! cjs-query */ 5).stringify,
+	var //util    = require('util'),
+	    app       = __webpack_require__(/*! spa-app/lib/core */ 2),
+	    stringify = __webpack_require__(/*! cjs-query */ 4).stringify,
 	    //request = require('spa-request'),
 	    //dom     = require('spa-dom'),
-	    grid    = __webpack_require__(/*! ./grid */ 30),
-	    events  = {};
+	    //storage = require('./storage'),
+	    grid      = __webpack_require__(/*! ./grid */ 31),
+	    events    = {};
 	
 	
 	/**
@@ -5190,7 +4915,7 @@
 	
 	    grid.init();
 	
-	    if ( localStorage.getItem('grid.active') === 'true' ) {
+	    if ( app.develop.storage.getItem('grid.active') === 'true' ) {
 	        grid.show();
 	    }
 	
@@ -5242,7 +4967,7 @@
 	                grid.show();
 	            }
 	            debug.log('show grid: ' + grid.active, 'red');
-	            localStorage.setItem('grid.active', grid.active.toString());
+	            app.develop.storage.setItem('grid.active', grid.active.toString());
 	            break;
 	
 	        // numpad 6
@@ -5332,7 +5057,7 @@
 
 
 /***/ },
-/* 30 */
+/* 31 */
 /*!**********************************!*\
   !*** ../app/lib/develop/grid.js ***!
   \**********************************/
@@ -5348,8 +5073,9 @@
 	
 	'use strict';
 	
-	var metrics = __webpack_require__(/*! ../core */ 2).metrics;
-	
+	var app     = __webpack_require__(/*! spa-app/lib/core */ 2),
+	    metrics = app.metrics;
+	    //storage = require('./storage');
 	
 	// public
 	module.exports = window.grid = {
@@ -5375,7 +5101,7 @@
 	    cursorY: 0,
 	
 	    // list of click points
-	    points: JSON.parse(localStorage.getItem('grid.points') || '[]'),
+	    points: JSON.parse(app.develop.storage.getItem('grid.points') || '[]'),
 	
 	    // points to snap
 	    snaps: [],
@@ -5498,7 +5224,7 @@
 	        }
 	        this.repaint();
 	        this.drawPointer();
-	        localStorage.setItem('grid.points', JSON.stringify(this.points));
+	        app.develop.storage.setItem('grid.points', JSON.stringify(this.points));
 	    },
 	
 	
@@ -5631,7 +5357,7 @@
 
 
 /***/ },
-/* 31 */
+/* 32 */
 /*!******************************!*\
   !*** ./src/js/pages/init.js ***!
   \******************************/
@@ -5643,7 +5369,7 @@
 	
 	'use strict';
 	
-	var Page = __webpack_require__(/*! stb-component-page */ 32),
+	var Page = __webpack_require__(/*! stb-component-page */ 33),
 	    page = new Page({$node: window.pageInit});
 	
 	
@@ -5652,7 +5378,7 @@
 
 
 /***/ },
-/* 32 */
+/* 33 */
 /*!**********************************!*\
   !*** ../component-page/index.js ***!
   \**********************************/
@@ -5666,11 +5392,11 @@
 	'use strict';
 	
 	// public
-	module.exports = __webpack_require__(/*! spa-component-page */ 33);
+	module.exports = __webpack_require__(/*! spa-component-page */ 34);
 
 
 /***/ },
-/* 33 */
+/* 34 */
 /*!************************************************************!*\
   !*** /home/dp/Projects/sdk/spasdk/component-page/index.js ***!
   \************************************************************/
@@ -5685,7 +5411,7 @@
 	
 	'use strict';
 	
-	var Component = __webpack_require__(/*! spa-component */ 34);
+	var Component = __webpack_require__(/*! spa-component */ 35);
 	
 	
 	/**
@@ -5767,7 +5493,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, "../../spasdk/component-page/index.js"))
 
 /***/ },
-/* 34 */
+/* 35 */
 /*!*******************************************************!*\
   !*** /home/dp/Projects/sdk/spasdk/component/index.js ***!
   \*******************************************************/
@@ -5782,8 +5508,8 @@
 	
 	'use strict';
 	
-	var app     = __webpack_require__(/*! spa-app/lib/core */ 3),
-	    Emitter = __webpack_require__(/*! cjs-emitter */ 4),
+	var app     = __webpack_require__(/*! spa-app/lib/core */ 2),
+	    Emitter = __webpack_require__(/*! cjs-emitter */ 3),
 	    counter = 0;
 	
 	
@@ -6337,7 +6063,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, "../../spasdk/component/index.js"))
 
 /***/ },
-/* 35 */
+/* 36 */
 /*!******************************!*\
   !*** ./src/js/pages/main.js ***!
   \******************************/
@@ -6349,7 +6075,7 @@
 	
 	'use strict';
 	
-	var Page = __webpack_require__(/*! stb-component-page */ 32),
+	var Page = __webpack_require__(/*! stb-component-page */ 33),
 	    page = new Page({$node: window.pageMain});
 	
 	
