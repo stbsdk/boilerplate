@@ -13,10 +13,11 @@ Create a new project base:
 git clone https://github.com/stbsdk/boilerplate.git my-project
 ```
 
-Build and start services:
+Remove git metadata, build and start services:
 
 ```bash
 cd my-project
+rm -rf .git
 stbsdk
 # or
 DEBUG=* stbsdk
