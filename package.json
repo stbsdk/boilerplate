@@ -14,14 +14,17 @@
         "start": "stbsdk",
         "build": "stbsdk build",
         "watch": "stbsdk watch",
-        "serve": "stbsdk serve"
+        "serve": "stbsdk serve",
+        "lint": "eslint .",
+        "test": "npm run lint"
     },
     "dependencies": {
         "stb-app": "stbsdk/app",
-        "stb-rc": "stbsdk/rc",
-        "stb-component-page": "stbsdk/component-page"
+        "stb-component-page": "stbsdk/component-page",
+        "stb-rc": "stbsdk/rc"
     },
     "devDependencies": {
+        "eslint": "2.*.*",
         "stb-eslint-config": "stbsdk/eslint-config"
     },
     "license": "MIT"
