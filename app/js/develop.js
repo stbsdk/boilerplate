@@ -107,8 +107,9 @@
 	// apply geometry
 	__webpack_require__(/*! ./lib/metrics */ 8);
 	
-	// load app css
-	__webpack_require__(/*! ./lib/css */ 10);
+	// load sdk+app css
+	__webpack_require__(/*! ./lib/css */ 10)('sdk');
+	__webpack_require__(/*! ./lib/css */ 10)('app');
 	
 	
 	// set max browser window size
@@ -793,6 +794,10 @@
 	     */
 	    keydown: function ( event ) {
 	        var page = app.activePage,
+	            eventLocal = {
+	                code: event.keyCode,
+	                stop: false
+	            },
 	            activeComponent;
 	
 	        if ( true ) {
@@ -806,12 +811,13 @@
 	        //event.code = event.keyCode;
 	
 	        // apply key modifiers
-	        //if ( event.shiftKey ) { event.code += 1000; }
-	        //if ( event.altKey )   { event.code += 2000; }
+	        if ( event.ctrlKey )  { eventLocal.code += 'c'; }
+	        if ( event.altKey )   { eventLocal.code += 'a'; }
+	        if ( event.shiftKey ) { eventLocal.code += 's'; }
 	
 	        //debug.event(event);
 	        //console.log(event);
-	        debug.info('app event: ' + event.type, event, {tags: [event.type, 'event']});
+	        //debug.info('app event: ' + event.type, event, {tags: [event.type, 'event']});
 	
 	        // page.activeComponent can be set to null in event handles
 	        activeComponent = page.activeComponent;
@@ -821,27 +827,27 @@
 	            // component is available and not page itself
 	            if ( activeComponent.events[event.type] ) {
 	                // there are some listeners
-	                activeComponent.emit(event.type, event);
+	                activeComponent.emit(event.type, eventLocal, event);
 	            }
 	
 	            // todo: bubble event recursively
 	            // bubbling
 	            if (
-	                !event.stop &&
+	                !eventLocal.stop &&
 	                activeComponent.propagate &&
 	                activeComponent.parent &&
 	                activeComponent.parent.events[event.type]
 	            ) {
-	                activeComponent.parent.emit(event.type, event);
+	                activeComponent.parent.emit(event.type, eventLocal, event);
 	            }
 	        }
 	
 	        // page handler
-	        if ( !event.stop ) {
+	        if ( !eventLocal.stop ) {
 	            // not prevented
 	            if ( page.events[event.type] ) {
 	                // there are some listeners
-	                page.emit(event.type, event);
+	                page.emit(event.type, eventLocal, event);
 	            }
 	
 	            // global app handler
@@ -849,7 +855,7 @@
 	                // not prevented
 	                if ( app.events[event.type] ) {
 	                    // there are some listeners
-	                    app.emit(event.type, event);
+	                    app.emit(event.type, eventLocal, event);
 	                }
 	            }
 	        }
@@ -1177,9 +1183,9 @@
 	
 	'use strict';
 	
-	var app = __webpack_require__(/*! spa-app/lib/core */ 2),
+	var app = __webpack_require__(/*! spa-app/lib/core */ 2);
 	    //metrics = require('app:metrics'),
-	    linkCSS;
+	    //linkCSS;
 	
 	
 	// global link
@@ -1194,14 +1200,20 @@
 	// window.resizeTo(metrics.width, metrics.height);
 	
 	// load CSS file base on resolution
-	linkCSS = document.createElement('link');
+	/*linkCSS = document.createElement('link');
 	linkCSS.rel  = 'stylesheet';
-	linkCSS.href = 'css/' + ( true ? 'develop.' : 'release.') + app.metrics.height + '.css' + ( true ? '?' + Date.now() : '');
-	document.head.appendChild(linkCSS);
+	linkCSS.href = 'css/' + (DEVELOP ? 'develop.' : 'release.') + app.metrics.height + '.css' + (DEVELOP ? '?' + Date.now() : '');
+	document.head.appendChild(linkCSS);*/
 	
 	
 	// public
-	module.exports = linkCSS;
+	module.exports = function ( name ) {
+	    var link = document.createElement('link');
+	
+	    link.rel  = 'stylesheet';
+	    link.href = 'css/' + ( true ? 'develop.' : 'release.') + name + '.' + app.metrics.height + '.css' + ( true ? '?' + Date.now() : '');
+	    document.head.appendChild(link);
+	};
 
 
 /***/ },
@@ -1339,8 +1351,8 @@
 	            if ( info ) {
 	                try {
 	                    info = JSON.parse(info);
-	                } catch ( e ) {
-	                    debug.fail('stbEvent JSON parse', e);
+	                } catch ( error ) {
+	                    debug.fail('stbEvent JSON parse', error);
 	                }
 	            }
 	
@@ -1355,7 +1367,7 @@
 	     *
 	     * @param {number} windowId that sent message
 	     * @param {string} message text
-	     * @param {object} data in sent message
+	     * @param {Object} data in sent message
 	     * @fires module:/stb/app#message
 	     */
 	    onBroadcastMessage: function ( windowId, message, data ) {
@@ -1376,7 +1388,7 @@
 	     *
 	     * @param {number} windowId that sent message
 	     * @param {string} message text
-	     * @param {object} data in sent message
+	     * @param {Object} data in sent message
 	     * @fires module:/stb/app#message
 	     */
 	    onMessage: function ( windowId, message, data ) {
@@ -3731,7 +3743,7 @@
 	    tag     = __webpack_require__(/*! spa-dom */ 25).tag,
 	    //storage = require('./storage'),
 	    util    = __webpack_require__(/*! util */ 26),
-	    config  = {} /*require('../../config/weinre')*/;
+	    config  = {}/*require('../../config/weinre')*/;
 	
 	
 	// web inspector is allowed only without SpyJS
@@ -3885,6 +3897,7 @@
 	                );
 	            }
 	        }
+	
 	        return tagDst;
 	    }
 	
@@ -5131,7 +5144,10 @@
 	            }
 	        } else if ( event.button === 2 ) {
 	            // right mouse button
-	            if ( matchPoint !== null ) {
+	            if ( matchPoint === null ) {
+	                this.lastX = 0;
+	                this.lastY = 0;
+	            } else {
 	                this.points.splice(this.points.indexOf(matchPoint), 1);
 	                point = this.points[this.points.length - 1];
 	                if ( point ) {
@@ -5141,9 +5157,6 @@
 	                    this.lastX = 0;
 	                    this.lastY = 0;
 	                }
-	            } else {
-	                this.lastX = 0;
-	                this.lastY = 0;
 	            }
 	        }
 	        this.repaint();
@@ -5213,7 +5226,7 @@
 	            // angle line
 	            ctx.beginPath();
 	            // show by color if 45°
-	            ctx.strokeStyle = [-135, 135, -45, 45].indexOf(angle) !== -1 ? 'yellow' : 'grey';
+	            ctx.strokeStyle = [-135, 135, -45, 45].indexOf(angle) === -1 ? 'grey' : 'yellow';
 	            ctx.moveTo(this.lastX, this.lastY);
 	            ctx.lineTo(this.cursorX, this.cursorY);
 	            ctx.stroke();
@@ -5317,6 +5330,9 @@
 	
 	// public
 	module.exports = __webpack_require__(/*! spa-component-page */ 34);
+	
+	// correct component name
+	module.exports.prototype.name = 'stb-component-page';
 
 
 /***/ },
@@ -5364,7 +5380,7 @@
 	    config = config || {};
 	
 	    console.assert(typeof this === 'object', 'must be constructed via new');
-	    
+	
 	    if ( true ) {
 	        if ( typeof config !== 'object' ) { throw new Error(__filename + ': wrong config type'); }
 	        // init parameters checks
@@ -5388,7 +5404,7 @@
 	    this.activeComponent = null;
 	
 	    // set default className if classList property empty or undefined
-	    config.className = 'page ' + (config.className || '');
+	    //config.className = 'page ' + (config.className || '');
 	
 	    // parent constructor call
 	    Component.call(this, config);
@@ -5409,6 +5425,9 @@
 	// inheritance
 	Page.prototype = Object.create(Component.prototype);
 	Page.prototype.constructor = Page;
+	
+	// set component name
+	Page.prototype.name = 'spa-component-page';
 	
 	
 	// public
@@ -5556,7 +5575,8 @@
 	    this.$body = config.$body || this.$node;
 	
 	    // set CSS class names
-	    this.$node.className += ' component ' + (config.className || '');
+	    //this.$node.className += ' component ' + (config.className || '');
+	    this.$node.className = this.name + ' ' + (config.className || '');
 	
 	    // apply component id if given, generate otherwise
 	    this.id = config.id || this.$node.id || 'cid' + counter++;
