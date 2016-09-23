@@ -21,7 +21,7 @@
     "dependencies": {
         "stb-app": "stbsdk/app",
         "stb-component-page": "stbsdk/component-page",
-        "stb-rc": "stbsdk/rc"
+        "stb-keys": "stbsdk/keys"
     },
     "devDependencies": {
         "eslint": "3.*.*",
