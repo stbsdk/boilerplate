@@ -184,10 +184,10 @@
 	        page.active = true;
 	        app.activePage = page;
 	
-	        debug.info('show component ' + page.constructor.name + '#' + page.id, null, {
-	            tags: ['show', 'component', page.constructor.name, page.id]
+	        debug.info('show component ' + page.name + '#' + page.id, null, {
+	            tags: ['show', 'component', page.name, page.id]
 	        });
-	        //console.log('component ' + page.constructor.name + '.' + page.id + ' show', 'green');
+	        //console.log('component ' + page.name + '.' + page.id + ' show', 'green');
 	
 	        // there are some listeners
 	        if ( page.events['show'] ) {
@@ -218,10 +218,10 @@
 	        page.active  = false;
 	        app.activePage = null;
 	
-	        debug.info('hide component ' + page.constructor.name + '#' + page.id, null, {
-	            tags: ['hide', 'component', page.constructor.name, page.id]
+	        debug.info('hide component ' + page.name + '#' + page.id, null, {
+	            tags: ['hide', 'component', page.name, page.id]
 	        });
-	        //console.log('component ' + page.constructor.name + '.' + page.id + ' hide', 'grey');
+	        //console.log('component ' + page.name + '.' + page.id + ' hide', 'grey');
 	
 	        // there are some listeners
 	        if ( page.events['hide'] ) {
@@ -272,7 +272,7 @@
 	    // valid not already active page
 	    if ( pageTo && !pageTo.active ) {
 	        //debug.log('router.navigate: ' + pageTo.id, pageTo === pageFrom ? 'grey' : 'green');
-	        debug.info('app route: ' + pageTo.id, null, {tags: ['route', 'page', pageTo.id]});
+	        debug.info('app route: ' + pageTo.name + '#' + pageTo.id, null, {tags: ['route', pageTo.name, pageTo.id]});
 	
 	        // update url
 	        //location.hash = this.stringify(name, data);
@@ -743,7 +743,7 @@
 	     */
 	    unload: function ( event ) {
 	        //debug.event(event);
-	        console.log(event);
+	        //console.log(event);
 	
 	        debug.info('app event: ' + event.type, event, {tags: [event.type, 'event']});
 	
@@ -817,7 +817,7 @@
 	
 	        //debug.event(event);
 	        //console.log(event);
-	        //debug.info('app event: ' + event.type, event, {tags: [event.type, 'event']});
+	        debug.info('app event: ' + event.type + ' - ' + eventLocal.code, event, {tags: [event.type, 'event']});
 	
 	        // page.activeComponent can be set to null in event handles
 	        activeComponent = page.activeComponent;
@@ -883,7 +883,8 @@
 	        }
 	
 	        //debug.event(event);
-	        debug.info('app event: ' + event.type, event, {tags: [event.type, 'event']});
+	        console.log(event);
+	        debug.info('app event: ' + event.type + ' - ' + event.key, event, {tags: [event.type, 'event']});
 	
 	        // current component handler
 	        if ( page.activeComponent && page.activeComponent !== page ) {
@@ -917,6 +918,15 @@
 	     *
 	     * @param {Event} event generated object with event data
 	     */
+	    contextmenu: function ( event ) {
+	        debug.info('app event: ' + event.type, event, {tags: [event.type, 'event']});
+	
+	        if ( false ) {
+	            // disable right click in release mode
+	            event.preventDefault();
+	        }
+	    },
+	
 	    /*contextmenu: function ( event ) {
 	     //var kbEvent = {}; //Object.create(document.createEvent('KeyboardEvent'));
 	
@@ -1978,7 +1988,8 @@
 	        'ws://' + (app.query.wampHost || location.hostname) + ':' + app.query.wampPort + '/target/' + (app.query.wampTargetId || '')
 	    );
 	
-	    app.develop.wamp.addListener('connection:open', function () {
+	    app.develop.wamp.onopen = function () {
+	        //app.develop.wamp.addListener(app.develop.wamp.EVENT_OPEN, function () {
 	        debug.info('wamp open ' + app.develop.wamp.socket.url, null, {tags: ['open', 'wamp']});
 	
 	        // get target connection id
@@ -1993,11 +2004,12 @@
 	                location.search = '?' + stringify(app.query);
 	            }
 	        });
-	    });
+	        //});
+	    };
 	
-	    app.develop.wamp.addListener('connection:close', function () {
+	    app.develop.wamp.onclose = function () {
 	        debug.info('wamp close ' + app.develop.wamp.socket.url, null, {tags: ['close', 'wamp']});
-	    });
+	    };
 	
 	    app.develop.wamp.addListener('evalCode', function ( params, callback ) {
 	        console.log('incoming evalCode', params);
@@ -2022,32 +2034,33 @@
 	
 	'use strict';
 	
-	var CjsWamp = __webpack_require__(/*! cjs-wamp */ 18),
-	    timeout = 5000,
-	    events  = {
-	        open:  'connection:open',
-	        close: 'connection:close'
-	    };
+	var CjsWamp = __webpack_require__(/*! cjs-wamp */ 18);
 	
 	
 	/**
 	 * WAMP implementation wrapper.
 	 *
 	 * @param {string} uri socket address to connect
+	 * @param {Object} [config={}] init parameters
+	 * @param {number} [config.timeout] time between connection retries
 	 *
 	 * @constructor
 	 */
-	function Wamp ( uri ) {
+	function Wamp ( uri, config ) {
 	    var self = this;
 	
 	    function getSocket () {
 	        var socket = new WebSocket(uri);
 	
 	        socket.onopen = function () {
-	            // there are some listeners
-	            if ( self.events[events.open] ) {
-	                self.emit(events.open);
+	            if ( typeof self.onopen === 'function' ) {
+	                self.onopen();
 	            }
+	
+	            // there are some listeners
+	            // if ( self.events[self.EVENT_OPEN] ) {
+	            //     self.emit(self.EVENT_OPEN);
+	            // }
 	
 	            // set activity flag
 	            self.open = true;
@@ -2055,22 +2068,28 @@
 	
 	        // reconnect
 	        socket.onclose = function () {
-	            // there are some listeners and it's the first time
-	            if ( self.events[events.close] && self.open ) {
-	                self.emit(events.close);
+	            if ( typeof self.onclose === 'function' && self.open ) {
+	                self.onclose();
 	            }
+	
+	            // there are some listeners and it's the first time
+	            // if ( self.events[self.EVENT_CLOSE] && self.open ) {
+	            //     self.emit(self.EVENT_CLOSE);
+	            // }
 	
 	            // mark as closed
 	            self.open = false;
 	
-	            setTimeout(function () {
-	                // recreate connection
-	                self.socket = getSocket();
-	                // reroute messages
-	                self.socket.onmessage = function ( event ) {
-	                    self.router(event.data);
-	                };
-	            }, timeout);
+	            if ( self.timeout ) {
+	                setTimeout(function () {
+	                    // recreate connection
+	                    self.socket = getSocket();
+	                    // reroute messages
+	                    self.socket.onmessage = function ( event ) {
+	                        self.router(event.data);
+	                    };
+	                }, self.timeout);
+	            }
 	        };
 	
 	        return socket;
@@ -2078,8 +2097,20 @@
 	
 	    console.assert(typeof this === 'object', 'must be constructed via new');
 	
+	    // sanitize
+	    config = config || {};
+	
 	    // connection state
 	    this.open = false;
+	
+	    // override prototype value
+	    if ( config.timeout ) {
+	        this.timeout = config.timeout;
+	    }
+	
+	    // events
+	    this.onopen  = null;
+	    this.onclose = null;
 	
 	    // parent constructor call
 	    CjsWamp.call(this, getSocket());
@@ -2089,6 +2120,13 @@
 	// inheritance
 	Wamp.prototype = Object.create(CjsWamp.prototype);
 	Wamp.prototype.constructor = Wamp;
+	
+	// configuration
+	Wamp.prototype.timeout = 5000;
+	
+	// events
+	// Wamp.prototype.EVENT_OPEN  = 'wamp:connection:open';
+	// Wamp.prototype.EVENT_CLOSE = 'wamp:connection:close';
 	
 	
 	// public
@@ -2333,6 +2371,14 @@
 	
 	events.keydown = function ( event ) {
 	    switch ( event.keyCode ) {
+	        // key b
+	        case 66:
+	            if ( event.altKey ) {
+	                app.develop.wamp.call('runTask', {id: 'build'}, function ( error, result ) {
+	                    console.log('task build executed: ', error, result);
+	                });
+	            }
+	            break;
 	        // numpad 0
 	        case 96:
 	            debug.info('full app reload', null, {tags: ['reload']});
@@ -2411,8 +2457,14 @@
 	        // numpad 9
 	        case 105:
 	            // outline components and inner structures
-	            debug.info('toggle develop css layout', null, {tags: ['css', 'toggle']});
-	            document.body.classList.toggle('develop');
+	            debug.info('toggle develop/release css layout', null, {tags: ['css', 'toggle']});
+	            document.querySelectorAll('link[rel=stylesheet]').forEach(function ( link ) {
+	                if ( link.href.indexOf('/release.') === -1 ) {
+	                    link.href = link.href.replace('/develop.', '/release.');
+	                } else {
+	                    link.href = link.href.replace('/release.', '/develop.');
+	                }
+	            });
 	            break;
 	
 	        // numpad .
@@ -4745,9 +4797,9 @@
 
 /***/ },
 /* 29 */
-/*!************************************************************!*\
-  !*** /home/dp/Projects/sdk/~/inherits/inherits_browser.js ***!
-  \************************************************************/
+/*!*******************************************************************!*\
+  !*** /home/dp/Projects/sdk/~/util/~/inherits/inherits_browser.js ***!
+  \*******************************************************************/
 /***/ function(module, exports) {
 
 	if (typeof Object.create === 'function') {
@@ -5566,7 +5618,7 @@
 	    this.propagate = !!config.propagate;
 	
 	    // parent constructor call
-	    Emitter.call(this, config.data);
+	    Emitter.call(this);
 	
 	    // outer handle - empty div in case nothing is given
 	    this.$node = config.$node || document.createElement('div');
@@ -5668,12 +5720,12 @@
 	
 	        // expose a link
 	        this.$node.component = this.$body.component = this;
-	        this.$node.title = 'component ' + this.constructor.name + '#' + this.id + ' (outer)';
-	        this.$body.title = 'component ' + this.constructor.name + '#' + this.id + ' (inner)';
+	        this.$node.title = this.name + '#' + this.id + ' (outer)';
+	        this.$body.title = this.name + '#' + this.id + ' (inner)';
 	    }
 	
-	    debug.info('create component ' + this.constructor.name + '#' + this.id, null, {
-	        tags: ['create', 'component', this.constructor.name, this.id]
+	    debug.info('create component ' + this.name + '#' + this.id, null, {
+	        tags: ['create', 'component', this.name, this.id]
 	    });
 	}
 	
@@ -5724,8 +5776,8 @@
 	            this.$body.appendChild(child.$node);
 	        }
 	
-	        debug.info('add component ' + child.constructor.name + '#' + child.id + ' to ' + this.constructor.name + '#' + this.id, null, {
-	            tags: ['add', 'component', this.constructor.name, this.id, child.constructor.name, child.id]
+	        debug.info('add component ' + child.name + '#' + child.id + ' to ' + this.name + '#' + this.id, null, {
+	            tags: ['add', 'component', this.name, this.id, child.name, child.id]
 	        });
 	
 	        // there are some listeners
@@ -5741,7 +5793,7 @@
 	            this.emit('add', {item: child});
 	        }
 	
-	        //debug.log('component ' + this.constructor.name + '#' + this.id + ' new child: ' + child.constructor.name + '#' + child.id);
+	        //debug.log('component ' + this.name + '#' + this.id + ' new child: ' + child.name + '#' + child.id);
 	    }
 	};
 	
@@ -5823,9 +5875,9 @@
 	        this.emit('remove');
 	    }
 	
-	    //debug.log('component ' + this.constructor.name + '#' + this.id + ' remove', 'red');
-	    debug.info('remove component ' + this.constructor.name + '#' + this.id, null, {
-	        tags: ['remove', 'component', this.constructor.name, this.id]
+	    //debug.log('component ' + this.name + '#' + this.id + ' remove', 'red');
+	    debug.info('remove component ' + this.name + '#' + this.id, null, {
+	        tags: ['remove', 'component', this.name, this.id]
 	    });
 	};
 	
@@ -5856,9 +5908,9 @@
 	        activePage.activeComponent = activeItem = this;
 	        activeItem.$node.classList.add('focus');
 	
-	        //debug.log('component ' + this.constructor.name + '#' + this.id + ' focus');
-	        debug.info('focus component ' + this.constructor.name + '#' + this.id, null, {
-	            tags: ['focus', 'component', this.constructor.name, this.id]
+	        //debug.log('component ' + this.name + '#' + this.id + ' focus');
+	        debug.info('focus component ' + this.name + '#' + this.id, null, {
+	            tags: ['focus', 'component', this.name, this.id]
 	        });
 	
 	        // there are some listeners
@@ -5898,9 +5950,9 @@
 	    if ( this === activeItem ) {
 	        activePage.activeComponent = null;
 	
-	        //debug.log('component ' + this.constructor.name + '#' + this.id + ' blur', 'grey');
-	        debug.info('blur component ' + this.constructor.name + '#' + this.id, null, {
-	            tags: ['blur', 'component', this.constructor.name, this.id]
+	        //debug.log('component ' + this.name + '#' + this.id + ' blur', 'grey');
+	        debug.info('blur component ' + this.name + '#' + this.id, null, {
+	            tags: ['blur', 'component', this.name, this.id]
 	        });
 	
 	        // there are some listeners
@@ -5916,8 +5968,8 @@
 	        return true;
 	    }
 	
-	    debug.warn('component ' + this.constructor.name + '#' + this.id + ' attempt to blur without link to a page', null, {
-	        tags: ['blur', 'component', this.constructor.name, this.id]
+	    debug.warn('component ' + this.name + '#' + this.id + ' attempt to blur without link to a page', null, {
+	        tags: ['blur', 'component', this.name, this.id]
 	    });
 	
 	    // nothing was done
@@ -5942,8 +5994,8 @@
 	        // flag
 	        this.visible = true;
 	
-	        debug.info('show component ' + this.constructor.name + '#' + this.id, null, {
-	            tags: ['show', 'component', this.constructor.name, this.id]
+	        debug.info('show component ' + this.name + '#' + this.id, null, {
+	            tags: ['show', 'component', this.name, this.id]
 	        });
 	
 	        // there are some listeners
@@ -5979,8 +6031,8 @@
 	        // flag
 	        this.visible = false;
 	
-	        debug.info('hide component ' + this.constructor.name + '#' + this.id, null, {
-	            tags: ['hide', 'component', this.constructor.name, this.id]
+	        debug.info('hide component ' + this.name + '#' + this.id, null, {
+	            tags: ['hide', 'component', this.name, this.id]
 	        });
 	
 	        // there are some listeners
