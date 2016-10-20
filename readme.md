@@ -1,8 +1,9 @@
 Application template
 ====================
 
-[![Build Status](https://img.shields.io/travis/stbsdk/boilerplate.svg?style=flat-square)](https://travis-ci.org/stbsdk/boilerplate)
-[![Dependencies Status](https://img.shields.io/david/stbsdk/boilerplate.svg?style=flat-square)](https://david-dm.org/stbsdk/boilerplate)
+[![build status](https://img.shields.io/travis/stbsdk/boilerplate.svg?style=flat-square)](https://travis-ci.org/stbsdk/boilerplate)
+[![dependencies status](https://img.shields.io/david/stbsdk/boilerplate.svg?style=flat-square)](https://david-dm.org/stbsdk/boilerplate)
+[![devDependencies status](https://img.shields.io/david/dev/stbsdk/boilerplate.svg?style=flat-square)](https://david-dm.org/stbsdk/boilerplate?type=dev)
 [![Gitter](https://img.shields.io/badge/gitter-join%20chat-blue.svg?style=flat-square)](https://gitter.im/DarkPark/stbsdk)
 
 
