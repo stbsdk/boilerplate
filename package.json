@@ -19,7 +19,7 @@
         "test": "npm run lint"
     },
     "dependencies": {
-        "stb-app": "stbsdk/app",
+        "stb-app": "1.*.*",
         "stb-component-page": "1.*.*",
         "stb-keys": "1.*.*"
     },
