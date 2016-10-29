@@ -20,7 +20,7 @@
     },
     "dependencies": {
         "stb-app": "stbsdk/app",
-        "stb-component-page": "stbsdk/component-page",
+        "stb-component-page": "1.*.*",
         "stb-keys": "1.*.*"
     },
     "devDependencies": {
