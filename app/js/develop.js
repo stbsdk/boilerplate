@@ -50,12 +50,12 @@
 	/**
 	 * Main application entry point.
 	 */
-	
+
 	'use strict';
-	
+
 	var app = __webpack_require__(/*! stb-app */ 1);
-	
-	
+
+
 	// everything is ready
 	app.once('load', function () {
 	    // load pages
@@ -63,10 +63,10 @@
 	        init: __webpack_require__(/*! ./pages/init */ 32),
 	        main: __webpack_require__(/*! ./pages/main */ 36)
 	    };
-	
+
 	    // show splash screen
 	    //app.route(app.pages.init);
-	
+
 	    // show main page
 	    app.route(app.pages.main);
 	});
@@ -83,15 +83,15 @@
 	 * @license The MIT License (MIT)
 	 * @copyright Stanislav Kalashnik <darkpark.main@gmail.com>
 	 */
-	
+
 	/* eslint no-path-concat: 0 */
-	
+
 	'use strict';
-	
+
 	var app    = __webpack_require__(/*! spa-app/lib/core */ 2),
 	    events = __webpack_require__(/*! spa-app/lib/events */ 6);
-	
-	
+
+
 	// extract key codes
 	// for ( key in codes ) {
 	//     if ( key === 'volumeUp' || key === 'volumeDown' ) {
@@ -100,27 +100,27 @@
 	//     // no need to save key names
 	//     keyCodes[codes[key]] = true;
 	// }
-	
+
 	// shims
 	__webpack_require__(/*! stb-shim-classlist */ 7);
-	
+
 	// apply geometry
 	__webpack_require__(/*! ./lib/metrics */ 8);
-	
+
 	// load sdk+app css
 	__webpack_require__(/*! ./lib/css */ 10)('sdk');
 	__webpack_require__(/*! ./lib/css */ 10)('app');
-	
-	
+
+
 	// set max browser window size
 	window.moveTo(0, 0);
 	window.resizeTo(app.metrics.width, app.metrics.height);
-	
-	
+
+
 	// create stbEvent global object
 	window.stbEvent = __webpack_require__(/*! ./lib/events */ 11);
-	
-	
+
+
 	// new way of string handling
 	// all strings are in UTF-16
 	// since stbapp 2.18
@@ -128,20 +128,20 @@
 	    /* eslint new-cap: 0 */
 	    gSTB.SetNativeStringMode(true);
 	}
-	
-	
+
+
 	// activate development mechanisms and tools
 	if ( true ) {
 	    __webpack_require__(/*! ./lib/develop/main */ 12);
 	}
-	
-	
+
+
 	// apply DOM events
 	Object.keys(events).forEach(function ( name ) {
 	    window.addEventListener(name, events[name]);
 	});
-	
-	
+
+
 	// public
 	module.exports = app;
 
@@ -157,16 +157,16 @@
 	 * @license The MIT License (MIT)
 	 * @copyright Stanislav Kalashnik <darkpark.main@gmail.com>
 	 */
-	
+
 	/* eslint no-path-concat: 0 */
-	
+
 	'use strict';
-	
+
 	var Emitter = __webpack_require__(/*! cjs-emitter */ 3),
 	    parse   = __webpack_require__(/*! cjs-query */ 4).parse,
 	    app     = new Emitter();
-	
-	
+
+
 	/**
 	 * Make the given inactive/hidden page active/visible.
 	 * Pass some data to the page and trigger the corresponding event.
@@ -183,26 +183,26 @@
 	        page.$node.classList.add('active');
 	        page.active = true;
 	        app.activePage = page;
-	
+
 	        debug.info('show component ' + page.name + '#' + page.id, null, {
 	            tags: ['show', 'component', page.name, page.id]
 	        });
 	        //console.log('component ' + page.name + '.' + page.id + ' show', 'green');
-	
+
 	        // there are some listeners
 	        if ( page.events['show'] ) {
 	            // notify listeners
 	            page.emit('show', {page: page, data: data});
 	        }
-	
+
 	        return true;
 	    }
-	
+
 	    // nothing was done
 	    return false;
 	}
-	
-	
+
+
 	/**
 	 * Make the given active/visible page inactive/hidden and trigger the corresponding event.
 	 *
@@ -217,39 +217,39 @@
 	        page.$node.classList.remove('active');
 	        page.active  = false;
 	        app.activePage = null;
-	
+
 	        debug.info('hide component ' + page.name + '#' + page.id, null, {
 	            tags: ['hide', 'component', page.name, page.id]
 	        });
 	        //console.log('component ' + page.name + '.' + page.id + ' hide', 'grey');
-	
+
 	        // there are some listeners
 	        if ( page.events['hide'] ) {
 	            // notify listeners
 	            page.emit('hide', {page: page});
 	        }
-	
+
 	        return true;
 	    }
-	
+
 	    // nothing was done
 	    return false;
 	}
-	
-	
+
+
 	// url request params
 	app.query = parse(document.location.search.substring(1));
-	
-	
+
+
 	// global application configuration
 	// in config.js file in js root
 	app.config = __webpack_require__(/*! app:config */ 5);
-	
-	
+
+
 	// the only visible page
 	app.activePage = null;
-	
-	
+
+
 	/**
 	 * Browse to a given page.
 	 * Do nothing if the link is invalid. Otherwise hide the current, show new and update the "previous" link.
@@ -261,49 +261,49 @@
 	 */
 	app.route = function ( pageTo, data ) {
 	    var pageFrom = app.activePage;
-	
+
 	    if ( true ) {
 	        //if ( router.pages.length > 0 ) {
 	        if ( !pageTo || typeof pageTo !== 'object' ) { throw new Error(__filename + ': wrong pageTo type'); }
 	        if ( !('active' in pageTo) ) { throw new Error(__filename + ': missing field "active" in pageTo'); }
 	        //}
 	    }
-	
+
 	    // valid not already active page
 	    if ( pageTo && !pageTo.active ) {
 	        //debug.log('router.navigate: ' + pageTo.id, pageTo === pageFrom ? 'grey' : 'green');
 	        debug.info('app route: ' + pageTo.name + '#' + pageTo.id, null, {tags: ['route', pageTo.name, pageTo.id]});
-	
+
 	        // update url
 	        //location.hash = this.stringify(name, data);
-	
+
 	        // apply visibility
 	        hidePage(app.activePage);
 	        showPage(pageTo, data);
-	
+
 	        // there are some listeners
 	        if ( this.events['route'] ) {
 	            // notify listeners
 	            this.emit('route', {from: pageFrom, to: pageTo});
 	        }
-	
+
 	        // store
 	        //this.history.push(pageTo);
-	
+
 	        return true;
 	    }
-	
+
 	    debug.warn('invalid page to route: ' + pageTo.id, null, {tags: ['route', 'page', pageTo.id]});
 	    //console.log('router.navigate: ' + pageTo.id, 'red');
-	
+
 	    // nothing was done
 	    return false;
 	};
-	
-	
+
+
 	// public
 	module.exports = app;
-	
+
 	/* WEBPACK VAR INJECTION */}.call(exports, "../../spasdk/app/lib/core.js"))
 
 /***/ },
@@ -317,12 +317,12 @@
 	 * @license The MIT License (MIT)
 	 * @copyright Stanislav Kalashnik <darkpark.main@gmail.com>
 	 */
-	
+
 	/* eslint no-path-concat: 0 */
-	
+
 	'use strict';
-	
-	
+
+
 	/**
 	 * Base Events Emitter implementation.
 	 *
@@ -334,11 +334,11 @@
 	 */
 	function Emitter () {
 	    console.assert(typeof this === 'object', 'must be constructed via new');
-	
+
 	    // if ( DEVELOP ) {
 	    //     if ( typeof this !== 'object' ) { throw new Error(__filename + ': must be constructed via new'); }
 	    // }
-	
+
 	    /**
 	     * Inner hash table for event names and linked callbacks.
 	     * Manual editing should be avoided.
@@ -358,8 +358,8 @@
 	     **/
 	    this.events = {};
 	}
-	
-	
+
+
 	Emitter.prototype = {
 	    /**
 	     * Bind an event to the given callback function.
@@ -378,20 +378,20 @@
 	        console.assert(typeof name === 'string', 'wrong name type');
 	        console.assert(name.length > 0, 'empty name');
 	        console.assert(typeof callback === 'function', 'callback should be a function');
-	
+
 	        // if ( DEVELOP ) {
 	        //     if ( arguments.length !== 2 ) { throw new Error(__filename + ': wrong arguments number'); }
 	        //     if ( typeof name !== 'string' || name.length === 0 ) { throw new Error(__filename + ': wrong or empty name'); }
 	        //     if ( typeof callback !== 'function' ) { throw new Error(__filename + ': wrong callback type'); }
 	        // }
-	
+
 	        // initialization may be required
 	        this.events[name] = this.events[name] || [];
 	        // append this new event to the list
 	        this.events[name].push(callback);
 	    },
-	
-	
+
+
 	    /**
 	     * Add a one time listener for the event.
 	     * This listener is invoked only the next time the event is fired, after which it is removed.
@@ -405,13 +405,13 @@
 	    once: function ( name, callback ) {
 	        // current execution context
 	        var self = this;
-	
+
 	        if ( true ) {
 	            if ( arguments.length !== 2 ) { throw new Error(__filename + ': wrong arguments number'); }
 	            if ( typeof name !== 'string' || name.length === 0 ) { throw new Error(__filename + ': wrong or empty name'); }
 	            if ( typeof callback !== 'function' ) { throw new Error(__filename + ': wrong callback type'); }
 	        }
-	
+
 	        // initialization may be required
 	        this.events[name] = this.events[name] || [];
 	        // append this new event to the list
@@ -420,8 +420,8 @@
 	            self.removeListener(name, onceWrapper);
 	        });
 	    },
-	
-	
+
+
 	    /**
 	     * Apply multiple listeners at once.
 	     *
@@ -435,21 +435,21 @@
 	     */
 	    addListeners: function ( callbacks ) {
 	        var name;
-	
+
 	        if ( true ) {
 	            if ( arguments.length !== 1 ) { throw new Error(__filename + ': wrong arguments number'); }
 	            if ( typeof callbacks !== 'object' ) { throw new Error(__filename + ': wrong callbacks type'); }
 	            if ( Object.keys(callbacks).length === 0 ) { throw new Error(__filename + ': no callbacks given'); }
 	        }
-	
+
 	        for ( name in callbacks ) {
 	            if ( callbacks.hasOwnProperty(name) ) {
 	                this.addListener(name, callbacks[name]);
 	            }
 	        }
 	    },
-	
-	
+
+
 	    /**
 	     * Remove all instances of the given callback.
 	     *
@@ -466,7 +466,7 @@
 	            if ( typeof callback !== 'function' ) { throw new Error(__filename + ': wrong callback type'); }
 	            if ( this.events[name] && !Array.isArray(this.events[name]) ) { throw new Error(__filename + ': corrupted inner data'); }
 	        }
-	
+
 	        // the event exists and should have some callbacks
 	        if ( this.events[name] ) {
 	            // rework the callback list to exclude the given one
@@ -478,8 +478,8 @@
 	            }
 	        }
 	    },
-	
-	
+
+
 	    /**
 	     * Remove all callbacks for the given event name.
 	     * Without event name clears all events.
@@ -498,7 +498,7 @@
 	                throw new Error(__filename + ': wrong or empty name');
 	            }
 	        }
-	
+
 	        // check input
 	        if ( arguments.length === 0 ) {
 	            // no arguments so remove everything
@@ -507,14 +507,14 @@
 	            if ( DEVELOP ) {
 	                if ( this.events[name] ) { throw new Error(__filename + ': event is not removed'); }
 	            }
-	
+
 	            // only name is given so remove all callbacks for the given event
 	            // but object structure modification should be avoided
 	            this.events[name] = undefined;
 	        }
 	    },*/
-	
-	
+
+
 	    /**
 	     * Execute each of the listeners in the given order with the supplied arguments.
 	     *
@@ -533,38 +533,38 @@
 	    emit: function ( name ) {
 	        var event = this.events[name],
 	            index;
-	
+
 	        if ( true ) {
 	            if ( arguments.length < 1 ) { throw new Error(__filename + ': wrong arguments number'); }
 	            if ( typeof name !== 'string' || name.length === 0 ) { throw new Error(__filename + ': wrong or empty name'); }
 	        }
-	
+
 	        // the event exists and should have some callbacks
 	        if ( event ) {
 	            if ( true ) {
 	                if ( !Array.isArray(event) ) { throw new Error(__filename + ': wrong event type'); }
 	            }
-	
+
 	            for ( index = 0; index < event.length; index++ ) {
 	                if ( true ) {
 	                    if ( typeof event[index] !== 'function' ) { throw new Error(__filename + ': wrong event callback type'); }
 	                }
-	
+
 	                // invoke the callback with parameters
 	                event[index].apply(this, Array.prototype.slice.call(arguments, 1));
 	            }
 	        }
 	    }
 	};
-	
-	
+
+
 	// correct constructor name
 	Emitter.prototype.constructor = Emitter;
-	
-	
+
+
 	// public
 	module.exports = Emitter;
-	
+
 	/* WEBPACK VAR INJECTION */}.call(exports, "../../cjssdk/emitter/index.js"))
 
 /***/ },
@@ -578,9 +578,9 @@
 	 * @license The MIT License (MIT)
 	 * @copyright Stanislav Kalashnik <darkpark.main@gmail.com>
 	 */
-	
+
 	'use strict';
-	
+
 	module.exports = {
 	    /**
 	     * Parse the given location search string into object.
@@ -591,7 +591,7 @@
 	     */
 	    parse: function ( query ) {
 	        var data = {};
-	
+
 	        // parse and fill the data
 	        query.split('&').forEach(function ( part ) {
 	            part = part.split('=');
@@ -600,11 +600,11 @@
 	                data[part[0]] = decodeURIComponent(part[1]);
 	            }
 	        });
-	
+
 	        return data;
 	    },
-	
-	
+
+
 		/**
 	     * Make uri query part in a string form.
 	     *
@@ -614,11 +614,11 @@
 	     */
 	    stringify: function ( params ) {
 	        var data = [];
-	
+
 	        Object.keys(params).forEach(function ( name ) {
 	            data.push(name + '=' + encodeURIComponent(params[name]));
 	        });
-	
+
 	        return data.join('&');
 	    }
 	};
@@ -636,9 +636,9 @@
 	 * Can store run-time options, API urls, paths, execution flags and so on.
 	 * Automatically loaded on application initialization and available as app.config.
 	 */
-	
+
 	'use strict';
-	
+
 	// public
 	module.exports = {};
 
@@ -654,22 +654,22 @@
 	 * @license The MIT License (MIT)
 	 * @copyright Stanislav Kalashnik <darkpark.main@gmail.com>
 	 */
-	
+
 	/* eslint no-path-concat: 0 */
-	
+
 	'use strict';
-	
+
 	var app = __webpack_require__(/*! ./core */ 2);
-	
-	
+
+
 	// public
 	module.exports = {
 	    DOMContentLoaded: function ( event ) {
 	        //debug.event(event);
 	        //console.log(event);
-	
+
 	        debug.info('app event: ' + event.type, event, {tags: [event.type, 'event']});
-	
+
 	        // there are some listeners
 	        if ( app.events['dom'] ) {
 	            // notify listeners
@@ -677,7 +677,7 @@
 	            //console.log('DOMContentLoaded');
 	        }
 	    },
-	
+
 	    /**
 	     * The load event is fired when a resource and its dependent resources have finished loading.
 	     *
@@ -692,36 +692,36 @@
 	     */
 	    load: function ( event ) {
 	        //var path;
-	
+
 	        //debug.event(event);
 	        //console.log(event);
-	
+
 	        // time mark
 	        //app.data.time.load = event.timeStamp;
-	
+
 	        debug.info('app event: ' + event.type, event, {tags: [event.type, 'event']});
-	
+
 	        // global handler
 	        // there are some listeners
 	        if ( app.events[event.type] ) {
 	            // notify listeners
 	            app.emit(event.type, event);
 	        }
-	
+
 	        // local handler on each page
 	        /*router.pages.forEach(function forEachPages ( page ) {
 	         debug.log('component ' + page.constructor.name + '.' + page.id + ' load', 'green');
-	
+
 	         // there are some listeners
 	         if ( page.events[event.type] ) {
 	         // notify listeners
 	         page.emit(event.type, event);
 	         }
 	         });*/
-	
+
 	        // time mark
 	        //app.data.time.done = +new Date();
-	
+
 	        // everything is ready
 	        // and there are some listeners
 	        // if ( app.events['done'] ) {
@@ -729,7 +729,7 @@
 	        //     app.emit('done', event);
 	        // }
 	    },
-	
+
 	    /**
 	     * The unload event is fired when the document or a child resource is being unloaded.
 	     *
@@ -744,20 +744,20 @@
 	    unload: function ( event ) {
 	        //debug.event(event);
 	        //console.log(event);
-	
+
 	        debug.info('app event: ' + event.type, event, {tags: [event.type, 'event']});
-	
+
 	        // global handler
 	        // there are some listeners
 	        if ( app.events[event.type] ) {
 	            // notify listeners
 	            app.emit(event.type, event);
 	        }
-	
+
 	        // local handler on each page
 	        /*router.pages.forEach(function forEachPages ( page ) {
 	         debug.log('component ' + page.constructor.name + '.' + page.id + ' unload', 'red');
-	
+
 	         // there are some listeners
 	         if ( page.events[event.type] ) {
 	         // notify listeners
@@ -765,7 +765,7 @@
 	         }
 	         });*/
 	    },
-	
+
 	    /**
 	     * The error event is fired when a resource failed to load.
 	     *
@@ -778,7 +778,7 @@
 	        //console.log(event);
 	        debug.fail('app event: ' + event.message, event, {tags: [event.type, 'event']});
 	    },
-	
+
 	    /**
 	     * The keydown event is fired when a key is pressed down.
 	     * Set event.stop to true in order to prevent bubbling.
@@ -799,29 +799,29 @@
 	                stop: false
 	            },
 	            activeComponent;
-	
+
 	        if ( true ) {
 	            if ( !page ) { throw new Error(__filename + ': app should have at least one page'); }
 	        }
-	
+
 	        // filter phantoms
 	        //if ( event.keyCode === 0 ) { return; }
-	
+
 	        // combined key code
 	        //event.code = event.keyCode;
-	
+
 	        // apply key modifiers
 	        if ( event.ctrlKey )  { eventLocal.code += 'c'; }
 	        if ( event.altKey )   { eventLocal.code += 'a'; }
 	        if ( event.shiftKey ) { eventLocal.code += 's'; }
-	
+
 	        //debug.event(event);
 	        //console.log(event);
 	        debug.info('app event: ' + event.type + ' - ' + eventLocal.code, event, {tags: [event.type, 'event']});
-	
+
 	        // page.activeComponent can be set to null in event handles
 	        activeComponent = page.activeComponent;
-	
+
 	        // current component handler
 	        if ( activeComponent && activeComponent !== page ) {
 	            // component is available and not page itself
@@ -829,7 +829,7 @@
 	                // there are some listeners
 	                activeComponent.emit(event.type, eventLocal, event);
 	            }
-	
+
 	            // todo: bubble event recursively
 	            // bubbling
 	            if (
@@ -841,7 +841,7 @@
 	                activeComponent.parent.emit(event.type, eventLocal, event);
 	            }
 	        }
-	
+
 	        // page handler
 	        if ( !eventLocal.stop ) {
 	            // not prevented
@@ -849,7 +849,7 @@
 	                // there are some listeners
 	                page.emit(event.type, eventLocal, event);
 	            }
-	
+
 	            // global app handler
 	            if ( !event.stop ) {
 	                // not prevented
@@ -859,13 +859,13 @@
 	                }
 	            }
 	        }
-	
+
 	        //// suppress non-printable keys in stb device (not in your browser)
 	        //if ( app.data.host && keyCodes[event.code] ) {
 	        //    event.preventDefault();
 	        //}
 	    },
-	
+
 	    /**
 	     * The keypress event is fired when press a printable character.
 	     * Delivers the event only to activeComponent at active page.
@@ -877,15 +877,15 @@
 	     */
 	    keypress: function ( event ) {
 	        var page = app.activePage;
-	
+
 	        if ( true ) {
 	            if ( page === null || page === undefined ) { throw new Error(__filename + ': app should have at least one page'); }
 	        }
-	
+
 	        //debug.event(event);
 	        console.log(event);
 	        debug.info('app event: ' + event.type + ' - ' + event.key, event, {tags: [event.type, 'event']});
-	
+
 	        // current component handler
 	        if ( page.activeComponent && page.activeComponent !== page ) {
 	            // component is available and not page itself
@@ -895,7 +895,7 @@
 	            }
 	        }
 	    },
-	
+
 	    /**
 	     * The click event is fired when a pointing device button (usually a mouse button) is pressed and released on a single element.
 	     *
@@ -908,7 +908,7 @@
 	     //console.log(event);
 	     debug.info('app event: ' + event.type, event, {tags: [event.type, 'event']});
 	     },*/
-	
+
 	    /**
 	     * The contextmenu event is fired when the right button of the mouse is clicked (before the context menu is displayed),
 	     * or when the context menu key is pressed (in which case the context menu is displayed at the bottom left of the focused
@@ -920,37 +920,37 @@
 	     */
 	    contextmenu: function ( event ) {
 	        debug.info('app event: ' + event.type, event, {tags: [event.type, 'event']});
-	
+
 	        if ( false ) {
 	            // disable right click in release mode
 	            event.preventDefault();
 	        }
 	    },
-	
+
 	    /*contextmenu: function ( event ) {
 	     //var kbEvent = {}; //Object.create(document.createEvent('KeyboardEvent'));
-	
+
 	     //debug.event(event);
 	     //console.log(event);
 	     debug.info('app event: ' + event.type, event, {tags: [event.type, 'event']});
-	
+
 	     //kbEvent.type    = 'keydown';
 	     //kbEvent.keyCode = 8;
-	
+
 	     //debug.log(kbEvent.type);
-	
+
 	     //globalEventListenerKeydown(kbEvent);
 	     //var event = document.createEvent('KeyboardEvent');
 	     //event.initEvent('keydown', true, true);
-	
+
 	     //document.dispatchEvent(kbEvent);
-	
+
 	     if ( !DEVELOP ) {
 	     // disable right click in release mode
 	     event.preventDefault();
 	     }
 	     },*/
-	
+
 	    /**
 	     * The wheel event is fired when a wheel button of a pointing device (usually a mouse) is rotated.
 	     *
@@ -960,15 +960,15 @@
 	     */
 	    mousewheel: function ( event ) {
 	        var page = app.activePage;
-	
+
 	        if ( true ) {
 	            if ( page === null || page === undefined ) { throw new Error(__filename + ': app should have at least one page'); }
 	        }
-	
+
 	        //debug.event(event);
 	        //console.log(event);
 	        debug.info('app event: ' + event.type, event, {tags: [event.type, 'event']});
-	
+
 	        // current component handler
 	        if ( page.activeComponent && page.activeComponent !== page ) {
 	            // component is available and not page itself
@@ -977,7 +977,7 @@
 	                page.activeComponent.emit(event.type, event);
 	            }
 	        }
-	
+
 	        // page handler
 	        if ( !event.stop ) {
 	            // not prevented
@@ -988,7 +988,7 @@
 	        }
 	    }
 	};
-	
+
 	/* WEBPACK VAR INJECTION */}.call(exports, "../../spasdk/app/lib/events.js"))
 
 /***/ },
@@ -1002,12 +1002,12 @@
 	 * @license The MIT License (MIT)
 	 * @copyright Stanislav Kalashnik <darkpark.main@gmail.com>
 	 */
-	
+
 	/* eslint-disable */
-	
+
 	'use strict';
-	
-	
+
+
 	if ( !document.documentElement.classList ) {
 	    var prototype = Array.prototype,
 	        indexOf   = prototype.indexOf,
@@ -1015,7 +1015,7 @@
 	        push      = prototype.push,
 	        splice    = prototype.splice,
 	        join      = prototype.join;
-	
+
 	    window.DOMTokenList = function ( el ) {
 	        this._element = el;
 	        if (el.className !== this._classCache) {
@@ -1028,22 +1028,22 @@
 	            }
 	        }
 	    };
-	
+
 	    window.DOMTokenList.prototype = {
 	        add: function ( token ) {
 	            if(this.contains(token)) { return; }
 	            push.call(this, token);
 	            this._element.className = slice.call(this, 0).join(' ');
 	        },
-	
+
 	        contains: function ( token ) {
 	            return indexOf.call(this, token) !== -1;
 	        },
-	
+
 	        item: function ( index ) {
 	            return this[index] || null;
 	        },
-	
+
 	        remove: function ( token ) {
 	            var i = indexOf.call(this, token);
 	            if (i === -1) {
@@ -1052,11 +1052,11 @@
 	            splice.call(this, i, 1);
 	            this._element.className = slice.call(this, 0).join(' ');
 	        },
-	
+
 	        toString: function () {
 	            return join.call(this, ' ');
 	        },
-	
+
 	        toggle: function ( token ) {
 	            if (!this.contains(token)) {
 	                this.add(token);
@@ -1066,7 +1066,7 @@
 	            return this.contains(token);
 	        }
 	    };
-	
+
 	    Object.defineProperty(Element.prototype, 'classList', {
 	        get: function () {
 	            return new window.DOMTokenList(this);
@@ -1086,23 +1086,23 @@
 	 * @license The MIT License (MIT)
 	 * @copyright Stanislav Kalashnik <darkpark.main@gmail.com>
 	 */
-	
+
 	/* eslint no-path-concat: 0 */
-	
+
 	'use strict';
-	
+
 	var app     = __webpack_require__(/*! spa-app/lib/core */ 2),
 	    metrics = __webpack_require__(/*! app:metrics */ 9);
-	
-	
+
+
 	// global link
 	app.metrics = metrics[app.query.screenHeight] || metrics[screen.height] || metrics[720];
-	
+
 	// calculate and extend
 	app.metrics.availHeight = app.metrics.height - (app.metrics.availTop  + app.metrics.availBottom);
 	app.metrics.availWidth  = app.metrics.width  - (app.metrics.availLeft + app.metrics.availRight);
-	
-	
+
+
 	// public
 	//module.exports = app;
 
@@ -1118,9 +1118,9 @@
 	 * Application geometry options.
 	 * Automatically loaded on application initialization and available as app.metrics.
 	 */
-	
+
 	'use strict';
-	
+
 	// public
 	module.exports = {
 	    480: {
@@ -1135,7 +1135,7 @@
 	        // project-specific vars
 	        // put here ...
 	    },
-	
+
 	    576: {
 	        // screen base dimension
 	        height: 576,
@@ -1148,7 +1148,7 @@
 	        // project-specific vars
 	        // put here ...
 	    },
-	
+
 	    720: {
 	        // screen base dimension
 	        height: 720,
@@ -1161,7 +1161,7 @@
 	        // project-specific vars
 	        // put here ...
 	    },
-	
+
 	    1080: {
 	        // screen base dimension
 	        height: 1080,
@@ -1188,38 +1188,38 @@
 	 * @license The MIT License (MIT)
 	 * @copyright Stanislav Kalashnik <darkpark.main@gmail.com>
 	 */
-	
+
 	/* eslint no-path-concat: 0 */
-	
+
 	'use strict';
-	
+
 	var app = __webpack_require__(/*! spa-app/lib/core */ 2);
 	    //metrics = require('app:metrics'),
 	    //linkCSS;
-	
-	
+
+
 	// global link
 	//app.metrics = metrics[app.query.screenHeight] || metrics[screen.height] || metrics[720];
-	
+
 	// calculate and extend
 	//app.metrics.availHeight = app.metrics.height - (app.metrics.availTop  + app.metrics.availBottom);
 	//app.metrics.availWidth  = app.metrics.width  - (app.metrics.availLeft + app.metrics.availRight);
-	
+
 	// // set max browser window size
 	// window.moveTo(0, 0);
 	// window.resizeTo(metrics.width, metrics.height);
-	
+
 	// load CSS file base on resolution
 	/*linkCSS = document.createElement('link');
 	linkCSS.rel  = 'stylesheet';
 	linkCSS.href = 'css/' + (DEVELOP ? 'develop.' : 'release.') + app.metrics.height + '.css' + (DEVELOP ? '?' + Date.now() : '');
 	document.head.appendChild(linkCSS);*/
-	
-	
+
+
 	// public
 	module.exports = function ( name ) {
 	    var link = document.createElement('link');
-	
+
 	    link.rel  = 'stylesheet';
 	    link.href = 'css/' + ( true ? 'develop.' : 'release.') + name + '.' + app.metrics.height + '.css' + ( true ? '?' + Date.now() : '');
 	    document.head.appendChild(link);
@@ -1237,14 +1237,14 @@
 	 * @license The MIT License (MIT)
 	 * @copyright Stanislav Kalashnik <darkpark.main@gmail.com>
 	 */
-	
+
 	/* eslint no-path-concat: 0 */
-	
+
 	'use strict';
-	
+
 	var app = __webpack_require__(/*! spa-app/lib/core */ 2);
-	
-	
+
+
 	/**
 	 * Device media events.
 	 *
@@ -1252,8 +1252,8 @@
 	 * @type object
 	 * @property {number} code of event
 	 */
-	
-	
+
+
 	/**
 	 * Event on messages from a window.
 	 *
@@ -1263,91 +1263,91 @@
 	 * @property {string} message received from window
 	 * @property {object} data received from window
 	 */
-	
-	
+
+
 	// public
 	module.exports = {
 	    /**
 	     * The player reached the end of the media content or detected a discontinuity of the stream.
 	     */
 	    EVENT_END_OF_FILE: 1,
-	
+
 	    /**
 	     * Information on audio and video tracks of the media content is received. It's now possible to call gSTB.GetAudioPIDs etc.
 	     */
 	    EVENT_GET_MEDIA_INFO: 2,
-	
+
 	    /**
 	     * Video and/or audio playback has begun.
 	     */
 	    EVENT_PLAYBACK_BEGIN: 4,
-	
+
 	    /**
 	     * Error when opening the content: content not found on the server or connection with the server was rejected
 	     */
 	    EVENT_CONTENT_ERROR: 5,
-	
+
 	    /**
 	     * Detected DualMono AC-3 sound
 	     */
 	    EVENT_DUAL_MONO_DETECT: 6,
-	
+
 	    /**
 	     * The decoder has received info about the content and started to play. It's now possible to call gSTB.GetVideoInfo
 	     */
 	    EVENT_INFO_GET: 7,
-	
+
 	    /**
 	     * Error occurred while loading external subtitles
 	     */
 	    EVENT_SUBTITLE_LOAD_ERROR: 8,
-	
+
 	    /**
 	     * Found new teletext subtitles in stream
 	     */
 	    EVENT_SUBTITLE_FIND: 9,
-	
+
 	    /**
 	     * HDMI device has been connected
 	     */
 	    EVENT_HDMI_CONNECT: 32,
-	
+
 	    /**
 	     * HDMI device has been disconnected
 	     */
 	    EVENT_HDMI_DISCONNECT: 33,
-	
+
 	    /**
 	     * Recording task has been finished successfully. See appendix 13. JavaScript API for PVR subsystem
 	     */
 	    EVENT_RECORD_FINISH_SUCCESSFUL: 34,
-	
+
 	    /**
 	     * Recording task has been finished with error. See appendix 13. JavaScript API for PVR subsystem
 	     */
 	    EVENT_RECORD_FINISH_ERROR: 35,
-	
+
 	    /**
 	     * Scanning DVB Channel in progress
 	     */
 	    EVENT_DVB_SCANING: 40,
-	
+
 	    /**
 	     * Scanning DVB Channel found
 	     */
 	    EVENT_DVB_FOUND: 41,
-	
+
 	    /**
 	     * DVB Channel EPG update
 	     */
 	    EVENT_DVB_CHANNEL_EPG_UPDATE: 42,
-	
+
 	    /**
 	     * DVB antenna power off
 	     */
 	    EVENT_DVB_ANTENNA_OFF: 43,
-	
-	
+
+
 	    /**
 	     * Fires stb device media events.
 	     *
@@ -1365,13 +1365,13 @@
 	                    debug.fail('stbEvent JSON parse', error);
 	                }
 	            }
-	
+
 	            // notify listeners
 	            app.emit('media', {code: parseInt(event, 10), info: info});
 	        }
 	    },
-	
-	
+
+
 	    /**
 	     * Fires event on broadcast messages from a window.
 	     *
@@ -1391,8 +1391,8 @@
 	            });
 	        }
 	    },
-	
-	
+
+
 	    /**
 	     * Fires event on messages from a window.
 	     *
@@ -1412,8 +1412,8 @@
 	            });
 	        }
 	    },
-	
-	
+
+
 	    /**
 	     * Event on device mount state.
 	     *
@@ -1421,15 +1421,15 @@
 	     * @type object
 	     * @property {boolean} state of mount device
 	     */
-	
-	
+
+
 	    /**
 	     * Event on callback on internet browser link clicked.
 	     *
 	     * @event module:stb/app#media:available
 	     */
-	
-	
+
+
 	    /**
 	     * Fires event of callback on internet browser link clicked to ask user what to do with link: play or download.
 	     *
@@ -1444,8 +1444,8 @@
 	            app.emit('media:available', {mime: mime, url: url});
 	        }
 	    },
-	
-	
+
+
 	    /**
 	     * Event on internet connection state.
 	     *
@@ -1453,8 +1453,8 @@
 	     * @type object
 	     * @property {boolean} state of internet connection
 	     */
-	
-	
+
+
 	    /**
 	     * Fires new internet connection state event.
 	     *
@@ -1467,8 +1467,8 @@
 	    //         app.emit('internet:state', {state: state});
 	    //     }
 	    // },
-	
-	
+
+
 	    /**
 	     * Event on document loading progress changes.
 	     *
@@ -1476,8 +1476,8 @@
 	     * @type object
 	     * @property {number} progress of document loading
 	     */
-	
-	
+
+
 	    /**
 	     * Fires document loading progress changes event.
 	     *
@@ -1490,15 +1490,15 @@
 	            app.emit('browser:progress', {progress: progress});
 	        }
 	    },
-	
-	
+
+
 	    /**
 	     * Event on browser web window activation event.
 	     *
 	     * @event module:stb/app#window:focus
 	     */
-	
-	
+
+
 	    /**
 	     * Fires browser web window activation event.
 	     *
@@ -1524,58 +1524,58 @@
 	 * @license The MIT License (MIT)
 	 * @copyright Stanislav Kalashnik <darkpark.main@gmail.com>
 	 */
-	
+
 	'use strict';
-	
+
 	var app = __webpack_require__(/*! spa-app/lib/core */ 2);
-	
-	
+
+
 	// shims
 	__webpack_require__(/*! stb-shim-bind */ 13);
 	__webpack_require__(/*! stb-shim-frame */ 14);
-	
+
 	// public app instance
 	window.app = app;
-	
+
 	// all development tools placeholder
 	app.develop = {
 	    storage: window.localStorage || window.stbStorage
 	};
-	
+
 	// execution environment
 	// STB device or desktop browser
 	app.host = !!(window.gSTB || (window.parent && window.parent.gSTB));
-	
+
 	// browser logging
 	window.debug = __webpack_require__(/*! spa-app/lib/develop/debug */ 15);
 	// STB logging
 	//window.debug = app.host ? require('./debug') : require('spa-develop/debug');
-	
+
 	// universal storage
 	//window.localStorage = window.localStorage || window.stbStorage;
-	
+
 	// apply screen size, position, margins and styles
 	// app.setScreen(
 	//     app.metrics[localStorage.getItem('screen.height')] ||
 	//     app.metrics[screen.height] ||
 	//     app.metrics[720]
 	// );
-	
+
 	// inherit SPA tools
 	__webpack_require__(/*! spa-app/lib/develop/wamp */ 16);
 	__webpack_require__(/*! spa-app/lib/develop/events */ 19);
 	__webpack_require__(/*! spa-app/lib/develop/hooks */ 21);
 	__webpack_require__(/*! spa-app/lib/develop/static */ 22);
-	
+
 	// STB tools
 	if ( app.host ) {
 	    // web inspector
 	    __webpack_require__(/*! ./weinre */ 24);
 	}
-	
+
 	//require('./proxy');
 	__webpack_require__(/*! ./events */ 30);
-	
+
 	// the application itself
 	// "js" directory is resolved by webpack to
 	// path.join(process.env.PATH_ROOT, process.env.PATH_SRC, 'js')
@@ -1593,12 +1593,12 @@
 	 * @license The MIT License (MIT)
 	 * @copyright Stanislav Kalashnik <darkpark.main@gmail.com>
 	 */
-	
+
 	/* eslint-disable */
-	
+
 	'use strict';
-	
-	
+
+
 	if ( !Function.prototype.bind ) {
 	    Function.prototype.bind = function ( oThis ) {
 	        if ( typeof this !== 'function' ) {
@@ -1606,7 +1606,7 @@
 	            // internal IsCallable function
 	            throw new TypeError('Function.prototype.bind - what is trying to be bound is not callable');
 	        }
-	
+
 	        var aArgs = Array.prototype.slice.call(arguments, 1),
 	            fToBind = this,
 	            fNOP = function () {},
@@ -1616,10 +1616,10 @@
 	                        : oThis,
 	                    aArgs.concat(Array.prototype.slice.call(arguments)));
 	            };
-	
+
 	        fNOP.prototype = this.prototype;
 	        fBound.prototype = new fNOP();
-	
+
 	        return fBound;
 	    };
 	}
@@ -1636,12 +1636,12 @@
 	 * @license The MIT License (MIT)
 	 * @copyright Stanislav Kalashnik <darkpark.main@gmail.com>
 	 */
-	
+
 	/* eslint-disable */
-	
+
 	'use strict';
-	
-	
+
+
 	if ( !window.requestAnimationFrame ) {
 	    // shim layer with setTimeout fallback
 	    window.requestAnimationFrame =
@@ -1652,7 +1652,7 @@
 	            window.setTimeout(callback, 1000 / 60);
 	        };
 	}
-	
+
 
 
 /***/ },
@@ -1668,12 +1668,12 @@
 	 * @license The MIT License (MIT)
 	 * @copyright Stanislav Kalashnik <darkpark.main@gmail.com>
 	 */
-	
+
 	/* eslint no-path-concat: 0 */
 	/* eslint new-cap: 0 */
-	
+
 	'use strict';
-	
+
 	var //host      = require('../app').data.host,
 	    app       = __webpack_require__(/*! ../core */ 2),
 	    //util      = require('util'),
@@ -1682,13 +1682,13 @@
 	    debug     = {},
 	    links     = {},
 	    linkId    = 0;
-	
-	
+
+
 	// debug.config = {
 	//     depth: 3
 	// };
-	
-	
+
+
 	/**
 	 * Check condition and warn if not match.
 	 *
@@ -1700,65 +1700,65 @@
 	        console.assert(condition, title);
 	    }
 	};
-	
-	
+
+
 	debug.links = links;
-	
-	
+
+
 	function prepareConfig ( config ) {
 	    config = config || {};
-	
+
 	    config.tags = config.tags || [];
 	    config.tags.push('target');
-	
+
 	    return config;
 	}
-	
-	
+
+
 	function wrapData ( data ) {
 	    var result = {
 	        type: typeof data
 	    };
-	
+
 	    if ( data && result.type === 'object' ) {
 	        result.link = linkId++;
 	        links[result.link] = data;
-	
+
 	        if ( data.constructor && data.constructor.name ) {
 	            result.name = data.constructor.name;
 	        }
-	
+
 	        if ( 'length' in data ) {
 	            result.size = data.length;
 	        }
 	    } else {
 	        result.value = data;
 	    }
-	
+
 	    return result;
 	}
-	
-	
+
+
 	// todo: remove setTimeout hack
 	setTimeout(function () {
 	    app.develop.wamp.addListener('getLinkData', function ( params, callback ) {
 	        var link = links[params.id],
 	            data = {};
-	
+
 	        console.log('incoming getLinkData', params);
 	        //console.log(link);
-	
+
 	        if ( link ) {
 	            Object.keys(link).forEach(function ( name ) {
 	                data[name] = wrapData(link[name]);
 	            });
 	        }
-	
+
 	        callback(null, data);
 	    });
 	}, 1000);
-	
-	
+
+
 	/**
 	 * Print a plain colored string.
 	 *
@@ -1769,10 +1769,10 @@
 	    // message = (message + '') || '(empty message)';
 		//
 	    // console.log('%c%s', 'color:' + (color || 'black'), message);
-	
+
 	    // sanitize
 	    config = config || {};
-	
+
 	    config.info = info;
 	    //config.data = data ? util.inspect(data, {depth: debug.config.depth}) : null;
 	    config.data = data !== undefined ? wrapData(data) : undefined;
@@ -1780,7 +1780,7 @@
 	    config.time = Date.now();
 	    config.targetId = app.query.wampTargetId;
 	    //config.tags = config.tags.sort();
-	
+
 	    if ( app.develop.wamp.open ) {
 	        if ( buffer.length ) {
 	            buffer.forEach(function ( bufItem ) {
@@ -1788,14 +1788,14 @@
 	            });
 	            buffer = [];
 	        }
-	
+
 	        app.develop.wamp.call('sendMessage', config);
 	    } else {
 	        buffer.push(config);
 	    }
 	};
-	
-	
+
+
 	/**
 	 * Print the given var with caption.
 	 *
@@ -1805,7 +1805,7 @@
 	debug.info = function ( info, data, config ) {
 	    /*var type = Object.prototype.toString.call(data).match(/\s([a-zA-Z]+)/)[1].toLowerCase(),
 	        args;
-	
+
 	    args = ['color:' + (type === 'error' ? 'red' : 'green'), type];
 	    if ( title ) {
 	        args.unshift('%c%s\t%c%s\t');
@@ -1817,33 +1817,33 @@
 	    args.push(data);
 	    // output
 	    console.log.apply(console, args);*/
-	
+
 	    config = prepareConfig(config);
 	    //config.tags.push('info');
 	    config.type = 'info';
-	
+
 	    debug.log(info, data, config);
 	};
-	
-	
+
+
 	debug.warn = function ( info, data, config ) {
 	    config = prepareConfig(config);
 	    //config.tags.push('warn');
 	    config.type = 'warn';
-	
+
 	    debug.log(info, data, config);
 	};
-	
-	
+
+
 	debug.fail = function ( info, data, config ) {
 	    config = prepareConfig(config);
 	    //config.tags.push('fail');
 	    config.type = 'fail';
-	
+
 	    debug.log(info, data, config);
 	};
-	
-	
+
+
 	/**
 	 * Print the given complex var with level restriction.
 	 *
@@ -1852,8 +1852,8 @@
 	debug.inspect = function ( data ) {
 	    console.log(data);
 	};
-	
-	
+
+
 	/**
 	 * Print the given event object in some special way.
 	 *
@@ -1862,7 +1862,7 @@
 	debug.event = function ( data ) {
 	    var type  = data.type.toUpperCase(),
 	        color = type === 'ERROR' ? 'red' : 'green';
-	
+
 	    switch ( type ) {
 	        case 'KEYDOWN':
 	        case 'KEYPRESS':
@@ -1877,8 +1877,8 @@
 	            console.log('%o\t%c%s', data, 'color:' + color + ';font-weight:bold', type);
 	    }
 	};
-	
-	
+
+
 	/**
 	 * Start specific timer.
 	 * Use to calculate time of some actions.
@@ -1900,11 +1900,11 @@
 	 */
 	debug.time = function ( name, title ) {
 	    var time = Date.now();
-	
+
 	    // sanitize
 	    name  = name  || '';
 	    title = title || '';
-	
+
 	    // is this mark exist
 	    if ( timeMarks[name] ) {
 	        // already set
@@ -1913,12 +1913,12 @@
 	        // create a new mark
 	        timeMarks[name] = {init: time};
 	    }
-	
+
 	    // update with the current value
 	    timeMarks[name].last = time;
 	};
-	
-	
+
+
 	/**
 	 * End specific timer.
 	 * Use to calculate time of some actions.
@@ -1940,25 +1940,25 @@
 	 */
 	debug.timeEnd = function ( name, title ) {
 	    var time = Date.now();
-	
+
 	    // sanitize
 	    name  = name  || '';
 	    title = title || 'total';
-	
+
 	    // is this mark exist
 	    if ( timeMarks[name] ) {
 	        debug.log((name || 'time') + ' (' + title + '): ' + (time - timeMarks[name].init) + 'ms', 'blue');
-	
+
 	        delete timeMarks[name];
 	    } else {
 	        throw new Error(__filename + ': no started timer for "' + name + '"');
 	    }
 	};
-	
-	
+
+
 	// public
 	module.exports = debug;
-	
+
 	/* WEBPACK VAR INJECTION */}.call(exports, "../../spasdk/app/lib/develop/debug.js"))
 
 /***/ },
@@ -1972,26 +1972,26 @@
 	 * @license The MIT License (MIT)
 	 * @copyright Stanislav Kalashnik <darkpark.main@gmail.com>
 	 */
-	
+
 	'use strict';
-	
+
 	var app       = __webpack_require__(/*! ../core */ 2),
 	    Wamp      = __webpack_require__(/*! spa-wamp */ 17),
 	    stringify = __webpack_require__(/*! cjs-query */ 4).stringify;
-	
-	
+
+
 	if ( app.query.wampPort ) {
 	    // correct type
 	    app.query.wampTargetId = parseInt(app.query.wampTargetId, 10);
-	
+
 	    app.develop.wamp = new Wamp(
 	        'ws://' + (app.query.wampHost || location.hostname) + ':' + app.query.wampPort + '/target/' + (app.query.wampTargetId || '')
 	    );
-	
+
 	    app.develop.wamp.onopen = function () {
 	        //app.develop.wamp.addListener(app.develop.wamp.EVENT_OPEN, function () {
 	        debug.info('wamp open ' + app.develop.wamp.socket.url, null, {tags: ['open', 'wamp']});
-	
+
 	        // get target connection id
 	        app.develop.wamp.call('getConnectionInfo', {}, function ( error, data ) {
 	            // check if already linked
@@ -2006,14 +2006,14 @@
 	        });
 	        //});
 	    };
-	
+
 	    app.develop.wamp.onclose = function () {
 	        debug.info('wamp close ' + app.develop.wamp.socket.url, null, {tags: ['close', 'wamp']});
 	    };
-	
+
 	    app.develop.wamp.addListener('evalCode', function ( params, callback ) {
 	        console.log('incoming evalCode', params);
-	
+
 	        /* eslint no-eval: 0 */
 	        callback(null, {eval: eval(params.code)});
 	    });
@@ -2031,12 +2031,12 @@
 	 * @license The MIT License (MIT)
 	 * @copyright Stanislav Kalashnik <darkpark.main@gmail.com>
 	 */
-	
+
 	'use strict';
-	
+
 	var CjsWamp = __webpack_require__(/*! cjs-wamp */ 18);
-	
-	
+
+
 	/**
 	 * WAMP implementation wrapper.
 	 *
@@ -2048,38 +2048,38 @@
 	 */
 	function Wamp ( uri, config ) {
 	    var self = this;
-	
+
 	    function getSocket () {
 	        var socket = new WebSocket(uri);
-	
+
 	        socket.onopen = function () {
 	            if ( typeof self.onopen === 'function' ) {
 	                self.onopen();
 	            }
-	
+
 	            // there are some listeners
 	            // if ( self.events[self.EVENT_OPEN] ) {
 	            //     self.emit(self.EVENT_OPEN);
 	            // }
-	
+
 	            // set activity flag
 	            self.open = true;
 	        };
-	
+
 	        // reconnect
 	        socket.onclose = function () {
 	            if ( typeof self.onclose === 'function' && self.open ) {
 	                self.onclose();
 	            }
-	
+
 	            // there are some listeners and it's the first time
 	            // if ( self.events[self.EVENT_CLOSE] && self.open ) {
 	            //     self.emit(self.EVENT_CLOSE);
 	            // }
-	
+
 	            // mark as closed
 	            self.open = false;
-	
+
 	            if ( self.timeout ) {
 	                setTimeout(function () {
 	                    // recreate connection
@@ -2091,44 +2091,44 @@
 	                }, self.timeout);
 	            }
 	        };
-	
+
 	        return socket;
 	    }
-	
+
 	    console.assert(typeof this === 'object', 'must be constructed via new');
-	
+
 	    // sanitize
 	    config = config || {};
-	
+
 	    // connection state
 	    this.open = false;
-	
+
 	    // override prototype value
 	    if ( config.timeout ) {
 	        this.timeout = config.timeout;
 	    }
-	
+
 	    // events
 	    this.onopen  = null;
 	    this.onclose = null;
-	
+
 	    // parent constructor call
 	    CjsWamp.call(this, getSocket());
 	}
-	
-	
+
+
 	// inheritance
 	Wamp.prototype = Object.create(CjsWamp.prototype);
 	Wamp.prototype.constructor = Wamp;
-	
+
 	// configuration
 	Wamp.prototype.timeout = 5000;
-	
+
 	// events
 	// Wamp.prototype.EVENT_OPEN  = 'wamp:connection:open';
 	// Wamp.prototype.EVENT_CLOSE = 'wamp:connection:close';
-	
-	
+
+
 	// public
 	module.exports = Wamp;
 
@@ -2144,15 +2144,15 @@
 	 * @license The MIT License (MIT)
 	 * @copyright Stanislav Kalashnik <darkpark.main@gmail.com>
 	 */
-	
+
 	'use strict';
-	
+
 	/** @private */
 	var Emitter   = __webpack_require__(/*! cjs-emitter */ 3),
 	    messageId = 0,
 	    callbacks = {};
-	
-	
+
+
 	/**
 	 * Lightweight WAMP implementation based on WebSockets.
 	 *
@@ -2163,14 +2163,14 @@
 	 */
 	function Wamp ( socket ) {
 	    var self = this;
-	
+
 	    console.assert(typeof this === 'object', 'must be constructed via new');
-	    
+
 	    // parent constructor call
 	    Emitter.call(this);
-	
+
 	    this.socket = socket;
-	
+
 	    if ( 'on' in socket ) {
 	        // server-side
 	        socket.on('message', function ( message ) {
@@ -2183,8 +2183,8 @@
 	        };
 	    }
 	}
-	
-	
+
+
 	/**
 	 * Send data through the given socket.
 	 *
@@ -2196,17 +2196,17 @@
 	    if ( socket.readyState === 1 ) {
 	        // protocol version
 	        message.jsonrpc = '2.0';
-	
+
 	        socket.send(JSON.stringify(message));
 	    }
 	}
-	
-	
+
+
 	// inheritance
 	Wamp.prototype = Object.create(Emitter.prototype);
 	Wamp.prototype.constructor = Wamp;
-	
-	
+
+
 	/**
 	 * Internal method to handle messages.
 	 *
@@ -2217,7 +2217,7 @@
 	Wamp.prototype.router = function ( message ) {
 	    var self = this,
 	        data;
-	
+
 	    try {
 	        data = JSON.parse(message);
 	    } catch ( error ) {
@@ -2225,10 +2225,10 @@
 	            error: {code: -32700, message: 'Parse error'},
 	            id: null
 	        });
-	
+
 	        return;
 	    }
-	
+
 	    if ( 'id' in data && !('method' in data) ) {
 	        // incoming answer for previous request
 	        if ( data.id in callbacks ) {
@@ -2267,8 +2267,8 @@
 	        });
 	    }
 	};
-	
-	
+
+
 	/**
 	 * Send message to execute remotely or notify (without `callback` argument).
 	 *
@@ -2281,18 +2281,18 @@
 	        method: method,
 	        params: params
 	    };
-	
+
 	    // execution mode with callback
 	    // notification mode otherwise
 	    if ( typeof callback === 'function' ) {
 	        message.id = ++messageId;
 	        callbacks[messageId] = callback;
 	    }
-	
+
 	    send(this.socket, message);
 	};
-	
-	
+
+
 	// public
 	module.exports = Wamp;
 
@@ -2310,11 +2310,11 @@
 	 * @license The MIT License (MIT)
 	 * @copyright Stanislav Kalashnik <darkpark.main@gmail.com>
 	 */
-	
+
 	'use strict';
-	
+
 	/* eslint new-cap: 0 */
-	
+
 	var //util    = require('util'),
 	    app      = __webpack_require__(/*! ../core */ 2),
 	    //Wamp     = require('spa-wamp'),
@@ -2324,51 +2324,51 @@
 	    //app;
 	    //dom     = require('spa-dom'),
 	    //grid    = require('./grid');
-	
-	
+
+
 	events.load = function () {
 	    // app instance
 	    //window.app = app = require('spa-app');
-	
+
 	    /*if ( app.query.wampPort ) {
 	        //console.log('connect to WAMP server');
 	        app.develop.wamp = new Wamp(
 	            //new WebSocket('ws://' + (app.query.wampHost || location.hostname) + ':' + app.query.wampPort + '/target')
 	            'ws://' + (app.query.wampHost || location.hostname) + ':' + app.query.wampPort + '/target'
 	        );
-	
+
 	        app.develop.wamp.addListener('connection:open', function () {
 	            console.log('wamp open ' + app.develop.wamp.socket.url);
 	        });
-	
+
 	        app.develop.wamp.addListener('connection:close', function () {
 	            console.log('wamp close ' + app.develop.wamp.socket.url);
 	        });
-	
+
 	        // ready
 	        /!*window.app.wamp.socket.onopen = function () {
 	            console.log('wamp is ready!');
 	        };*!/
 	    }*/
-	
+
 	    // export to globals div for develop HTML elements
 	    /*window.$develop = document.body.appendChild(document.createElement('div'));
 	    window.$develop.className = 'develop';/**/
-	
+
 	    // apply dev css
 	    document.body.classList.add('develop');
-	
+
 	    //grid.init();
-	
+
 	    //if ( localStorage.getItem('grid.active') ) {
 	    //    grid.show();
 	    //}
-	
+
 	    // stress-testing
 	    app.develop.horde = gremlins.createHorde();
 	};
-	
-	
+
+
 	events.keydown = function ( event ) {
 	    switch ( event.keyCode ) {
 	        // key b
@@ -2385,7 +2385,7 @@
 	            location.hash = '';
 	            location.reload();
 	            break;
-	
+
 	        // numpad 5
 	        //case 101:
 	        //    // debug grid
@@ -2397,13 +2397,13 @@
 	        //    debug.log('show grid: ' + grid.active, 'red');
 	        //    localStorage.setItem('grid.active', grid.active);
 	        //    break;
-	
+
 	        // numpad 6
 	        case 102:
 	            // stress-testing
 	            app.develop.horde.unleash({nb: 500});
 	            break;
-	
+
 	        // numpad 7
 	        /*case 103:
 	            //if ( !app.data.host ) {
@@ -2426,7 +2426,7 @@
 	                        localStorage.setItem('spyjs.active', true);
 	                        debug.log('SpyJS: enable', 'red');
 	                        debug.log('SpyJS: set proxy to ' + location.hostname + ':' + 3546);
-	
+
 	                        gSTB.SetWebProxy(location.hostname, 3546, '', '', '');
 	                        location.reload();
 	                    },
@@ -2437,7 +2437,7 @@
 	            }
 	            //}
 	            break;*/
-	
+
 	        //// numpad 8
 	        //case 104:
 	        //    // FireBug Lite
@@ -2453,7 +2453,7 @@
 	        //        }
 	        //    }));
 	        //    break;
-	
+
 	        // numpad 9
 	        case 105:
 	            // outline components and inner structures
@@ -2466,7 +2466,7 @@
 	                }
 	            });
 	            break;
-	
+
 	        // numpad .
 	        case 110:
 	            // CSS reload
@@ -2479,13 +2479,13 @@
 	            break;
 	    }
 	};
-	
-	
+
+
 	// additional top-level key handlers
 	window.addEventListener('load',    events.load);
 	window.addEventListener('keydown', events.keydown);
-	
-	
+
+
 	// public
 	module.exports = events;
 
@@ -2511,36 +2511,36 @@
 	 * @license The MIT License (MIT)
 	 * @copyright Stanislav Kalashnik <darkpark.main@gmail.com>
 	 */
-	
+
 	/* eslint no-path-concat: 0 */
-	
+
 	'use strict';
-	
+
 	var getElementById = document.getElementById,
 	    querySelector  = document.querySelector;
-	
-	
+
+
 	document.getElementById = function ( id ) {
 	    var el = getElementById.call(document, id);
-	
+
 	    if ( !el ) {
 	        throw new Error(__filename + ': no element with id ' + id);
 	    }
-	
+
 	    return el;
 	};
-	
-	
+
+
 	document.querySelector = function ( selector ) {
 	    var el = querySelector.call(document, selector);
-	
+
 	    if ( !el ) {
 	        throw new Error(__filename + ': no element with selector: ' + selector);
 	    }
-	
+
 	    return el;
 	};
-	
+
 	/* WEBPACK VAR INJECTION */}.call(exports, "../../spasdk/app/lib/develop/hooks.js"))
 
 /***/ },
@@ -2556,12 +2556,12 @@
 	 * @license The MIT License (MIT)
 	 * @copyright Stanislav Kalashnik <darkpark.main@gmail.com>
 	 */
-	
+
 	'use strict';
-	
+
 	//var tag = require('spa-dom').tag;
-	
-	
+
+
 	//window.LiveReloadOptions = {port: LIVERELOAD.port};
 	window.LiveReloadOptions = {
 	    host: location.hostname,
@@ -2569,9 +2569,9 @@
 	};
 	//console.log(require('spa-gulp-livereload/config').default.tinylr);
 	//console.log(LIVERELOAD);
-	
+
 	__webpack_require__(/*! livereload-js/dist/livereload.js */ 23);
-	
+
 	// livereload activation
 	//if ( config.livereload ) {
 	    // load external script
@@ -2592,11 +2592,11 @@
 	(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 	(function() {
 	  var Connector, PROTOCOL_6, PROTOCOL_7, Parser, Version, _ref;
-	
+
 	  _ref = require('./protocol'), Parser = _ref.Parser, PROTOCOL_6 = _ref.PROTOCOL_6, PROTOCOL_7 = _ref.PROTOCOL_7;
-	
+
 	  Version = '2.2.2';
-	
+
 	  exports.Connector = Connector = (function() {
 	    function Connector(options, WebSocket, Timer, handlers) {
 	      this.options = options;
@@ -2648,11 +2648,11 @@
 	      })(this));
 	      this.connect();
 	    }
-	
+
 	    Connector.prototype._isSocketConnected = function() {
 	      return this.socket && this.socket.readyState === this.WebSocket.OPEN;
 	    };
-	
+
 	    Connector.prototype.connect = function() {
 	      this._connectionDesired = true;
 	      if (this._isSocketConnected()) {
@@ -2684,7 +2684,7 @@
 	        };
 	      })(this);
 	    };
-	
+
 	    Connector.prototype.disconnect = function() {
 	      this._connectionDesired = false;
 	      this._reconnectTimer.stop();
@@ -2694,7 +2694,7 @@
 	      this._disconnectionReason = 'manual';
 	      return this.socket.close();
 	    };
-	
+
 	    Connector.prototype._scheduleReconnection = function() {
 	      if (!this._connectionDesired) {
 	        return;
@@ -2704,24 +2704,24 @@
 	        return this._nextDelay = Math.min(this.options.maxdelay, this._nextDelay * 2);
 	      }
 	    };
-	
+
 	    Connector.prototype.sendCommand = function(command) {
 	      if (this.protocol == null) {
 	        return;
 	      }
 	      return this._sendCommand(command);
 	    };
-	
+
 	    Connector.prototype._sendCommand = function(command) {
 	      return this.socket.send(JSON.stringify(command));
 	    };
-	
+
 	    Connector.prototype._closeOnError = function() {
 	      this._handshakeTimeout.stop();
 	      this._disconnectionReason = 'error';
 	      return this.socket.close();
 	    };
-	
+
 	    Connector.prototype._onopen = function(e) {
 	      var hello;
 	      this.handlers.socketConnected();
@@ -2743,29 +2743,29 @@
 	      this._sendCommand(hello);
 	      return this._handshakeTimeout.start(this.options.handshake_timeout);
 	    };
-	
+
 	    Connector.prototype._onclose = function(e) {
 	      this.protocol = 0;
 	      this.handlers.disconnected(this._disconnectionReason, this._nextDelay);
 	      return this._scheduleReconnection();
 	    };
-	
+
 	    Connector.prototype._onerror = function(e) {};
-	
+
 	    Connector.prototype._onmessage = function(e) {
 	      return this.protocolParser.process(e.data);
 	    };
-	
+
 	    return Connector;
-	
+
 	  })();
-	
+
 	}).call(this);
-	
+
 	},{"./protocol":6}],2:[function(require,module,exports){
 	(function() {
 	  var CustomEvents;
-	
+
 	  CustomEvents = {
 	    bind: function(element, eventName, handler) {
 	      if (element.addEventListener) {
@@ -2796,27 +2796,27 @@
 	      }
 	    }
 	  };
-	
+
 	  exports.bind = CustomEvents.bind;
-	
+
 	  exports.fire = CustomEvents.fire;
-	
+
 	}).call(this);
-	
+
 	},{}],3:[function(require,module,exports){
 	(function() {
 	  var LessPlugin;
-	
+
 	  module.exports = LessPlugin = (function() {
 	    LessPlugin.identifier = 'less';
-	
+
 	    LessPlugin.version = '1.0';
-	
+
 	    function LessPlugin(window, host) {
 	      this.window = window;
 	      this.host = host;
 	    }
-	
+
 	    LessPlugin.prototype.reload = function(path, options) {
 	      if (this.window.less && this.window.less.refresh) {
 	        if (path.match(/\.less$/i)) {
@@ -2828,7 +2828,7 @@
 	      }
 	      return false;
 	    };
-	
+
 	    LessPlugin.prototype.reloadLess = function(path) {
 	      var link, links, _i, _len;
 	      links = (function() {
@@ -2854,32 +2854,32 @@
 	      this.window.less.refresh(true);
 	      return true;
 	    };
-	
+
 	    LessPlugin.prototype.analyze = function() {
 	      return {
 	        disable: !!(this.window.less && this.window.less.refresh)
 	      };
 	    };
-	
+
 	    return LessPlugin;
-	
+
 	  })();
-	
+
 	}).call(this);
-	
+
 	},{}],4:[function(require,module,exports){
 	(function() {
 	  var Connector, LiveReload, Options, Reloader, Timer,
 	    __hasProp = {}.hasOwnProperty;
-	
+
 	  Connector = require('./connector').Connector;
-	
+
 	  Timer = require('./timer').Timer;
-	
+
 	  Options = require('./options').Options;
-	
+
 	  Reloader = require('./reloader').Reloader;
-	
+
 	  exports.LiveReload = LiveReload = (function() {
 	    function LiveReload(window) {
 	      var k, v, _ref;
@@ -2981,15 +2981,15 @@
 	      });
 	      this.initialized = true;
 	    }
-	
+
 	    LiveReload.prototype.on = function(eventName, handler) {
 	      return this.listeners[eventName] = handler;
 	    };
-	
+
 	    LiveReload.prototype.log = function(message) {
 	      return this.console.log("" + message);
 	    };
-	
+
 	    LiveReload.prototype.performReload = function(message) {
 	      var _ref, _ref1;
 	      this.log("LiveReload received reload request: " + (JSON.stringify(message, null, 2)));
@@ -3001,11 +3001,11 @@
 	        serverURL: "http://" + this.options.host + ":" + this.options.port
 	      });
 	    };
-	
+
 	    LiveReload.prototype.performAlert = function(message) {
 	      return alert(message.message);
 	    };
-	
+
 	    LiveReload.prototype.shutDown = function() {
 	      var _base;
 	      if (!this.initialized) {
@@ -3015,11 +3015,11 @@
 	      this.log("LiveReload disconnected.");
 	      return typeof (_base = this.listeners).shutdown === "function" ? _base.shutdown() : void 0;
 	    };
-	
+
 	    LiveReload.prototype.hasPlugin = function(identifier) {
 	      return !!this.pluginIdentifiers[identifier];
 	    };
-	
+
 	    LiveReload.prototype.addPlugin = function(pluginClass) {
 	      var plugin;
 	      if (!this.initialized) {
@@ -3044,7 +3044,7 @@
 	      this.plugins.push(plugin);
 	      this.reloader.addPlugin(plugin);
 	    };
-	
+
 	    LiveReload.prototype.analyze = function() {
 	      var plugin, pluginData, pluginsData, _i, _len, _ref;
 	      if (!this.initialized) {
@@ -3066,17 +3066,17 @@
 	        url: this.window.location.href
 	      });
 	    };
-	
+
 	    return LiveReload;
-	
+
 	  })();
-	
+
 	}).call(this);
-	
+
 	},{"./connector":1,"./options":5,"./reloader":7,"./timer":9}],5:[function(require,module,exports){
 	(function() {
 	  var Options;
-	
+
 	  exports.Options = Options = (function() {
 	    function Options() {
 	      this.https = false;
@@ -3089,7 +3089,7 @@
 	      this.maxdelay = 60000;
 	      this.handshake_timeout = 5000;
 	    }
-	
+
 	    Options.prototype.set = function(name, value) {
 	      if (typeof value === 'undefined') {
 	        return;
@@ -3099,11 +3099,11 @@
 	      }
 	      return this[name] = value;
 	    };
-	
+
 	    return Options;
-	
+
 	  })();
-	
+
 	  Options.extract = function(document) {
 	    var element, keyAndValue, m, mm, options, pair, src, _i, _j, _len, _len1, _ref, _ref1;
 	    _ref = document.getElementsByTagName('script');
@@ -3132,37 +3132,37 @@
 	    }
 	    return null;
 	  };
-	
+
 	}).call(this);
-	
+
 	},{}],6:[function(require,module,exports){
 	(function() {
 	  var PROTOCOL_6, PROTOCOL_7, Parser, ProtocolError,
 	    __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
-	
+
 	  exports.PROTOCOL_6 = PROTOCOL_6 = 'http://livereload.com/protocols/official-6';
-	
+
 	  exports.PROTOCOL_7 = PROTOCOL_7 = 'http://livereload.com/protocols/official-7';
-	
+
 	  exports.ProtocolError = ProtocolError = (function() {
 	    function ProtocolError(reason, data) {
 	      this.message = "LiveReload protocol error (" + reason + ") after receiving data: \"" + data + "\".";
 	    }
-	
+
 	    return ProtocolError;
-	
+
 	  })();
-	
+
 	  exports.Parser = Parser = (function() {
 	    function Parser(handlers) {
 	      this.handlers = handlers;
 	      this.reset();
 	    }
-	
+
 	    Parser.prototype.reset = function() {
 	      return this.protocol = null;
 	    };
-	
+
 	    Parser.prototype.process = function(data) {
 	      var command, e, message, options, _ref;
 	      try {
@@ -3208,7 +3208,7 @@
 	        }
 	      }
 	    };
-	
+
 	    Parser.prototype._parseMessage = function(data, validCommands) {
 	      var e, message, _ref;
 	      try {
@@ -3225,17 +3225,17 @@
 	      }
 	      return message;
 	    };
-	
+
 	    return Parser;
-	
+
 	  })();
-	
+
 	}).call(this);
-	
+
 	},{}],7:[function(require,module,exports){
 	(function() {
 	  var IMAGE_STYLES, Reloader, numberOfMatchingSegments, pathFromUrl, pathsMatch, pickBestMatch, splitUrl;
-	
+
 	  splitUrl = function(url) {
 	    var hash, index, params;
 	    if ((index = url.indexOf('#')) >= 0) {
@@ -3256,7 +3256,7 @@
 	      hash: hash
 	    };
 	  };
-	
+
 	  pathFromUrl = function(url) {
 	    var path;
 	    url = splitUrl(url).url;
@@ -3267,7 +3267,7 @@
 	    }
 	    return decodeURIComponent(path);
 	  };
-	
+
 	  pickBestMatch = function(path, objects, pathFunc) {
 	    var bestMatch, object, score, _i, _len;
 	    bestMatch = {
@@ -3289,7 +3289,7 @@
 	      return null;
 	    }
 	  };
-	
+
 	  numberOfMatchingSegments = function(path1, path2) {
 	    var comps1, comps2, eqCount, len;
 	    path1 = path1.replace(/^\/+/, '').toLowerCase();
@@ -3306,11 +3306,11 @@
 	    }
 	    return eqCount;
 	  };
-	
+
 	  pathsMatch = function(path1, path2) {
 	    return numberOfMatchingSegments(path1, path2) > 0;
 	  };
-	
+
 	  IMAGE_STYLES = [
 	    {
 	      selector: 'background',
@@ -3320,7 +3320,7 @@
 	      styleNames: ['borderImage', 'webkitBorderImage', 'MozBorderImage']
 	    }
 	  ];
-	
+
 	  exports.Reloader = Reloader = (function() {
 	    function Reloader(window, console, Timer) {
 	      this.window = window;
@@ -3330,15 +3330,15 @@
 	      this.importCacheWaitPeriod = 200;
 	      this.plugins = [];
 	    }
-	
+
 	    Reloader.prototype.addPlugin = function(plugin) {
 	      return this.plugins.push(plugin);
 	    };
-	
+
 	    Reloader.prototype.analyze = function(callback) {
 	      return results;
 	    };
-	
+
 	    Reloader.prototype.reload = function(path, options) {
 	      var plugin, _base, _i, _len, _ref;
 	      this.options = options;
@@ -3367,11 +3367,11 @@
 	      }
 	      return this.reloadPage();
 	    };
-	
+
 	    Reloader.prototype.reloadPage = function() {
 	      return this.window.document.location.reload();
 	    };
-	
+
 	    Reloader.prototype.reloadImages = function(path) {
 	      var expando, img, selector, styleNames, styleSheet, _i, _j, _k, _l, _len, _len1, _len2, _len3, _ref, _ref1, _ref2, _ref3, _results;
 	      expando = this.generateUniqueString();
@@ -3402,7 +3402,7 @@
 	        return _results;
 	      }
 	    };
-	
+
 	    Reloader.prototype.reloadStylesheetImages = function(styleSheet, path, expando) {
 	      var e, rule, rules, styleNames, _i, _j, _len, _len1;
 	      try {
@@ -3430,7 +3430,7 @@
 	        }
 	      }
 	    };
-	
+
 	    Reloader.prototype.reloadStyleImages = function(style, styleNames, path, expando) {
 	      var newValue, styleName, value, _i, _len;
 	      for (_i = 0, _len = styleNames.length; _i < _len; _i++) {
@@ -3452,7 +3452,7 @@
 	        }
 	      }
 	    };
-	
+
 	    Reloader.prototype.reloadStylesheet = function(path) {
 	      var imported, link, links, match, style, _i, _j, _k, _l, _len, _len1, _len2, _len3, _ref, _ref1;
 	      links = (function() {
@@ -3509,7 +3509,7 @@
 	      }
 	      return true;
 	    };
-	
+
 	    Reloader.prototype.collectImportedStylesheets = function(link, styleSheet, result) {
 	      var e, index, rule, rules, _i, _len;
 	      try {
@@ -3538,7 +3538,7 @@
 	        }
 	      }
 	    };
-	
+
 	    Reloader.prototype.waitUntilCssLoads = function(clone, func) {
 	      var callbackExecuted, executeCallback, poll;
 	      callbackExecuted = false;
@@ -3572,11 +3572,11 @@
 	      }
 	      return this.Timer.start(this.options.stylesheetReloadTimeout, executeCallback);
 	    };
-	
+
 	    Reloader.prototype.linkHref = function(link) {
 	      return link.href || link.getAttribute('data-href');
 	    };
-	
+
 	    Reloader.prototype.reattachStylesheetLink = function(link) {
 	      var clone, parent;
 	      if (link.__LiveReload_pendingRemoval) {
@@ -3618,7 +3618,7 @@
 	        };
 	      })(this));
 	    };
-	
+
 	    Reloader.prototype.reattachImportedRule = function(_arg) {
 	      var href, index, link, media, newRule, parent, rule, tempLink;
 	      rule = _arg.rule, index = _arg.index, link = _arg.link;
@@ -3656,11 +3656,11 @@
 	        };
 	      })(this));
 	    };
-	
+
 	    Reloader.prototype.generateUniqueString = function() {
 	      return 'livereload=' + Date.now();
 	    };
-	
+
 	    Reloader.prototype.generateCacheBustUrl = function(url, expando) {
 	      var hash, oldParams, originalUrl, params, _ref;
 	      if (expando == null) {
@@ -3686,51 +3686,51 @@
 	      }
 	      return url + params + hash;
 	    };
-	
+
 	    return Reloader;
-	
+
 	  })();
-	
+
 	}).call(this);
-	
+
 	},{}],8:[function(require,module,exports){
 	(function() {
 	  var CustomEvents, LiveReload, k;
-	
+
 	  CustomEvents = require('./customevents');
-	
+
 	  LiveReload = window.LiveReload = new (require('./livereload').LiveReload)(window);
-	
+
 	  for (k in window) {
 	    if (k.match(/^LiveReloadPlugin/)) {
 	      LiveReload.addPlugin(window[k]);
 	    }
 	  }
-	
+
 	  LiveReload.addPlugin(require('./less'));
-	
+
 	  LiveReload.on('shutdown', function() {
 	    return delete window.LiveReload;
 	  });
-	
+
 	  LiveReload.on('connect', function() {
 	    return CustomEvents.fire(document, 'LiveReloadConnect');
 	  });
-	
+
 	  LiveReload.on('disconnect', function() {
 	    return CustomEvents.fire(document, 'LiveReloadDisconnect');
 	  });
-	
+
 	  CustomEvents.bind(document, 'LiveReloadShutDown', function() {
 	    return LiveReload.shutDown();
 	  });
-	
+
 	}).call(this);
-	
+
 	},{"./customevents":2,"./less":3,"./livereload":4}],9:[function(require,module,exports){
 	(function() {
 	  var Timer;
-	
+
 	  exports.Timer = Timer = (function() {
 	    function Timer(func) {
 	      this.func = func;
@@ -3744,7 +3744,7 @@
 	        };
 	      })(this);
 	    }
-	
+
 	    Timer.prototype.start = function(timeout) {
 	      if (this.running) {
 	        clearTimeout(this.id);
@@ -3752,7 +3752,7 @@
 	      this.id = setTimeout(this._handler, timeout);
 	      return this.running = true;
 	    };
-	
+
 	    Timer.prototype.stop = function() {
 	      if (this.running) {
 	        clearTimeout(this.id);
@@ -3760,17 +3760,17 @@
 	        return this.id = null;
 	      }
 	    };
-	
+
 	    return Timer;
-	
+
 	  })();
-	
+
 	  Timer.start = function(timeout, func) {
 	    return setTimeout(func, timeout);
 	  };
-	
+
 	}).call(this);
-	
+
 	},{}]},{},[8]);
 
 
@@ -3788,16 +3788,16 @@
 	 * @author Stanislav Kalashnik <darkpark.main@gmail.com>
 	 * @license GNU GENERAL PUBLIC LICENSE Version 3
 	 */
-	
+
 	'use strict';
-	
+
 	var app     = __webpack_require__(/*! spa-app/lib/core */ 2),
 	    tag     = __webpack_require__(/*! spa-dom */ 25).tag,
 	    //storage = require('./storage'),
 	    util    = __webpack_require__(/*! util */ 26),
 	    config  = {}/*require('../../config/weinre')*/;
-	
-	
+
+
 	// web inspector is allowed only without SpyJS
 	if ( config.active && !app.develop.storage.getItem('spyjs.active') ) {
 	    // load external script
@@ -3821,17 +3821,17 @@
 	 * @license The MIT License (MIT)
 	 * @copyright Stanislav Kalashnik <darkpark.main@gmail.com>
 	 */
-	
+
 	'use strict';
-	
+
 	/* eslint no-unused-vars: 0 */
-	
+
 	/**
 	 * DOM manipulation module
 	 */
 	var dom = {};
-	
-	
+
+
 	/**
 	 * Create a new HTML element.
 	 *
@@ -3849,12 +3849,12 @@
 	dom.tag = function ( tagName, attrList, content ) {
 	    var node = null,
 	        index, name;
-	
+
 	    // minimal param is given
 	    if ( tagName ) {
 	        // empty element
 	        node = document.createElement(tagName);
-	
+
 	        // optional attribute list is given
 	        if ( attrList && typeof attrList === 'object' ) {
 	            for ( name in attrList ) {
@@ -3862,7 +3862,7 @@
 	                node[name] = attrList[name];
 	            }
 	        }
-	
+
 	        // content (arguments except the first two)
 	        for ( index = 2; index < arguments.length; index++ ) {
 	            // some data is given
@@ -3875,13 +3875,13 @@
 	                );
 	            }
 	        }
-	
+
 	    }
-	
+
 	    return node;
 	};
-	
-	
+
+
 	/**
 	 * Create a new DocumentFragment filled with the given non-empty elements if any.
 	 *
@@ -3900,7 +3900,7 @@
 	    // prepare placeholder
 	    var fragment = document.createDocumentFragment(),
 	        index;
-	
+
 	    // walk through all the given elements
 	    for ( index = 0; index < arguments.length; index++ ) {
 	        node = arguments[index];
@@ -3910,11 +3910,11 @@
 	            fragment.appendChild(typeof node === 'object' ? node : document.createTextNode(node));
 	        }
 	    }
-	
+
 	    return fragment;
 	};
-	
-	
+
+
 	/**
 	 * Add the given non-empty data (HTML element/text or list) to the destination element.
 	 *
@@ -3934,7 +3934,7 @@
 	 */
 	dom.add = function ( tagDst, content ) {
 	    var index;
-	
+
 	    // valid HTML tag as the destination
 	    if ( tagDst instanceof Node ) {
 	        // append all except the first one
@@ -3949,14 +3949,14 @@
 	                );
 	            }
 	        }
-	
+
 	        return tagDst;
 	    }
-	
+
 	    return null;
 	};
-	
-	
+
+
 	/**
 	 * Remove the given elements from the DOM.
 	 *
@@ -3970,7 +3970,7 @@
 	dom.remove = function ( nodes ) {
 	    var count = 0,  // amount of successfully removed nodes
 	        index;
-	
+
 	    // walk through all the given elements
 	    for ( index = 0; index < arguments.length; index++ ) {
 	        // valid non-empty tag
@@ -3980,18 +3980,18 @@
 	            }
 	        }
 	    }
-	
+
 	    return arguments.length > 0 && count === arguments.length;
 	};
-	
-	
+
+
 	dom.clear = function ( node ) {
 	    while ( node.lastChild ) {
 	        node.removeChild(node.lastChild);
 	    }
 	};
-	
-	
+
+
 	// public
 	module.exports = dom;
 
@@ -4023,7 +4023,7 @@
 	// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 	// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 	// USE OR OTHER DEALINGS IN THE SOFTWARE.
-	
+
 	var formatRegExp = /%[sdj%]/g;
 	exports.format = function(f) {
 	  if (!isString(f)) {
@@ -4033,7 +4033,7 @@
 	    }
 	    return objects.join(' ');
 	  }
-	
+
 	  var i = 1;
 	  var args = arguments;
 	  var len = args.length;
@@ -4062,8 +4062,8 @@
 	  }
 	  return str;
 	};
-	
-	
+
+
 	// Mark that a method should not be used.
 	// Returns a modified function which warns once by default.
 	// If --no-deprecation is set, then it is a no-op.
@@ -4074,11 +4074,11 @@
 	      return exports.deprecate(fn, msg).apply(this, arguments);
 	    };
 	  }
-	
+
 	  if (process.noDeprecation === true) {
 	    return fn;
 	  }
-	
+
 	  var warned = false;
 	  function deprecated() {
 	    if (!warned) {
@@ -4093,11 +4093,11 @@
 	    }
 	    return fn.apply(this, arguments);
 	  }
-	
+
 	  return deprecated;
 	};
-	
-	
+
+
 	var debugs = {};
 	var debugEnviron;
 	exports.debuglog = function(set) {
@@ -4117,8 +4117,8 @@
 	  }
 	  return debugs[set];
 	};
-	
-	
+
+
 	/**
 	 * Echos the value of a value. Trys to print the value out
 	 * in the best way possible given the different types.
@@ -4152,8 +4152,8 @@
 	  return formatValue(ctx, obj, ctx.depth);
 	}
 	exports.inspect = inspect;
-	
-	
+
+
 	// http://en.wikipedia.org/wiki/ANSI_escape_code#graphics
 	inspect.colors = {
 	  'bold' : [1, 22],
@@ -4170,7 +4170,7 @@
 	  'red' : [31, 39],
 	  'yellow' : [33, 39]
 	};
-	
+
 	// Don't use 'blue' not visible on cmd.exe
 	inspect.styles = {
 	  'special': 'cyan',
@@ -4183,11 +4183,11 @@
 	  // "name": intentionally not styling
 	  'regexp': 'red'
 	};
-	
-	
+
+
 	function stylizeWithColor(str, styleType) {
 	  var style = inspect.styles[styleType];
-	
+
 	  if (style) {
 	    return '\u001b[' + inspect.colors[style][0] + 'm' + str +
 	           '\u001b[' + inspect.colors[style][1] + 'm';
@@ -4195,24 +4195,24 @@
 	    return str;
 	  }
 	}
-	
-	
+
+
 	function stylizeNoColor(str, styleType) {
 	  return str;
 	}
-	
-	
+
+
 	function arrayToHash(array) {
 	  var hash = {};
-	
+
 	  array.forEach(function(val, idx) {
 	    hash[val] = true;
 	  });
-	
+
 	  return hash;
 	}
-	
-	
+
+
 	function formatValue(ctx, value, recurseTimes) {
 	  // Provide a hook for user-specified inspect functions.
 	  // Check that value is an object with an inspect function on it
@@ -4229,28 +4229,28 @@
 	    }
 	    return ret;
 	  }
-	
+
 	  // Primitive types cannot have properties
 	  var primitive = formatPrimitive(ctx, value);
 	  if (primitive) {
 	    return primitive;
 	  }
-	
+
 	  // Look up the keys of the object.
 	  var keys = Object.keys(value);
 	  var visibleKeys = arrayToHash(keys);
-	
+
 	  if (ctx.showHidden) {
 	    keys = Object.getOwnPropertyNames(value);
 	  }
-	
+
 	  // IE doesn't make error fields non-enumerable
 	  // http://msdn.microsoft.com/en-us/library/ie/dww52sbt(v=vs.94).aspx
 	  if (isError(value)
 	      && (keys.indexOf('message') >= 0 || keys.indexOf('description') >= 0)) {
 	    return formatError(value);
 	  }
-	
+
 	  // Some type of object without properties can be shortcutted.
 	  if (keys.length === 0) {
 	    if (isFunction(value)) {
@@ -4267,40 +4267,40 @@
 	      return formatError(value);
 	    }
 	  }
-	
+
 	  var base = '', array = false, braces = ['{', '}'];
-	
+
 	  // Make Array say that they are Array
 	  if (isArray(value)) {
 	    array = true;
 	    braces = ['[', ']'];
 	  }
-	
+
 	  // Make functions say that they are functions
 	  if (isFunction(value)) {
 	    var n = value.name ? ': ' + value.name : '';
 	    base = ' [Function' + n + ']';
 	  }
-	
+
 	  // Make RegExps say that they are RegExps
 	  if (isRegExp(value)) {
 	    base = ' ' + RegExp.prototype.toString.call(value);
 	  }
-	
+
 	  // Make dates with properties first say the date
 	  if (isDate(value)) {
 	    base = ' ' + Date.prototype.toUTCString.call(value);
 	  }
-	
+
 	  // Make error with message first say the error
 	  if (isError(value)) {
 	    base = ' ' + formatError(value);
 	  }
-	
+
 	  if (keys.length === 0 && (!array || value.length == 0)) {
 	    return braces[0] + base + braces[1];
 	  }
-	
+
 	  if (recurseTimes < 0) {
 	    if (isRegExp(value)) {
 	      return ctx.stylize(RegExp.prototype.toString.call(value), 'regexp');
@@ -4308,9 +4308,9 @@
 	      return ctx.stylize('[Object]', 'special');
 	    }
 	  }
-	
+
 	  ctx.seen.push(value);
-	
+
 	  var output;
 	  if (array) {
 	    output = formatArray(ctx, value, recurseTimes, visibleKeys, keys);
@@ -4319,13 +4319,13 @@
 	      return formatProperty(ctx, value, recurseTimes, visibleKeys, key, array);
 	    });
 	  }
-	
+
 	  ctx.seen.pop();
-	
+
 	  return reduceToSingleString(output, base, braces);
 	}
-	
-	
+
+
 	function formatPrimitive(ctx, value) {
 	  if (isUndefined(value))
 	    return ctx.stylize('undefined', 'undefined');
@@ -4343,13 +4343,13 @@
 	  if (isNull(value))
 	    return ctx.stylize('null', 'null');
 	}
-	
-	
+
+
 	function formatError(value) {
 	  return '[' + Error.prototype.toString.call(value) + ']';
 	}
-	
-	
+
+
 	function formatArray(ctx, value, recurseTimes, visibleKeys, keys) {
 	  var output = [];
 	  for (var i = 0, l = value.length; i < l; ++i) {
@@ -4368,8 +4368,8 @@
 	  });
 	  return output;
 	}
-	
-	
+
+
 	function formatProperty(ctx, value, recurseTimes, visibleKeys, key, array) {
 	  var name, str, desc;
 	  desc = Object.getOwnPropertyDescriptor(value, key) || { value: value[key] };
@@ -4424,11 +4424,11 @@
 	      name = ctx.stylize(name, 'string');
 	    }
 	  }
-	
+
 	  return name + ': ' + str;
 	}
-	
-	
+
+
 	function reduceToSingleString(output, base, braces) {
 	  var numLinesEst = 0;
 	  var length = output.reduce(function(prev, cur) {
@@ -4436,7 +4436,7 @@
 	    if (cur.indexOf('\n') >= 0) numLinesEst++;
 	    return prev + cur.replace(/\u001b\[\d\d?m/g, '').length + 1;
 	  }, 0);
-	
+
 	  if (length > 60) {
 	    return braces[0] +
 	           (base === '' ? '' : base + '\n ') +
@@ -4445,79 +4445,79 @@
 	           ' ' +
 	           braces[1];
 	  }
-	
+
 	  return braces[0] + base + ' ' + output.join(', ') + ' ' + braces[1];
 	}
-	
-	
+
+
 	// NOTE: These type checking functions intentionally don't use `instanceof`
 	// because it is fragile and can be easily faked with `Object.create()`.
 	function isArray(ar) {
 	  return Array.isArray(ar);
 	}
 	exports.isArray = isArray;
-	
+
 	function isBoolean(arg) {
 	  return typeof arg === 'boolean';
 	}
 	exports.isBoolean = isBoolean;
-	
+
 	function isNull(arg) {
 	  return arg === null;
 	}
 	exports.isNull = isNull;
-	
+
 	function isNullOrUndefined(arg) {
 	  return arg == null;
 	}
 	exports.isNullOrUndefined = isNullOrUndefined;
-	
+
 	function isNumber(arg) {
 	  return typeof arg === 'number';
 	}
 	exports.isNumber = isNumber;
-	
+
 	function isString(arg) {
 	  return typeof arg === 'string';
 	}
 	exports.isString = isString;
-	
+
 	function isSymbol(arg) {
 	  return typeof arg === 'symbol';
 	}
 	exports.isSymbol = isSymbol;
-	
+
 	function isUndefined(arg) {
 	  return arg === void 0;
 	}
 	exports.isUndefined = isUndefined;
-	
+
 	function isRegExp(re) {
 	  return isObject(re) && objectToString(re) === '[object RegExp]';
 	}
 	exports.isRegExp = isRegExp;
-	
+
 	function isObject(arg) {
 	  return typeof arg === 'object' && arg !== null;
 	}
 	exports.isObject = isObject;
-	
+
 	function isDate(d) {
 	  return isObject(d) && objectToString(d) === '[object Date]';
 	}
 	exports.isDate = isDate;
-	
+
 	function isError(e) {
 	  return isObject(e) &&
 	      (objectToString(e) === '[object Error]' || e instanceof Error);
 	}
 	exports.isError = isError;
-	
+
 	function isFunction(arg) {
 	  return typeof arg === 'function';
 	}
 	exports.isFunction = isFunction;
-	
+
 	function isPrimitive(arg) {
 	  return arg === null ||
 	         typeof arg === 'boolean' ||
@@ -4527,22 +4527,22 @@
 	         typeof arg === 'undefined';
 	}
 	exports.isPrimitive = isPrimitive;
-	
+
 	exports.isBuffer = __webpack_require__(/*! ./support/isBuffer */ 28);
-	
+
 	function objectToString(o) {
 	  return Object.prototype.toString.call(o);
 	}
-	
-	
+
+
 	function pad(n) {
 	  return n < 10 ? '0' + n.toString(10) : n.toString(10);
 	}
-	
-	
+
+
 	var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep',
 	              'Oct', 'Nov', 'Dec'];
-	
+
 	// 26 Feb 16:19:34
 	function timestamp() {
 	  var d = new Date();
@@ -4551,14 +4551,14 @@
 	              pad(d.getSeconds())].join(':');
 	  return [d.getDate(), months[d.getMonth()], time].join(' ');
 	}
-	
-	
+
+
 	// log is just a thin wrapper to console.log that prepends a timestamp
 	exports.log = function() {
 	  console.log('%s - %s', timestamp(), exports.format.apply(exports, arguments));
 	};
-	
-	
+
+
 	/**
 	 * Inherit the prototype methods from one constructor into another.
 	 *
@@ -4573,11 +4573,11 @@
 	 * @param {function} superCtor Constructor function to inherit prototype from.
 	 */
 	exports.inherits = __webpack_require__(/*! inherits */ 29);
-	
+
 	exports._extend = function(origin, add) {
 	  // Don't do anything if add isn't an object
 	  if (!add || !isObject(add)) return origin;
-	
+
 	  var keys = Object.keys(add);
 	  var i = keys.length;
 	  while (i--) {
@@ -4585,11 +4585,11 @@
 	  }
 	  return origin;
 	};
-	
+
 	function hasOwnProperty(obj, prop) {
 	  return Object.prototype.hasOwnProperty.call(obj, prop);
 	}
-	
+
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }()), __webpack_require__(/*! /home/dp/Projects/sdk/~/process/browser.js */ 27)))
 
 /***/ },
@@ -4601,15 +4601,15 @@
 
 	// shim for using process in browser
 	var process = module.exports = {};
-	
+
 	// cached from whatever global is present so that test runners that stub it
 	// don't break things.  But we need to wrap it in a try catch in case it is
 	// wrapped in strict mode code which doesn't define any globals.  It's inside a
 	// function because try/catches deoptimize in certain engines.
-	
+
 	var cachedSetTimeout;
 	var cachedClearTimeout;
-	
+
 	function defaultSetTimout() {
 	    throw new Error('setTimeout has not been defined');
 	}
@@ -4658,8 +4658,8 @@
 	            return cachedSetTimeout.call(this, fun, 0);
 	        }
 	    }
-	
-	
+
+
 	}
 	function runClearTimeout(marker) {
 	    if (cachedClearTimeout === clearTimeout) {
@@ -4684,15 +4684,15 @@
 	            return cachedClearTimeout.call(this, marker);
 	        }
 	    }
-	
-	
-	
+
+
+
 	}
 	var queue = [];
 	var draining = false;
 	var currentQueue;
 	var queueIndex = -1;
-	
+
 	function cleanUpNextTick() {
 	    if (!draining || !currentQueue) {
 	        return;
@@ -4707,14 +4707,14 @@
 	        drainQueue();
 	    }
 	}
-	
+
 	function drainQueue() {
 	    if (draining) {
 	        return;
 	    }
 	    var timeout = runTimeout(cleanUpNextTick);
 	    draining = true;
-	
+
 	    var len = queue.length;
 	    while(len) {
 	        currentQueue = queue;
@@ -4731,7 +4731,7 @@
 	    draining = false;
 	    runClearTimeout(timeout);
 	}
-	
+
 	process.nextTick = function (fun) {
 	    var args = new Array(arguments.length - 1);
 	    if (arguments.length > 1) {
@@ -4744,7 +4744,7 @@
 	        runTimeout(drainQueue);
 	    }
 	};
-	
+
 	// v8 likes predictible objects
 	function Item(fun, array) {
 	    this.fun = fun;
@@ -4759,9 +4759,9 @@
 	process.argv = [];
 	process.version = ''; // empty string to avoid regexp issues
 	process.versions = {};
-	
+
 	function noop() {}
-	
+
 	process.on = noop;
 	process.addListener = noop;
 	process.once = noop;
@@ -4769,11 +4769,11 @@
 	process.removeListener = noop;
 	process.removeAllListeners = noop;
 	process.emit = noop;
-	
+
 	process.binding = function (name) {
 	    throw new Error('process.binding is not supported');
 	};
-	
+
 	process.cwd = function () { return '/' };
 	process.chdir = function (dir) {
 	    throw new Error('process.chdir is not supported');
@@ -4841,11 +4841,11 @@
 	 * @author Stanislav Kalashnik <darkpark.main@gmail.com>
 	 * @license GNU GENERAL PUBLIC LICENSE Version 3
 	 */
-	
+
 	'use strict';
-	
+
 	/* eslint new-cap: 0 */
-	
+
 	var //util    = require('util'),
 	    app       = __webpack_require__(/*! spa-app/lib/core */ 2),
 	    stringify = __webpack_require__(/*! cjs-query */ 4).stringify,
@@ -4854,8 +4854,8 @@
 	    //storage = require('./storage'),
 	    grid      = __webpack_require__(/*! ./grid */ 31),
 	    events    = {};
-	
-	
+
+
 	/**
 	 * Apply the given screen geometry and reload the page.
 	 *
@@ -4865,7 +4865,7 @@
 	function changeScreenDimension ( width, height ) {
 	    app.query.screenHeight = height;
 	    location.search = '?' + stringify(app.query);
-	
+
 	    // check if it's necessary
 	    /*if ( Number(localStorage.getItem('screen.height')) === height ) {
 	        // not really
@@ -4873,47 +4873,47 @@
 	    } else {
 	        // yes
 	        debug.log(util.format('switch to %sx%s', width, height), 'red');
-	
+
 	        // save in case of document reload
 	        localStorage.setItem('screen.height', height);
 	        localStorage.setItem('screen.width',  width);
-	
+
 	        // hide content to avoid raw HTML blinking
 	        document.body.style.display = 'none';
-	
+
 	        // apply new metrics
 	        app.setScreen(require('app:metrics')[height]);
-	
+
 	        // restore visibility
 	        document.body.style.display = '';
 	    }*/
 	}
-	
-	
+
+
 	// inherit SPA tools
 	//require('spa-develop/events');
-	
-	
+
+
 	events.load = function () {
 	    // export to globals div for develop HTML elements
 	    //window.$develop = document.body.appendChild(document.createElement('div'));
 	   // window.$develop.className = 'develop';
-	
+
 	    // apply dev css
 	    //document.body.classList.add('develop');
-	
+
 	    grid.init();
-	
+
 	    if ( app.develop.storage.getItem('grid.active') === 'true' ) {
 	        grid.show();
 	    }
-	
+
 	    // stress-testing
 	    //window.gremlins = require('gremlins.js/gremlins.min.js');
 	    //window.horde    = window.gremlins.createHorde();
 	};
-	
-	
+
+
 	events.keydown = function ( event ) {
 	    switch ( event.keyCode ) {
 	        //// numpad 0
@@ -4922,31 +4922,31 @@
 	        //    location.hash = '';
 	        //    location.reload();
 	        //    break;
-	
+
 	        // numpad 1
 	        case 97:
 	            // NTSC
 	            changeScreenDimension(720, 480);
 	            break;
-	
+
 	        // numpad 2
 	        case 98:
 	            // PAL
 	            changeScreenDimension(720, 576);
 	            break;
-	
+
 	        // numpad 3
 	        case 99:
 	            // 720p
 	            changeScreenDimension(1280, 720);
 	            break;
-	
+
 	        // numpad 4
 	        case 100:
 	            // 1080p
 	            changeScreenDimension(1920, 1080);
 	            break;
-	
+
 	        // numpad 5
 	        case 101:
 	            // debug grid
@@ -4958,13 +4958,13 @@
 	            debug.log('show grid: ' + grid.active, 'red');
 	            app.develop.storage.setItem('grid.active', grid.active.toString());
 	            break;
-	
+
 	        // numpad 6
 	        //case 102:
 	        //    // stress-testing for emulation
 	        //    window.horde.unleash({nb: 500});
 	        //    break;
-	
+
 	        // numpad 7
 	        //case 103:
 	        //    if ( !app.data.host ) {
@@ -4998,7 +4998,7 @@
 	        //        }
 	        //    }
 	        //    break;
-	
+
 	        // numpad 8
 	        //case 104:
 	        //    // FireBug Lite
@@ -5014,14 +5014,14 @@
 	        //        }
 	        //    }));
 	        //    break;
-	
+
 	        // numpad 9
 	        //case 105:
 	        //    // outline components and inner structures
 	        //    debug.log('toggle develop css layout', 'red');
 	        //    document.body.classList.toggle('develop');
 	        //    break;
-	
+
 	        // numpad .
 	        //case 110:
 	        //    // CSS reload
@@ -5034,13 +5034,13 @@
 	        //    break;
 	    }
 	};
-	
-	
+
+
 	// additional top-level key handlers
 	window.addEventListener('load',    events.load);
 	window.addEventListener('keydown', events.keydown);
-	
-	
+
+
 	// public
 	module.exports = events;
 
@@ -5059,91 +5059,91 @@
 	 * @author Stanislav Kalashnik <darkpark.main@gmail.com>
 	 * @license GNU GENERAL PUBLIC LICENSE Version 3
 	 */
-	
+
 	'use strict';
-	
+
 	var app     = __webpack_require__(/*! spa-app/lib/core */ 2),
 	    metrics = app.metrics;
 	    //storage = require('./storage');
-	
+
 	// public
 	module.exports = window.grid = {
-	
+
 	    /** @type {HTMLElement} */
 	    $canvas: null,
-	
+
 	    /** @type {CanvasRenderingContext2D} */
 	    ctx: null,
-	
+
 	    lineWidth: 1,
-	
+
 	    // content middle point
 	    centerX: 0,
 	    centerY: 0,
-	
+
 	    // last click point
 	    lastX: 0,
 	    lastY: 0,
-	
+
 	    // mouse pointer
 	    cursorX: 0,
 	    cursorY: 0,
-	
+
 	    // list of click points
 	    points: JSON.parse(app.develop.storage.getItem('grid.points') || '[]'),
-	
+
 	    // points to snap
 	    snaps: [],
-	
+
 	    // visible or not
 	    active: false,
-	
-	
+
+
 	    init: function () {
 	        // current execution context
 	        var self = this;
-	
+
 	        this.$canvas = document.body.appendChild(document.createElement('canvas'));
 	        this.ctx = this.$canvas.getContext('2d');
-	
+
 	        // apply size
 	        this.ctx.canvas.width  = metrics.width;
 	        this.ctx.canvas.height = metrics.height;
-	
+
 	        // safe zone center
 	        this.centerX = metrics.availWidth  / 2 + metrics.availLeft;
 	        this.centerY = metrics.availHeight / 2 + metrics.availTop;
-	
+
 	        this.snaps.push({x: metrics.availLeft,  y: metrics.availTop});
 	        this.snaps.push({x: metrics.width - metrics.availRight, y: metrics.height - metrics.availBottom});
 	        this.snaps.push({x: this.centerX, y: this.centerY});
-	
+
 	        this.ctx.lineWidth = this.lineWidth;
 	        this.ctx.font = '14px Ubuntu';
-	
+
 	        this.$canvas.addEventListener('contextmenu', function ( event ) {
 	            event.preventDefault();
 	        });
-	
+
 	        this.$canvas.addEventListener('mousedown', function ( event ) {
 	            self.mousedown(event);
 	        });
-	
+
 	        this.$canvas.addEventListener('mousemove', function ( event ) {
 	            self.mousemove(event);
 	        });
 	    },
-	
-	
+
+
 	    mousemove: function ( event ) {
 	        // current execution context
 	        var self = this;
-	
+
 	        this.cursorX = event.x;
 	        this.cursorY = event.y;
-	
+
 	        this.repaint();
-	
+
 	        if ( event.shiftKey ) {
 	            // snap to the point divisible by 10
 	            this.cursorX = Math.round(event.x / 10) * 10;
@@ -5159,23 +5159,23 @@
 	                }
 	            });
 	        }
-	
+
 	        this.drawPointer();
 	    },
-	
-	
+
+
 	    mousedown: function ( event ) {
 	        var matchPoint = null,
 	            self       = this,  // current execution context
 	            point;
-	
+
 	        // all clicked crosses
 	        this.points.forEach(function ( point ) {
 	            if ( self.cursorX === point.x && self.cursorY === point.y ) {
 	                matchPoint = point;
 	            }
 	        });
-	
+
 	        if ( event.button === 0 ) {
 	            // left mouse button
 	            if ( matchPoint === null ) {
@@ -5215,66 +5215,66 @@
 	        this.drawPointer();
 	        app.develop.storage.setItem('grid.points', JSON.stringify(this.points));
 	    },
-	
-	
+
+
 	    show: function () {
 	        this.active = true;
 	        this.$canvas.classList.add('active');
 	        this.repaint();
 	    },
-	
-	
+
+
 	    hide: function () {
 	        this.active = false;
 	        this.$canvas.classList.remove('active');
 	    },
-	
-	
+
+
 	    repaint: function () {
 	        var ctx  = this.ctx,
 	            self = this;  // current execution context
-	
+
 	        // remove all
 	        ctx.clearRect(0, 0, metrics.width, metrics.height);
-	
+
 	        // safe zone center
 	        this.drawCross({x: this.centerX, y: this.centerY}, {color: 'grey'});
-	
+
 	        // draw safe zone borders
 	        ctx.strokeStyle = 'red';
 	        ctx.strokeRect(metrics.availLeft + 0.5, metrics.availTop + 0.5, metrics.availWidth, metrics.availHeight);
-	
+
 	        // all clicked crosses
 	        this.points.forEach(function ( point ) {
 	            self.drawCross(point, {color: 'green', mark: 3});
 	        });
 	    },
-	
-	
+
+
 	    drawPointer: function () {
 	        var ctx    = this.ctx,
 	            height = 16,
 	            width, dx, dy, angle, title;
-	
+
 	        title = this.cursorX + ' : ' + this.cursorY;
-	
+
 	        // there were some clicks
 	        if ( this.lastX || this.lastY ) {
 	            // distance by X and Y from last point
 	            dx = this.cursorX - this.lastX;
 	            dy = this.cursorY - this.lastY;
 	            title = title + ' [' + (dx > 0 ? '+' : '') + dx + ', ' + (dy > 0 ? '+' : '') + dy + ']';
-	
+
 	            // angle of the line connecting the cursor and the last point
 	            angle = Math.atan2(dy, dx) * 180 / Math.PI;
 	            title = title + ' ' + angle.toFixed(2) + '°';
-	
+
 	            // not perpendicular
 	            if ( dx && dy ) {
 	                // distance between the cursor and the last point
 	                title = title + ' len: ' + Math.sqrt(Math.pow(Math.abs(dx), 2) + Math.pow(Math.abs(dy), 2)).toFixed(2);
 	            }
-	
+
 	            // angle line
 	            ctx.beginPath();
 	            // show by color if 45°
@@ -5283,13 +5283,13 @@
 	            ctx.lineTo(this.cursorX, this.cursorY);
 	            ctx.stroke();
 	        }
-	
+
 	        // pointer itself
 	        this.drawCross({x: this.cursorX, y: this.cursorY});
-	
+
 	        title = ' ' + title + ' ';
 	        width = ctx.measureText(title).width;
-	
+
 	        // title background
 	        ctx.fillStyle = 'yellow';
 	        ctx.fillRect(
@@ -5297,25 +5297,25 @@
 	            this.cursorY > this.centerY ? this.cursorY - height : this.cursorY,
 	            width, height
 	        );
-	
+
 	        // title itself
 	        ctx.fillStyle    = 'black';
 	        ctx.textBaseline = this.cursorY > this.centerY ? 'bottom' : 'top';
 	        ctx.textAlign    = this.cursorX > this.centerX ? 'right'  : 'left';
 	        ctx.fillText(title, this.cursorX, this.cursorY);
 	    },
-	
-	
+
+
 	    drawCross: function ( point, options ) {
 	        var ctx = this.ctx;
-	
+
 	        // defaults
 	        options = options || {};
-	
+
 	        // apply style options
 	        ctx.lineWidth   = options.width || this.lineWidth;
 	        ctx.strokeStyle = options.color || 'yellow';
-	
+
 	        ctx.beginPath();
 	        // horizontal line
 	        ctx.moveTo(0, point.y + 0.5);
@@ -5325,7 +5325,7 @@
 	        ctx.lineTo(point.x + 0.5, metrics.height);
 	        // draw
 	        ctx.stroke();
-	
+
 	        // center mark
 	        if ( options.mark ) {
 	            ctx.lineWidth = 3;
@@ -5341,7 +5341,7 @@
 	            ctx.lineWidth = this.lineWidth;
 	        }
 	    }
-	
+
 	};
 
 
@@ -5355,13 +5355,13 @@
 	/**
 	 * Loading page implementation.
 	 */
-	
+
 	'use strict';
-	
+
 	var Page = __webpack_require__(/*! stb-component-page */ 33),
 	    page = new Page({$node: window.pageInit});
-	
-	
+
+
 	// public
 	module.exports = page;
 
@@ -5377,12 +5377,12 @@
 	 * @license The MIT License (MIT)
 	 * @copyright Stanislav Kalashnik <darkpark.main@gmail.com>
 	 */
-	
+
 	'use strict';
-	
+
 	// public
 	module.exports = __webpack_require__(/*! spa-component-page */ 34);
-	
+
 	// correct component name
 	module.exports.prototype.name = 'stb-component-page';
 
@@ -5398,14 +5398,14 @@
 	 * @license The MIT License (MIT)
 	 * @copyright Stanislav Kalashnik <darkpark.main@gmail.com>
 	 */
-	
+
 	/* eslint no-path-concat: 0 */
-	
+
 	'use strict';
-	
+
 	var Component = __webpack_require__(/*! spa-component */ 35);
-	
-	
+
+
 	/**
 	 * Base page implementation.
 	 *
@@ -5430,15 +5430,19 @@
 	function Page ( config ) {
 	    // sanitize
 	    config = config || {};
-	
+
 	    console.assert(typeof this === 'object', 'must be constructed via new');
-	
+
 	    if ( true ) {
-	        if ( typeof config !== 'object' ) { throw new Error(__filename + ': wrong config type'); }
-	        // init parameters checks
-	        if ( config.className && typeof config.className !== 'string' ) { throw new Error(__filename + ': wrong or empty config.className'); }
+            if ( typeof config !== 'object' ) {
+                throw new Error(__filename + ': wrong config type');
+            }
+            // init parameters checks
+            if ( 'className' in config && (!config.className || typeof config.className !== 'string') ) {
+                throw new Error(__filename + ': wrong or empty config.className');
+            }
 	    }
-	
+
 	    /**
 	     * Page visibility/active state flag.
 	     *
@@ -5446,7 +5450,7 @@
 	     * @type {boolean}
 	     */
 	    this.active = false;
-	
+
 	    /**
 	     * Link to the currently active component with focus.
 	     *
@@ -5454,37 +5458,37 @@
 	     * @type {Component}
 	     */
 	    this.activeComponent = null;
-	
+
 	    // set default className if classList property empty or undefined
 	    //config.className = 'page ' + (config.className || '');
-	
+
 	    // parent constructor call
 	    Component.call(this, config);
-	
+
 	    // state flag
 	    this.active = this.$node.classList.contains('active');
-	
+
 	    // correct DOM parent/child connection if necessary
 	    if ( this.$node.parentNode === null ) {
 	        document.body.appendChild(this.$node);
 	    }
-	
+
 	    // always itself
 	    this.page = this;
 	}
-	
-	
+
+
 	// inheritance
 	Page.prototype = Object.create(Component.prototype);
 	Page.prototype.constructor = Page;
-	
+
 	// set component name
 	Page.prototype.name = 'spa-component-page';
-	
-	
+
+
 	// public
 	module.exports = Page;
-	
+
 	/* WEBPACK VAR INJECTION */}.call(exports, "../../spasdk/component-page/index.js"))
 
 /***/ },
@@ -5498,16 +5502,16 @@
 	 * @license The MIT License (MIT)
 	 * @copyright Stanislav Kalashnik <darkpark.main@gmail.com>
 	 */
-	
+
 	/* eslint no-path-concat: 0 */
-	
+
 	'use strict';
-	
+
 	var app     = __webpack_require__(/*! spa-app/lib/core */ 2),
 	    Emitter = __webpack_require__(/*! cjs-emitter */ 3),
 	    counter = 0;
-	
-	
+
+
 	/**
 	 * Base component implementation.
 	 *
@@ -5548,23 +5552,37 @@
 	    // current execution context
 	    var self = this,
 	        name;
-	
+
 	    // sanitize
 	    config = config || {};
-	
+
 	    console.assert(typeof this === 'object', 'must be constructed via new');
-	
+
 	    if ( true ) {
-	        if ( typeof config !== 'object' ) { throw new Error(__filename + ': wrong config type'); }
-	        // init parameters checks
-	        if ( config.id        && typeof config.id !== 'string'         ) { throw new Error(__filename + ': wrong or empty config.id'); }
-	        if ( config.className && typeof config.className !== 'string'  ) { throw new Error(__filename + ': wrong or empty config.className'); }
-	        if ( config.$node     && !(config.$node instanceof Element)    ) { throw new Error(__filename + ': wrong config.$node type'); }
-	        if ( config.$body     && !(config.$body instanceof Element)    ) { throw new Error(__filename + ': wrong config.$body type'); }
-	        if ( config.parent    && !(config.parent instanceof Component) ) { throw new Error(__filename + ': wrong config.parent type'); }
-	        if ( config.children  && !Array.isArray(config.children)       ) { throw new Error(__filename + ': wrong config.children type'); }
+            if ( typeof config !== 'object' ) {
+                throw new Error(__filename + ': wrong config type');
+            }
+            // init parameters checks
+            if ( config.id && typeof config.id !== 'string' ) {
+                throw new Error(__filename + ': wrong or empty config.id');
+            }
+            if ( 'className' in config && (!config.className || typeof config.className !== 'string') ) {
+                throw new Error(__filename + ': wrong or empty config.className');
+            }
+            if ( config.$node && !(config.$node instanceof Element) ) {
+                throw new Error(__filename + ': wrong config.$node type');
+            }
+            if ( config.$body && !(config.$body instanceof Element) ) {
+                throw new Error(__filename + ': wrong config.$body type');
+            }
+            if ( config.parent && !(config.parent instanceof Component) ) {
+                throw new Error(__filename + ': wrong config.parent type');
+            }
+            if ( config.children && !Array.isArray(config.children) ) {
+                throw new Error(__filename + ': wrong config.children type');
+            }
 	    }
-	
+
 	    /**
 	     * Component visibility state flag.
 	     *
@@ -5572,21 +5590,21 @@
 	     * @type {boolean}
 	     */
 	    this.visible = true;
-	
+
 	    /**
 	     * Component can accept focus or not.
 	     *
 	     * @type {boolean}
 	     */
 	    this.focusable = true;
-	
+
 	    /**
 	     * DOM outer handle.
 	     *
 	     * @type {Element}
 	     */
 	    this.$node = null;
-	
+
 	    /**
 	     * DOM inner handle.
 	     * In simple cases is the same as $node.
@@ -5594,21 +5612,21 @@
 	     * @type {Element}
 	     */
 	    this.$body = null;
-	
+
 	    /**
 	     * Link to the parent component which has this component as a child.
 	     *
 	     * @type {Component}
 	     */
 	    this.parent = null;
-	
+
 	    /**
 	     * List of all children components.
 	     *
 	     * @type {Component[]}
 	     */
 	    this.children = [];
-	
+
 	    /**
 	     * allow to emit events to the parent component
 	     *
@@ -5616,77 +5634,77 @@
 	     * @type {boolean}
 	     */
 	    this.propagate = !!config.propagate;
-	
+
 	    // parent constructor call
 	    Emitter.call(this);
-	
+
 	    // outer handle - empty div in case nothing is given
 	    this.$node = config.$node || document.createElement('div');
-	
+
 	    // inner handle - the same as outer handler in case nothing is given
 	    this.$body = config.$body || this.$node;
-	
+
 	    // set CSS class names
 	    //this.$node.className += ' component ' + (config.className || '');
 	    this.$node.className = this.name + ' ' + (config.className || '');
-	
+
 	    // apply component id if given, generate otherwise
 	    this.id = config.id || this.$node.id || 'cid' + counter++;
-	
+
 	    // apply hierarchy
 	    if ( config.parent ) {
 	        // add to parent component
 	        config.parent.add(this);
 	    }
-	
+
 	    // apply given visibility
 	    if ( config.visible === false ) {
 	        // default state is visible
 	        this.hide();
 	    }
-	
+
 	    // apply focus handling method
 	    if ( config.focusable === false ) {
 	        // can't accept focus
 	        this.focusable = false;
 	    }
-	
+
 	    // a descendant defined own events
 	    if ( this.defaultEvents ) {
 	        // sanitize
 	        config.events = config.events || {};
-	
+
 	        if ( true ) {
 	            if ( typeof config.events !== 'object' ) { throw new Error(__filename + ': wrong config.events type'); }
 	            if ( typeof this.defaultEvents !== 'object' ) { throw new Error(__filename + ': wrong this.defaultEvents type'); }
 	        }
-	
+
 	        for ( name in this.defaultEvents ) {
 	            // overwrite default events with user-defined
 	            config.events[name] = config.events[name] || this.defaultEvents[name];
 	        }
 	    }
-	
+
 	    if ( config.events ) {
 	        // apply all given events
 	        Object.keys(config.events).forEach(function ( name ) {
 	            self.addListener(name, config.events[name]);
 	        });
 	    }
-	
+
 	    // apply the given children components
 	    if ( config.children ) {
 	        // apply
 	        this.add.apply(this, config.children);
 	    }
-	
+
 	    // component activation by mouse
 	    this.$node.addEventListener('click', function ( event ) {
 	        // left mouse button
 	        //if ( event.button === 0 ) {
 	        // activate if possible
 	        self.focus();
-	
+
 	        // there are some listeners
 	        if ( self.events['click'] ) {
 	            /**
@@ -5700,7 +5718,7 @@
 	            self.emit('click', event);
 	        }
 	        //}
-	
+
 	        if ( true ) {
 	            // middle mouse button
 	            if ( event.button === 1 ) {
@@ -5710,39 +5728,39 @@
 	                self.$node.classList.toggle('wired');
 	            }
 	        }
-	
+
 	        event.stopPropagation();
 	    });
-	
+
 	    if ( true ) {
 	        // expose inner ID to global scope
 	        window[self.id] = self.$node;
-	
+
 	        // expose a link
 	        this.$node.component = this.$body.component = this;
 	        this.$node.title = this.name + '#' + this.id + ' (outer)';
 	        this.$body.title = this.name + '#' + this.id + ' (inner)';
 	    }
-	
+
 	    debug.info('create component ' + this.name + '#' + this.id, null, {
 	        tags: ['create', 'component', this.name, this.id]
 	    });
 	}
-	
-	
+
+
 	// inheritance
 	Component.prototype = Object.create(Emitter.prototype);
 	Component.prototype.constructor = Component;
-	
-	
+
+
 	/**
 	 * List of all default event callbacks.
 	 *
 	 * @type {Object.<string, function>}
 	 */
 	Component.prototype.defaultEvents = null;
-	
-	
+
+
 	/**
 	 * Add a new component as a child.
 	 *
@@ -5758,28 +5776,28 @@
 	 */
 	Component.prototype.add = function ( child ) {
 	    var index;
-	
+
 	    // walk through all the given elements
 	    for ( index = 0; index < arguments.length; index++ ) {
 	        child = arguments[index];
-	
+
 	        if ( true ) {
 	            if ( !(child instanceof Component) ) { throw new Error(__filename + ': wrong child type'); }
 	        }
-	
+
 	        // apply
 	        this.children.push(child);
 	        child.parent = this;
-	
+
 	        // correct DOM parent/child connection if necessary
 	        if ( child.$node && child.$node.parentNode === null ) {
 	            this.$body.appendChild(child.$node);
 	        }
-	
+
 	        debug.info('add component ' + child.name + '#' + child.id + ' to ' + this.name + '#' + this.id, null, {
 	            tags: ['add', 'component', this.name, this.id, child.name, child.id]
 	        });
-	
+
 	        // there are some listeners
 	        if ( this.events['add'] ) {
 	            /**
@@ -5792,12 +5810,12 @@
 	             */
 	            this.emit('add', {item: child});
 	        }
-	
+
 	        //debug.log('component ' + this.name + '#' + this.id + ' new child: ' + child.name + '#' + child.id);
 	    }
 	};
-	
-	
+
+
 	/* @todo: consider activation in future */
 	///**
 	// * Insert component into the specific position.
@@ -5829,8 +5847,8 @@
 	//        child.parent = this;
 	//    }
 	//};
-	
-	
+
+
 	/**
 	 * Delete this component and clear all associated events.
 	 *
@@ -5842,7 +5860,7 @@
 	        if ( true ) {
 	            if ( !(this.parent instanceof Component) ) { throw new Error(__filename + ': wrong this.parent type'); }
 	        }
-	
+
 	        // active at the moment
 	        if ( app.activePage.activeComponent === this ) {
 	            this.blur();
@@ -5850,21 +5868,21 @@
 	        }
 	        this.parent.children.splice(this.parent.children.indexOf(this), 1);
 	    }
-	
+
 	    // remove all children
 	    this.children.forEach(function ( child ) {
 	        if ( true ) {
 	            if ( !(child instanceof Component) ) { throw new Error(__filename + ': wrong child type'); }
 	        }
-	
+
 	        child.remove();
 	    });
-	
+
 	    // remove all listeners
 	    this.events = {};
-	
+
 	    this.$node.parentNode.removeChild(this.$node);
-	
+
 	    // there are some listeners
 	    if ( this.events['remove'] ) {
 	        /**
@@ -5874,14 +5892,14 @@
 	         */
 	        this.emit('remove');
 	    }
-	
+
 	    //debug.log('component ' + this.name + '#' + this.id + ' remove', 'red');
 	    debug.info('remove component ' + this.name + '#' + this.id, null, {
 	        tags: ['remove', 'component', this.name, this.id]
 	    });
 	};
-	
-	
+
+
 	/**
 	 * Activate the component.
 	 * Notify the owner-page and apply CSS class.
@@ -5895,24 +5913,24 @@
 	Component.prototype.focus = function ( data ) {
 	    var activePage = app.activePage,
 	        activeItem = activePage.activeComponent;
-	
+
 	    // this is a visual component on a page
 	    // not already focused and can accept focus
 	    if ( this.focusable && this !== activeItem ) {
 	        // notify the current active component
 	        if ( activeItem ) { activeItem.blur(); }
-	
+
 	        /* eslint consistent-this: 0 */
-	
+
 	        // apply
 	        activePage.activeComponent = activeItem = this;
 	        activeItem.$node.classList.add('focus');
-	
+
 	        //debug.log('component ' + this.name + '#' + this.id + ' focus');
 	        debug.info('focus component ' + this.name + '#' + this.id, null, {
 	            tags: ['focus', 'component', this.name, this.id]
 	        });
-	
+
 	        // there are some listeners
 	        if ( activeItem.events['focus'] ) {
 	            /**
@@ -5922,15 +5940,15 @@
 	             */
 	            activeItem.emit('focus', data);
 	        }
-	
+
 	        return true;
 	    }
-	
+
 	    // nothing was done
 	    return false;
 	};
-	
-	
+
+
 	/**
 	 * Remove focus.
 	 * Change page.activeComponent and notify subscribers.
@@ -5942,19 +5960,19 @@
 	Component.prototype.blur = function () {
 	    var activePage = app.activePage,
 	        activeItem = activePage.activeComponent;
-	
+
 	    // apply visuals anyway
 	    this.$node.classList.remove('focus');
-	
+
 	    // this is the active component
 	    if ( this === activeItem ) {
 	        activePage.activeComponent = null;
-	
+
 	        //debug.log('component ' + this.name + '#' + this.id + ' blur', 'grey');
 	        debug.info('blur component ' + this.name + '#' + this.id, null, {
 	            tags: ['blur', 'component', this.name, this.id]
 	        });
-	
+
 	        // there are some listeners
 	        if ( this.events['blur'] ) {
 	            /**
@@ -5964,19 +5982,19 @@
 	             */
 	            this.emit('blur');
 	        }
-	
+
 	        return true;
 	    }
-	
+
 	    debug.warn('component ' + this.name + '#' + this.id + ' attempt to blur without link to a page', null, {
 	        tags: ['blur', 'component', this.name, this.id]
 	    });
-	
+
 	    // nothing was done
 	    return false;
 	};
-	
-	
+
+
 	/**
 	 * Make the component visible and notify subscribers.
 	 *
@@ -5993,11 +6011,11 @@
 	        this.$node.classList.remove('hidden');
 	        // flag
 	        this.visible = true;
-	
+
 	        debug.info('show component ' + this.name + '#' + this.id, null, {
 	            tags: ['show', 'component', this.name, this.id]
 	        });
-	
+
 	        // there are some listeners
 	        if ( this.events['show'] ) {
 	            /**
@@ -6007,15 +6025,15 @@
 	             */
 	            this.emit('show', data);
 	        }
-	
+
 	        return true;
 	    }
-	
+
 	    // nothing was done
 	    return true;
 	};
-	
-	
+
+
 	/**
 	 * Make the component hidden and notify subscribers.
 	 *
@@ -6030,11 +6048,11 @@
 	        this.$node.classList.add('hidden');
 	        // flag
 	        this.visible = false;
-	
+
 	        debug.info('hide component ' + this.name + '#' + this.id, null, {
 	            tags: ['hide', 'component', this.name, this.id]
 	        });
-	
+
 	        // there are some listeners
 	        if ( this.events['hide'] ) {
 	            /**
@@ -6044,18 +6062,18 @@
 	             */
 	            this.emit('hide');
 	        }
-	
+
 	        return true;
 	    }
-	
+
 	    // nothing was done
 	    return true;
 	};
-	
-	
+
+
 	// public
 	module.exports = Component;
-	
+
 	/* WEBPACK VAR INJECTION */}.call(exports, "../../spasdk/component/index.js"))
 
 /***/ },
@@ -6068,13 +6086,13 @@
 	/**
 	 * Main page implementation.
 	 */
-	
+
 	'use strict';
-	
+
 	var Page = __webpack_require__(/*! stb-component-page */ 33),
 	    page = new Page({$node: window.pageMain});
-	
-	
+
+
 	// public
 	module.exports = page;
 
