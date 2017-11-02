@@ -5,7 +5,7 @@
 'use strict';
 
 var Page = require('stb-component-page'),
-    page = new Page({$node: window.pageMain});
+    page = new Page({$node: document.getElementById('pageMain')});
 
 
 // public
