@@ -52,6 +52,7 @@ Object.assign(runner.tasks,
         source: path.join(source, 'pug', 'main.pug'),
         target: path.join(target, 'index.html'),
         variables: {
+            develop: false,
             package: require('../package')
         }
     }),
@@ -93,7 +94,11 @@ Object.assign(runner.tasks,
                             dead_code: true,
                             drop_console: true,
                             drop_debugger: true,
-                            properties: false
+                            properties: false,
+                            pure_funcs: [
+                                'debug.assert', 'debug.log', 'debug.info', 'debug.warn', 'debug.fail', 'debug.inspect',
+                                'debug.event', 'debug.stub', 'debug.time', 'debug.timeEnd'
+                            ]
                         }
                     }
                 })
@@ -113,17 +118,17 @@ resolutions.forEach(function ( resolution ) {
     Object.assign(runner.tasks,
         require('@runner/generator-sass')({
             file: path.join(source, 'sass', 'release.' + resolution + '.scss'),
-            outFile: path.join(target, 'css', 'release.app.' + resolution + '.css'),
+            outFile: path.join(target, 'css', 'app.' + resolution + '.css'),
             outputStyle: 'compressed',
             // specify a sourceMap for debugging
-            sourceMap: path.join(target, 'css', 'release.app.' + resolution + '.map')
+            sourceMap: path.join(target, 'css', 'app.' + resolution + '.map')
         }, {
             suffix: ':' + resolution
         }),
 
         css({
             resolution: resolution,
-            outFile: path.join(target, 'css', 'release.sdk.' + resolution + '.css'),
+            outFile: path.join(target, 'css', 'sdk.' + resolution + '.css'),
             mode: 'release'
         }, {
             suffix: ':' + resolution
