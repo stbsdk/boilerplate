@@ -4,7 +4,8 @@
 
 'use strict';
 
-var path   = require('path'),
+var fs     = require('fs'),
+    path   = require('path'),
     runner = require('runner'),
     tools  = require('@runner/tools'),
     logger = require('@runner/logger'),
@@ -22,15 +23,13 @@ function build ( config, done ) {
 
     Object.keys(packageData.dependencies || {}).concat(Object.keys(packageData.devDependencies || {})).forEach(function ( name ) {
         if ( name.indexOf('stb-component-') === 0 ) {
-            modules.push(path.resolve('node_modules', name, 'css', config.mode + '.' + config.resolution + '.css'));
+            modules.push(path.join('node_modules', name, 'css', config.mode + '.' + config.resolution + '.css'));
         }
     });
 
     async.parallel(modules.map(function ( module ) {
         return function ( ready ) {
-            tools.read(module, log, function ( error, data ) {
-                ready(error, data);
-            });
+            fs.readFile(module, ready);
         };
     }), function ( error, results ) {
         if ( !error ) {
