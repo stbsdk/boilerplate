@@ -4,12 +4,8 @@ html
         title=package.name
         meta(charset="utf-8")
         meta(name="description" content=package.description)
-        link(rel="icon", type="image/png", href="img/favicon.png")
-
-        if develop
-            script(type="text/javascript", src="main.js")
-        else
-            script(type="text/javascript", src="main.js")
+        link(rel="icon" href="data:,")
+        script(type="text/javascript", src="main.js")
 
     body
         include pages/init

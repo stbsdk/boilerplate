@@ -100,15 +100,15 @@ resolutions.forEach(function ( resolution ) {
     Object.assign(runner.tasks,
         require('@runner/generator-sass')({
             file: path.join(source, 'sass', 'develop.' + resolution + '.scss'),
-            outFile: path.join(target, 'css', 'develop.app.' + resolution + '.css'),
-            sourceMap: path.join(target, 'css', 'develop.app.' + resolution + '.map')
+            outFile: path.join(target, 'css', 'app.' + resolution + '.css'),
+            sourceMap: path.join(target, 'css', 'app.' + resolution + '.map')
         }, {
             suffix: ':' + resolution
         }),
 
         css({
             resolution: resolution,
-            outFile: path.join(target, 'css', 'develop.sdk.' + resolution + '.css'),
+            outFile: path.join(target, 'css', 'sdk.' + resolution + '.css'),
             mode: 'develop'
         }, {
             suffix: ':' + resolution
