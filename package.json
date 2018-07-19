@@ -20,13 +20,13 @@
         "start": "npm run develop"
     },
     "dependencies": {
-        "stb-app": "^1.5.0",
+        "stb-app": "^2.0.0",
         "stb-component-page": "^1.4.0",
         "stb-keys": "^1.4.3"
     },
     "devDependencies": {
         "@runner/generator-eslint": "^1.0.1",
-        "@runner/generator-gettext": "^1.1.0",
+        "@runner/generator-gettext": "^1.2.0",
         "@runner/generator-livereload": "^1.1.0",
         "@runner/generator-notify": "^1.0.0",
         "@runner/generator-pug": "^1.0.0",
