@@ -15,7 +15,7 @@ var fs     = require('fs'),
 
 
 function build ( config, done ) {
-    var modules = [],
+    var modules  = ['stb-app'],
         packageData;
 
     delete require.cache[require.resolve('../package')];
@@ -23,13 +23,13 @@ function build ( config, done ) {
 
     Object.keys(packageData.dependencies || {}).concat(Object.keys(packageData.devDependencies || {})).forEach(function ( name ) {
         if ( name.indexOf('stb-component-') === 0 ) {
-            modules.push(path.join('node_modules', name, 'css', config.mode + '.' + config.resolution + '.css'));
+            modules.push(name);
         }
     });
 
     async.parallel(modules.map(function ( module ) {
         return function ( ready ) {
-            fs.readFile(module, ready);
+            fs.readFile(path.join('node_modules', module, 'css', config.mode + '.' + config.resolution + '.css'), ready);
         };
     }), function ( error, results ) {
         if ( !error ) {
