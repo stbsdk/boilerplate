@@ -21,15 +21,15 @@ function build ( config, done ) {
     delete require.cache[require.resolve('../package')];
     packageData = require('../package');
 
-    Object.keys(packageData.dependencies || {}).concat(Object.keys(packageData.devDependencies || {})).forEach(function ( name ) {
-        if ( name.indexOf('stb-component-') === 0 ) {
-            modules.push(name);
+    Object.keys(packageData.dependencies || {}).concat(Object.keys(packageData.devDependencies || {})).forEach(function ( moduleName ) {
+        if ( moduleName.indexOf('stb-component-') === 0 ) {
+            modules.push(moduleName);
         }
     });
 
-    async.parallel(modules.map(function ( module ) {
+    async.parallel(modules.map(function ( moduleName ) {
         return function ( ready ) {
-            fs.readFile(path.join('node_modules', module, 'css', config.mode + '.' + config.resolution + '.css'), ready);
+            fs.readFile(path.join('node_modules', moduleName, 'css', config.mode + '.' + config.resolution + '.css'), ready);
         };
     }), function ( error, results ) {
         if ( !error ) {

@@ -19,7 +19,9 @@ var path        = require('path'),
 // to get all tasks running state
 // require('node-runner/lib/status');
 
-Object.assign(runner.tasks,
+Object.assign(
+    runner.tasks,
+
     // activate popup notifications on errors
     require('@runner/generator-notify')(),
 
@@ -97,7 +99,9 @@ Object.assign(runner.tasks,
 );
 
 resolutions.forEach(function ( resolution ) {
-    Object.assign(runner.tasks,
+    Object.assign(
+        runner.tasks,
+
         require('@runner/generator-sass')({
             file: path.join(source, 'sass', 'develop.' + resolution + '.scss'),
             outFile: path.join(target, 'css', 'app.' + resolution + '.css'),
