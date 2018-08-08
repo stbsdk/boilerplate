@@ -19,13 +19,12 @@
         "test": "npm run lint"
     },
     "dependencies": {
-        "stb-app": "1.*.*",
-        "stb-component-page": "1.*.*",
-        "stb-keys": "1.*.*"
+        "stb-app": "^2.0.1",
+        "stb-component-page": "^1.4.0",
+        "stb-keys": "^1.4.3"
     },
     "devDependencies": {
-        "eslint": "4.*.*",
-        "stb-eslint-config": "1.*.*"
+        "stb-eslint": "^1.0.0"
     },
     "license": "MIT"
 }
