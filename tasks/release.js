@@ -7,8 +7,8 @@
 
 var path        = require('path'),
     runner      = require('runner'),
-    tools       = require('@runner/tools'),
-    logger      = require('@runner/logger'),
+    tools       = require('runner-tools'),
+    logger      = require('runner-logger'),
     webpack     = require('webpack'),
     UglifyJS    = require('uglifyjs-webpack-plugin'),
     css         = require('./css'),
@@ -25,20 +25,20 @@ Object.assign(
     runner.tasks,
 
     // activate popup notifications on errors
-    require('@runner/generator-notify')(),
+    require('runner-generator-notify')(),
 
-    require('@runner/generator-repl')({
+    require('runner-generator-repl')({
         runner: runner
     }),
 
-    require('@runner/generator-eslint')({
+    require('runner-generator-eslint')({
         watch: [
             path.join(source, 'js', '**', '*.js'),
             path.join('tasks', '**', '*.js')
         ]
     }),
 
-    require('@runner/generator-gettext')({
+    require('runner-generator-gettext')({
         // add languages to translate
         languages: [/*'fr'*/],
         source: path.join(source, 'lang'),
@@ -46,11 +46,11 @@ Object.assign(
         jsData: [path.join(source, 'js')]
     }),
 
-    require('@runner/generator-static')({
+    require('runner-generator-static')({
         open: path.join(target)
     }),
 
-    require('@runner/generator-pug')({
+    require('runner-generator-pug')({
         source: path.join(source, 'pug', 'main.pug'),
         target: path.join(target, 'index.html'),
         variables: {
@@ -59,7 +59,7 @@ Object.assign(
         }
     }),
 
-    require('@runner/generator-webpack')({
+    require('runner-generator-webpack')({
         mode: 'production',
         entry: path.resolve(path.join(source, 'js', 'main.js')),
         output: {
@@ -98,8 +98,16 @@ Object.assign(
                             drop_debugger: true,
                             properties: false,
                             pure_funcs: [
-                                'debug.assert', 'debug.log', 'debug.info', 'debug.warn', 'debug.fail', 'debug.inspect',
-                                'debug.event', 'debug.stub', 'debug.time', 'debug.timeEnd'
+                                'debug.assert',
+                                'debug.log',
+                                'debug.info',
+                                'debug.warn',
+                                'debug.fail',
+                                'debug.inspect',
+                                'debug.event',
+                                'debug.stub',
+                                'debug.time',
+                                'debug.timeEnd'
                             ]
                         }
                     }
@@ -120,7 +128,7 @@ resolutions.forEach(function ( resolution ) {
     Object.assign(
         runner.tasks,
 
-        require('@runner/generator-sass')({
+        require('runner-generator-sass')({
             file: path.join(source, 'sass', 'release.' + resolution + '.scss'),
             outFile: path.join(target, 'css', 'app.' + resolution + '.css'),
             outputStyle: 'compressed',

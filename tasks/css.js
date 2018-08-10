@@ -7,8 +7,8 @@
 var fs     = require('fs'),
     path   = require('path'),
     runner = require('runner'),
-    tools  = require('@runner/tools'),
-    logger = require('@runner/logger'),
+    tools  = require('runner-tools'),
+    logger = require('runner-logger'),
     async  = require('cjs-async'),
     name   = 'css',
     log    = logger.wrap(name);
