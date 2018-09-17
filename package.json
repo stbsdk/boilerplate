@@ -20,12 +20,13 @@
         "start": "npm run develop"
     },
     "dependencies": {
-        "stb-app": "^2.0.1",
-        "stb-component-page": "^1.4.0",
-        "stb-keys": "^1.4.3"
+        "stb-app": "^2.0.2",
+        "stb-component-page": "^1.4.1",
+        "stb-keys": "^1.4.4"
     },
     "devDependencies": {
         "cjs-async": "^1.6.0",
+        "runner": "^2.0.1",
         "runner-generator-eslint": "^1.0.2",
         "runner-generator-gettext": "^1.2.1",
         "runner-generator-livereload": "^1.1.1",
@@ -37,9 +38,8 @@
         "runner-generator-webpack": "^1.0.2",
         "runner-logger": "^1.0.1",
         "runner-tools": "^1.2.1",
-        "runner": "^2.0.1",
-        "stb-eslint": "^1.0.0",
-        "uglifyjs-webpack-plugin": "^1.2.7"
+        "stb-eslint": "^1.0.1",
+        "uglifyjs-webpack-plugin": "^2.0.0"
     },
     "license": "MIT"
 }
