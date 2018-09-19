@@ -1,4 +1,4 @@
 Application Jade files
 ======================
 
-The directory contains source [Jade](http://jade-lang.com/) files to generate development and release [HTML files](../../app/).
+The directory contains source [Pug](https://pugjs.org/) files to generate HTML files.
