@@ -33,16 +33,7 @@ function build ( config, done ) {
         };
     }), function ( error, results ) {
         if ( !error ) {
-            tools.write(
-                [
-                    {
-                        name: config.outFile,
-                        data: results.join('\n')
-                    }
-                ],
-                log,
-                done
-            );
+            tools.write([{name: config.outFile, data: results.join('\n')}], log, done);
         }
     });
 }
