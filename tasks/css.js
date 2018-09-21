@@ -15,7 +15,7 @@ var fs     = require('fs'),
 
 
 function build ( config, done ) {
-    var modules  = ['stb-app'],
+    var modules = ['stb-app'],
         packageData;
 
     delete require.cache[require.resolve('../package')];
@@ -27,15 +27,31 @@ function build ( config, done ) {
         }
     });
 
-    async.parallel(modules.map(function ( moduleName ) {
-        return function ( ready ) {
-            fs.readFile(path.join('node_modules', moduleName, 'css', config.mode + '.' + config.resolution + '.css'), ready);
-        };
-    }), function ( error, results ) {
-        if ( !error ) {
+    // concatenate all given files into one
+    // without error handling (only displaying)
+    async.parallel(
+        modules.map(function ( moduleName ) {
+            return function ( ready ) {
+                var file = path.join('node_modules', moduleName, 'css', config.mode + '.' + config.resolution + '.css');
+
+                if ( !fs.existsSync(file) ) {
+                    file = path.join('node_modules', moduleName, 'css', config.mode + '.css');
+                }
+
+                fs.readFile(file, function ( error, data ) {
+                    if ( error ) {
+                        log.warn(error.toString());
+                    }
+
+                    ready(null, data);
+                });
+            };
+        }),
+        // eslint-disable-next-line handle-callback-err
+        function ( error, results ) {
             tools.write([{name: config.outFile, data: results.join('\n')}], log, done);
         }
-    });
+    );
 }
 
 
