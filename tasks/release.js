@@ -77,13 +77,13 @@ Object.assign(
             aggregateTimeout: 50
         },
         // choose a developer tool to enhance debugging
-        // devtool: 'source-map',
+        devtool: 'source-map',
         optimization: {
             minimize: true,
             minimizer: [
                 new UglifyJS({
                     // set true to sourceMap to get correct map-file
-                    // sourceMap: true,
+                    sourceMap: true,
                     uglifyOptions: {
                         output: {
                             comments: false
