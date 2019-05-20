@@ -119,7 +119,10 @@ Object.assign(
             new webpack.DefinePlugin({
                 DEVELOP: false
             }),
-            new webpack.optimize.OccurrenceOrderPlugin()
+            new webpack.optimize.OccurrenceOrderPlugin(),
+            new webpack.ProvidePlugin({
+                jsxDomTag: ['spa-dom/jsx.js', 'tag']
+            })
         ],
         module: {
             rules: [
