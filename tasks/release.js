@@ -10,7 +10,7 @@ var path        = require('path'),
     tools       = require('runner-tools'),
     logger      = require('runner-logger'),
     webpack     = require('webpack'),
-    UglifyJS    = require('uglifyjs-webpack-plugin'),
+    Terser      = require('terser-webpack-plugin'),
     css         = require('./css'),
     resolutions = ['480', '576', '720', '1080'],
     source      = 'src',
@@ -81,10 +81,10 @@ Object.assign(
         optimization: {
             minimize: true,
             minimizer: [
-                new UglifyJS({
+                new Terser({
                     // set true to sourceMap to get correct map-file
                     sourceMap: true,
-                    uglifyOptions: {
+                    terserOptions: {
                         output: {
                             comments: false
                         },
@@ -119,8 +119,29 @@ Object.assign(
             new webpack.DefinePlugin({
                 DEVELOP: false
             }),
-            new webpack.optimize.OccurrenceOrderPlugin()
-        ]
+            new webpack.optimize.OccurrenceOrderPlugin(),
+            new webpack.ProvidePlugin({
+                jsxDomTag: ['spa-dom/jsx.js', 'tag']
+            })
+        ],
+        module: {
+            rules: [
+                {
+                    test: /\.js$/,
+                    exclude: /node_modules/,
+                    use: {
+                        loader: 'babel-loader?cacheDirectory',
+                        options: {
+                            presets: [['@babel/preset-env', {loose: true, modules: 'commonjs'}]],
+                            plugins: [
+                                '@babel/plugin-transform-runtime',
+                                ['@babel/plugin-transform-react-jsx', {pragma: 'jsxDomTag'}]
+                            ]
+                        }
+                    }
+                }
+            ]
+        }
     })
 );
 
