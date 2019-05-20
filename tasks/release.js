@@ -120,7 +120,25 @@ Object.assign(
                 DEVELOP: false
             }),
             new webpack.optimize.OccurrenceOrderPlugin()
-        ]
+        ],
+        module: {
+            rules: [
+                {
+                    test: /\.js$/,
+                    exclude: /node_modules/,
+                    use: {
+                        loader: 'babel-loader?cacheDirectory',
+                        options: {
+                            presets: [['@babel/preset-env', {loose: true, modules: 'commonjs'}]],
+                            plugins: [
+                                '@babel/plugin-transform-runtime',
+                                ['@babel/plugin-transform-react-jsx', {pragma: 'jsxDomTag'}]
+                            ]
+                        }
+                    }
+                }
+            ]
+        }
     })
 );
 
